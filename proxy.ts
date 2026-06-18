@@ -18,6 +18,8 @@ export function proxy(request: NextRequest) {
   // Sin sesión → forzar login
   const session = request.cookies.get(SESSION)?.value
   if (!session) {
+    const url = request.nextUrl.pathname
+    if (url === '/') return NextResponse.next()
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -25,5 +27,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|api|$).+)'],
 }
