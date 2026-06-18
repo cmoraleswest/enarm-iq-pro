@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { stripe, PLANS } from '@/lib/stripe'
+import { getStripe, PLANS } from '@/lib/stripe'
 import { getUserProfile } from '@/lib/firestore'
 import { getCreditBalance } from '@/lib/referrals'
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const creditBalance = await getCreditBalance(uid)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://enarm-iq.vercel.app'
 
-    const checkoutSession = await stripe.checkout.sessions.create({
+    const checkoutSession = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{ price: selectedPlan.priceId, quantity: 1 }],
       mode: 'subscription',

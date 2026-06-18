@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { adminFirestore } from '@/lib/firebase-admin'
 import { creditReferrerIfExists } from '@/lib/referrals'
 
@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   const sig = req.headers.get('stripe-signature')!
   let event
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch {
     return NextResponse.json({ error: 'Webhook inválido' }, { status: 400 })
   }
