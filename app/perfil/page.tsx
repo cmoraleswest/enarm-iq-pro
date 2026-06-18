@@ -55,7 +55,7 @@ export default function PerfilPage() {
     return (
       <main style={S.main}>
         <p style={{ color: '#f87171', textAlign: 'center', marginTop: 80 }}>{error || 'Sin datos disponibles aún.'}</p>
-        <button onClick={() => router.push('/home')} style={S.btnBack}>← Inicio</button>
+        <button onClick={() => window.location.href = '/home'} style={S.btnBack}>← Inicio</button>
       </main>
     )
   }
@@ -88,7 +88,7 @@ export default function PerfilPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.push('/home')} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}>←</button>
+          <button onClick={() => window.location.href = '/home'} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}>←</button>
           <h1 style={{ color: '#D4AF37', fontSize: '1.8rem', margin: 0, letterSpacing: 2 }}>MI PERFIL</h1>
         </div>
         <button onClick={fetchStats} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'Georgia, serif' }}>↺ Actualizar</button>

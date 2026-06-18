@@ -53,7 +53,7 @@ function ResultadoContent() {
     return (
       <Screen>
         <p style={{ color: '#f87171', marginBottom: 16 }}>No se encontraron los resultados de este examen.</p>
-        <button onClick={() => router.push('/home')} style={S.btnGold}>Volver al inicio</button>
+        <button onClick={() => window.location.href = '/home'} style={S.btnGold}>Volver al inicio</button>
       </Screen>
     )
   }
@@ -82,7 +82,7 @@ function ResultadoContent() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <h1 style={{ color: '#D4AF37', fontSize: '1.6rem', margin: 0, letterSpacing: 2 }}>RESULTADOS</h1>
-        <button onClick={() => router.push('/home')} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'Georgia, serif' }}>
+        <button onClick={() => window.location.href = '/home'} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'Georgia, serif' }}>
           Inicio
         </button>
       </div>
@@ -140,7 +140,7 @@ function ResultadoContent() {
       </div>
 
       <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-        <button onClick={() => router.push('/home')} style={{ flex: 1, padding: 14, backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 12, cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
+        <button onClick={() => window.location.href = '/home'} style={{ flex: 1, padding: 14, backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 12, cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
           Volver al inicio
         </button>
         <button onClick={() => router.push('/perfil')} style={{ flex: 1, padding: 14, backgroundColor: '#D4AF37', color: '#0f0f1a', border: 'none', borderRadius: 12, cursor: 'pointer', fontWeight: 'bold', fontFamily: 'Georgia, serif' }}>

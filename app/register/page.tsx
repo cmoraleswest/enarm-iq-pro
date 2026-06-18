@@ -1,14 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { generateFingerprint, getClientIp } from '@/lib/fingerprint'
-import Link from 'next/link'
 
 export default function RegisterPage() {
-  const router = useRouter()
   const [email, setEmail]         = useState('')
   const [pass, setPass]           = useState('')
   const [confirm, setConfirm]     = useState('')
@@ -25,12 +22,12 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      // 1. Verificación anti-fraude antes de crear la cuenta
       const fingerprint = generateFingerprint()
       const ip          = await getClientIp()
 
       const fraudCheck = await fetch('/api/auth', {
         method:  'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ action: 'register', fingerprint, ip }),
       })
@@ -40,24 +37,21 @@ export default function RegisterPage() {
         return
       }
 
-      // 2. Crear cuenta en Firebase Auth
       const cred = await createUserWithEmailAndPassword(auth, email, pass)
 
-      // 3. Enviar email de verificación
       await sendEmailVerification(cred.user, {
         url: `${window.location.origin}/login`,
       })
 
-      // 4. Guardar perfil en Firestore vía API (usa idToken para verificar identidad server-side)
       const idToken = await cred.user.getIdToken()
       await fetch('/api/auth', {
         method:  'PUT',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ idToken, fingerprint, ip }),
       })
 
-      // 5. Redirigir a verificar email
-      router.push('/verify-email')
+      window.location.href = '/verify-email'
     } catch (err: unknown) {
       const code = (err as { code?: string }).code
       if (code === 'auth/email-already-in-use') setError('Este correo ya tiene una cuenta registrada.')
@@ -68,93 +62,70 @@ export default function RegisterPage() {
     }
   }
 
+  const inp: React.CSSProperties = { width: '100%', padding: '12px 16px', backgroundColor: '#1a1a2e', border: '1px solid #1e3a5f', borderRadius: 10, color: '#e2e8f0', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'DM Sans, Arial, sans-serif' }
+
   return (
-    <main style={styles.main}>
-      <div style={styles.card}>
-        <h1 style={styles.logo}>ENARM IQ</h1>
-        <p style={styles.sub}>Crea tu cuenta gratuita · 2 días de acceso completo</p>
+    <main style={{ minHeight: '100vh', backgroundColor: '#0a0a14', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'DM Sans, Arial, sans-serif' }}>
+      <div style={{ width: '100%', maxWidth: 420, backgroundColor: '#0f0f1a', borderRadius: 20, padding: '40px 32px', border: '1px solid #1a1a2e' }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <svg width="40" height="40" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="38" fill="none" stroke="#00d9ff" strokeWidth="2" opacity="0.3"/>
+              <path d="M 15 40 L 28 40 L 32 28 L 40 52 L 48 40 L 65 40" fill="none" stroke="#ff006e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="28" cy="40" r="2.5" fill="#ff006e"/>
+              <circle cx="48" cy="40" r="2.5" fill="#ff006e"/>
+              <circle cx="65" cy="40" r="2.5" fill="#ff006e"/>
+            </svg>
+            <span style={{ fontSize: '1.5rem', fontWeight: 700 }}>Simula<span style={{ color: '#00d9ff' }}>ENARM</span></span>
+          </div>
+          <p style={{ color: '#475569', fontSize: '0.82rem' }}>Crea tu cuenta gratuita · 2 dias de acceso completo</p>
+        </div>
 
         <form onSubmit={handleRegister}>
-          <Field label="CORREO ELECTRÓNICO">
-            <input
-              type="email" autoComplete="email" required
-              value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="tu@correo.com"
-              style={styles.input}
-            />
-          </Field>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CORREO ELECTRONICO</label>
+            <input style={inp} type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@correo.com" />
+          </div>
 
-          <Field label="CONTRASEÑA">
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CONTRASENA</label>
             <div style={{ position: 'relative' }}>
-              <input
-                type={showPass ? 'text' : 'password'} autoComplete="new-password" required
-                value={pass} onChange={e => setPass(e.target.value)}
-                placeholder="Mínimo 8 caracteres"
-                style={{ ...styles.input, paddingRight: 48 }}
-              />
-              <EyeBtn show={showPass} toggle={() => setShowPass(v => !v)} />
+              <input style={inp} type={showPass ? 'text' : 'password'} autoComplete="new-password" required value={pass} onChange={e => setPass(e.target.value)} placeholder="Minimo 8 caracteres" />
+              <button type="button" onClick={() => setShowPass(v => !v)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.1rem' }}>
+                {showPass ? '🙈' : '👁'}
+              </button>
             </div>
-          </Field>
+          </div>
 
-          <Field label="CONFIRMAR CONTRASEÑA">
-            <input
-              type={showPass ? 'text' : 'password'} autoComplete="new-password" required
-              value={confirm} onChange={e => setConfirm(e.target.value)}
-              placeholder="Repite tu contraseña"
-              style={styles.input}
-            />
-          </Field>
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CONFIRMAR CONTRASENA</label>
+            <input style={inp} type={showPass ? 'text' : 'password'} autoComplete="new-password" required value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Repite tu contrasena" />
+          </div>
 
-          <button type="submit" disabled={loading} style={{ ...styles.btn, backgroundColor: loading ? '#78600a' : '#D4AF37', cursor: loading ? 'not-allowed' : 'pointer' }}>
+          {error && <p style={{ color: '#ff006e', fontSize: '0.85rem', marginBottom: 16, textAlign: 'center' }}>{error}</p>}
+
+          <button style={{ width: '100%', padding: 14, background: loading ? '#334155' : 'linear-gradient(135deg, #ff006e, #00d9ff)', border: 'none', borderRadius: 10, color: '#fff', fontSize: '1rem', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif' }} type="submit" disabled={loading}>
             {loading ? 'Creando cuenta...' : 'CREAR CUENTA GRATIS'}
           </button>
         </form>
 
-        {error && <p style={styles.error}>{error}</p>}
-
-        <div style={styles.trialBadge}>
-          <p style={{ color: '#4ade80', fontSize: '0.78rem', letterSpacing: '1px', margin: '0 0 4px 0' }}>◉ PERÍODO DE PRUEBA</p>
-          <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: 0 }}>2 días de acceso completo · Sin tarjeta de crédito</p>
+        {/* Trial badge */}
+        <div style={{ marginTop: 24, padding: 14, backgroundColor: '#0a1628', borderRadius: 12, border: '1px solid #1e3a5f', textAlign: 'center' }}>
+          <p style={{ color: '#00d9ff', fontSize: '0.72rem', letterSpacing: '2px', margin: '0 0 4px 0' }}>◉ PERIODO DE PRUEBA</p>
+          <p style={{ color: '#64748b', fontSize: '0.82rem', margin: 0 }}>2 dias de acceso completo · Sin tarjeta de credito</p>
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: 24, color: '#475569', fontSize: '0.85rem' }}>
-          ¿Ya tienes cuenta?{' '}
-          <Link href="/login" style={{ color: '#D4AF37', textDecoration: 'none' }}>Inicia sesión</Link>
+        <p style={{ textAlign: 'center', marginTop: 20, color: '#475569', fontSize: '0.85rem' }}>
+          Ya tienes cuenta? <a href="/login" style={{ color: '#00d9ff' }}>Inicia sesion</a>
         </p>
+
+        <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #1a1a2e', display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' as const }}>
+          <a href="/terminos" style={{ color: '#334155', fontSize: '0.72rem' }}>Terminos</a>
+          <a href="/privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Privacidad</a>
+          <a href="/aviso-privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Aviso</a>
+        </div>
       </div>
     </main>
   )
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginBottom: 20 }}>
-      <label style={styles.label}>{label}</label>
-      {children}
-    </div>
-  )
-}
-
-function EyeBtn({ show, toggle }: { show: boolean; toggle: () => void }) {
-  return (
-    <button type="button" onClick={toggle} style={styles.eyeBtn} aria-label={show ? 'Ocultar' : 'Mostrar'}>
-      {show
-        ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-        : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      }
-    </button>
-  )
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  main:       { minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'Georgia, serif' },
-  card:       { width: '100%', maxWidth: 420, backgroundColor: '#111827', borderRadius: 16, padding: '40px 32px', border: '1px solid #1e293b' },
-  logo:       { color: '#D4AF37', fontSize: '2rem', letterSpacing: 3, margin: '0 0 4px 0', textAlign: 'center' },
-  sub:        { color: '#475569', fontSize: '0.8rem', textAlign: 'center', marginBottom: 36 },
-  label:      { display: 'block', color: '#94a3b8', fontSize: '0.78rem', letterSpacing: '1px', marginBottom: 8 },
-  input:      { width: '100%', backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 10, padding: '13px 16px', color: '#e2e8f0', fontSize: '1rem', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' },
-  btn:        { width: '100%', padding: 15, color: '#0f0f1a', border: 'none', borderRadius: 10, fontSize: '1rem', fontWeight: 'bold', letterSpacing: '1px', fontFamily: 'Georgia, serif', marginTop: 8, transition: 'background-color 0.2s' },
-  error:      { color: '#f87171', fontSize: '0.85rem', textAlign: 'center', marginTop: 12, backgroundColor: '#450a0a', padding: 10, borderRadius: 8 },
-  eyeBtn:     { position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 4, lineHeight: 0 },
-  trialBadge: { marginTop: 28, padding: 16, backgroundColor: '#0f172a', borderRadius: 10, border: '1px solid #14532d' },
 }

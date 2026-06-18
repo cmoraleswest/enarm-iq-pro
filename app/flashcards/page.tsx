@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface Pregunta {
   id: number
@@ -36,7 +35,6 @@ function saveStats(s: FlashStats) {
 }
 
 export default function FlashcardsPage() {
-  const router = useRouter()
   const [pregunta, setPregunta] = useState<Pregunta | null>(null)
   const [volteada, setVolteada] = useState(false)
   const [cargando, setCargando] = useState(false)
@@ -95,7 +93,7 @@ export default function FlashcardsPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
         <button
-          onClick={() => router.push('/home')}
+          onClick={() => window.location.href = '/home'}
           style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: '0', lineHeight: 1 }}
           title="Volver al dashboard"
         >
