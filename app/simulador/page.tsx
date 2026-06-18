@@ -62,6 +62,7 @@ export default function SimuladorPage() {
       const res = await fetch('/api/generar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ categoria: categoria === 'Todas' ? undefined : categoria }),
       })
       const data = await res.json()
