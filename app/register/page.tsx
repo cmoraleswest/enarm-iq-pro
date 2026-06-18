@@ -48,11 +48,12 @@ export default function RegisterPage() {
         url: `${window.location.origin}/login`,
       })
 
-      // 4. Guardar perfil en Firestore vía API
+      // 4. Guardar perfil en Firestore vía API (usa idToken para verificar identidad server-side)
+      const idToken = await cred.user.getIdToken()
       await fetch('/api/auth', {
         method:  'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ uid: cred.user.uid, email, fingerprint, ip }),
+        body:    JSON.stringify({ idToken, fingerprint, ip }),
       })
 
       // 5. Redirigir a verificar email

@@ -5,50 +5,32 @@
 
 import admin from 'firebase-admin'
 
-const PROJECT_ID    = 'enarm-iq'
-const API_KEY       = 'AIzaSyDquVZNBV5o-WM-ZeJFoTS-2IsLIk6s98k'
-const BASE_URL      = 'https://enarm-iq.vercel.app'
-const TEST_EMAIL    = 'test_auto@enarm-iq.dev'
-const TEST_PASSWORD = 'TestENARM2025!'
+const PROJECT_ID    = process.env.FIREBASE_ADMIN_PROJECT_ID ?? 'enarm-iq'
+const API_KEY       = process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? ''
+const BASE_URL      = process.env.TEST_BASE_URL ?? 'http://localhost:3000'
+const TEST_EMAIL    = process.env.TEST_EMAIL ?? 'test_auto@enarm-iq.dev'
+const TEST_PASSWORD = process.env.TEST_PASSWORD ?? 'TestENARM2025!'
 
-const PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDED2ECWzlsJWxw
-qUXFAwN8pD13t8qxxr2huQtwvb8OlUwWA5uYzBtNtxqrFOlKMVjrkRR8d9u7Dpy0
-QB/UaorxJp4SoT8vPx/or0Qp8Nm2g0McVfKJ0N8HBS8XWnjX/E1h1ajdMcdvnqqI
-++CJocuFKWs2Nx7afQAfU9vbZNiQne+wa9CEUrSA2Lc9d8zLt2ea9jv1H8pIqzDv
-wzyzB8aSb/uvZPKZRZHp2wt333Zlq5l3lJGKP1ll3RpaRoh9YAOviNrl2tsVE51S
-DUjPfKshbHJUsMxcvPEq97DqMgIE8WceEPfA5ADion8RnBdfputhIdbtS1Rm7rO6
-obhkCaqHAgMBAAECggEAIlyHpgAS+k88yCoCnlq+27N1SmwdzDaGubdSt/mpaIbm
-BN2xAYCUMHSs6dsKYARyDycoLgBbtFcFQ9oROgtKOqWIAr/b8Q3hK8i765XYslIj
-Cu5NSbYfwH06GZ+zmjcP4NuvcsTsrTVjsgpi+fwvTTFLJv9WGvjZcqQh3ju4cO/O
-qLGIdtVB89eYm609+yJ7j504botmy0lVSCEVcQEEZ9dKA9CuW0IjEeH+lkbelJ9h
-NLZ1P7Z1jC+yQo5yddL4FHjzBA3dKdQK1elRmR+QFErP/ms+Dmi7zgIv59Z2KQRd
-bKbo0UOHzwrDVwzWua8qRjD5OpatZt0BF9cFlYhEkQKBgQDme9FGZB9ByS+b81y1
-i12KzGZmfoya30fZniypFOeBJ0uozgUpHitt5wmgFcEgXsxASxyqkgVngjwkw7pr
-HssXJ3Yzq5nz5NEY83SGs2/KwFLZ40Nsm8iB8ytfMDQSBRxCSgQGvd6S6jJvQovV
-nb6GqA6eBpO9LWsNkiR09W4ZEwKBgQDZw/Sw5hR+rxFFS9j+A1Dui8UDEdY+BGuq
-BOjIy36Em7EkfyhgD1nVHGzvRxKuvpIw62UXjb2jjgPdEM21O96noSVuXuuDTPCd
-u/rhhpsMESfDp4PUarorORdMSab4Qe1WuxSez04nWWwha6evwmaLYnsNfnS6F+UX
-2kzpSXqrPQKBgEyruaUp3z/6Fg1RunBl6PsoHZRQ2qMWTYd117NzUcOj98YyqoLQ
-F3Ba39fSBMmo31cv5VxUcNnK+Aje11+VAcg1B1wO5Iq+flRHgGbiv/h5W9ZBhIdX
-ly6rXq0uktO/wXPHvWkktiq3H4nlYDDyZZPTyfEFjRXsSuVbzSbfEf3jAoGBAMPe
-SEGwwPBtgOhGX4eh7fKSDwNC0OP5T+md/s9UkZiu/TcplGRKim9v4N+bmsdIK/AK
-WmREHjV1MC5vxcbkcdFu1V8fy0/PLYGCqhad3umMqKqICsBNuuPTtwvsF12m1tYy
-8UoihlZITUUGMs6Y2Wk3jBzICC+1/F5nANS4Pbi1AoGBANY7lbuOI9Cn4HKcbQpJ
-5DY4+02BP7qJz6dS6Osqy++uyk7HBZjzVplHS/LY/CAMVBcLNWAbulyqHa9V9Moi
-X4uoRdgS7B/fe8Kz8d27HSILm30BJfiKmQm28xZsibB880awG59goNKd9U+9/uve
-l3Jy339F0kYhuZbjM7g09R7M
------END PRIVATE KEY-----`
+if (!API_KEY) {
+  console.error('Set NEXT_PUBLIC_FIREBASE_API_KEY env var')
+  process.exit(1)
+}
 
-const CLIENT_EMAIL = 'firebase-adminsdk-fbsvc@enarm-iq.iam.gserviceaccount.com'
-
-// Inicializar Firebase Admin
+// Inicializar Firebase Admin usando las mismas env vars que el server
 if (!admin.apps.length) {
+  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL
+  const privateKey  = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n')
+
+  if (!clientEmail || !privateKey) {
+    console.error('Set FIREBASE_ADMIN_CLIENT_EMAIL and FIREBASE_ADMIN_PRIVATE_KEY env vars')
+    process.exit(1)
+  }
+
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId:   PROJECT_ID.trim(),
-      clientEmail: CLIENT_EMAIL.trim(),
-      privateKey:  PRIVATE_KEY.trim(),
+      clientEmail: clientEmail.trim(),
+      privateKey:  privateKey.trim(),
     }),
   })
 }

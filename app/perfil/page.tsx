@@ -286,12 +286,41 @@ export default function PerfilPage() {
       {tab === 'history' && (
         <div style={S.card}>
           <h2 style={S.cardTitle}>SESIONES RECIENTES</h2>
-          {stats.totalSessions === 0 ? (
+          {(!stats.sessionHistory || stats.sessionHistory.length === 0) ? (
             <p style={{ color: '#475569', textAlign: 'center' }}>Aún no has completado ningún examen.</p>
           ) : (
-            <p style={{ color: '#64748b', textAlign: 'center', fontSize: '0.85rem' }}>
-              Historial disponible después de completar exámenes.
-            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {stats.sessionHistory.map((s) => {
+                const pctColor = s.pct >= 70 ? '#4ade80' : s.pct >= 50 ? '#fbbf24' : '#f87171'
+                const label: Record<string, string> = {
+                  diagnostico: 'Diagnóstico',
+                  diario: 'Diario',
+                  personalizado: 'Personalizado',
+                  simulador_cronometrado: 'Simulador Real',
+                  simulador_libre: 'Simulador Libre',
+                }
+                const formatTime = (sec: number) => {
+                  const h = Math.floor(sec / 3600)
+                  const m = Math.floor((sec % 3600) / 60)
+                  return h > 0 ? `${h}h ${m}m` : `${m}m`
+                }
+                return (
+                  <div key={s.sessionId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#0d1117', borderRadius: 10, border: '1px solid #1e293b' }}>
+                    <div>
+                      <div style={{ color: '#e2e8f0', fontSize: '0.9rem', fontWeight: 'bold' }}>{label[s.examType] ?? s.examType}</div>
+                      <div style={{ color: '#475569', fontSize: '0.75rem', marginTop: 2 }}>
+                        {new Date(s.finishedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {s.timeTakenSeconds > 0 && ` · ${formatTime(s.timeTakenSeconds)}`}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ color: pctColor, fontSize: '1.2rem', fontWeight: 'bold' }}>{s.pct}%</div>
+                      <div style={{ color: '#475569', fontSize: '0.72rem' }}>{s.correctAnswers}/{s.totalQuestions}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
         </div>
       )}

@@ -82,14 +82,17 @@ async function handleRegister(fingerprint: string, ip: string) {
 
 // PUT: crear perfil tras registro exitoso en Firebase Auth
 export async function PUT(request: Request) {
-  const { uid, email, fingerprint, ip } = await request.json() as {
-    uid: string
-    email: string
+  const { idToken, fingerprint, ip } = await request.json() as {
+    idToken: string
     fingerprint: string
     ip: string
   }
 
   try {
+    const decoded = await adminAuth.verifyIdToken(idToken)
+    const uid = decoded.uid
+    const email = decoded.email ?? ''
+
     const existing = await getUserProfile(uid)
     if (!existing) {
       await createUserProfile(uid, email, fingerprint, ip)
