@@ -20,22 +20,7 @@ export default function SimuladorRealPage() {
   const [respondido, setRespondido] = useState(false)
   const [timeLeft, setTimeLeft]     = useState(TIEMPO_LIMITE)
   const timerRef                    = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  // Cronómetro regresivo
-  useEffect(() => {
-    if (phase !== 'exam') return
-    timerRef.current = setInterval(() => {
-      setTimeLeft(t => {
-        if (t <= 1) {
-          clearInterval(timerRef.current!)
-          submitExam(true)
-          return 0
-        }
-        return t - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [phase])
+  const submitExamRef               = useRef<(timeUp: boolean) => void>(() => {})
 
   const formatTime = (s: number) => {
     const h = Math.floor(s / 3600)
@@ -45,6 +30,37 @@ export default function SimuladorRealPage() {
   }
 
   const timerColor = timeLeft < 1800 ? '#f87171' : timeLeft < 3600 ? '#fbbf24' : '#4ade80'
+
+  const submitExam = async (timeUp: boolean) => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    setPhase('submitting')
+    const res = await fetch('/api/exam', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
+    })
+    const data = await res.json()
+    sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
+    router.push(`/exams/resultado?session=${data.sessionId}${timeUp ? '&timeup=1' : ''}`)
+  }
+
+  useEffect(() => { submitExamRef.current = submitExam })
+
+  // Cronómetro regresivo
+  useEffect(() => {
+    if (phase !== 'exam') return
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current!)
+          submitExamRef.current(true)
+          return 0
+        }
+        return t - 1
+      })
+    }, 1000)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [phase])
 
   const startExam = async () => {
     setPhase('loading')
@@ -80,24 +96,11 @@ export default function SimuladorRealPage() {
     setSeleccion('')
   }
 
-  const submitExam = async (timeUp: boolean) => {
-    if (timerRef.current) clearInterval(timerRef.current)
-    setPhase('submitting')
-    const res = await fetch('/api/exam', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
-    })
-    const data = await res.json()
-    sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
-    router.push(`/exams/resultado?session=${data.sessionId}${timeUp ? '&timeup=1' : ''}`)
-  }
-
   if (phase === 'intro') {
     return (
       <main style={S.main}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <button onClick={() => router.push('/')} style={S.back}>←</button>
+          <button onClick={() => window.location.href = '/home'} style={S.back}>←</button>
           <h1 style={S.h1}>SIMULADOR REAL CRONOMETRADO</h1>
         </div>
 

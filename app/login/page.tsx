@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import { generateFingerprint, getClientIp } from '@/lib/fingerprint'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -20,19 +19,22 @@ export default function LoginPage() {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password)
       const idToken = await cred.user.getIdToken()
+      const fingerprint = generateFingerprint()
+      const ip = await getClientIp()
       const res = await fetch('/api/auth', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'login', idToken }),
+        body: JSON.stringify({ action: 'login', idToken, fingerprint, ip }),
       })
       const data = await res.json()
       if (!res.ok) {
-        if (data.code === 'TRIAL_EXPIRED') { router.push('/upgrade'); return }
+        if (data.code === 'TRIAL_EXPIRED') { window.location.href = '/upgrade'; return }
         setError(data.error || 'Error al iniciar sesion')
         return
       }
       if (data.uid) localStorage.setItem('enarm_user_info', JSON.stringify({ uid: data.uid, email: data.email, isPaid: data.isPaid, daysLeft: data.daysLeft }))
-      router.push('/home')
+      window.location.href = '/home'
     } catch {
       setError('Correo o contrasena incorrectos')
     } finally {

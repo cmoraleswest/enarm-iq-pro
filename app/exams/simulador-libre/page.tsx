@@ -54,6 +54,19 @@ export default function SimuladorLibrePage() {
     }
   }
 
+  const submitExam = async () => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    setPhase('submitting')
+    const res = await fetch('/api/exam', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
+    })
+    const data = await res.json()
+    sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
+    router.push(`/exams/resultado?session=${data.sessionId}`)
+  }
+
   const responder = (op: string) => {
     if (respondido) return
     setSeleccion(op)
@@ -68,24 +81,11 @@ export default function SimuladorLibrePage() {
     setSeleccion('')
   }
 
-  const submitExam = async () => {
-    if (timerRef.current) clearInterval(timerRef.current)
-    setPhase('submitting')
-    const res = await fetch('/api/exam', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
-    })
-    const data = await res.json()
-    sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
-    router.push(`/exams/resultado?session=${data.sessionId}`)
-  }
-
   if (phase === 'intro') {
     return (
       <main style={S.main}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <button onClick={() => router.push('/')} style={S.back}>←</button>
+          <button onClick={() => window.location.href = '/home'} style={S.back}>←</button>
           <h1 style={S.h1}>SIMULADOR SIN CRONÓMETRO</h1>
         </div>
 

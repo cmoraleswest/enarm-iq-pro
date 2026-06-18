@@ -1,9 +1,9 @@
 import { adminFirestore } from './firebase-admin'
 import type {
   UserProfile, ExamSession, SubmitExamResponse,
-  AnswerResult, SpecialtyStats, Specialty, DiagnosticSnapshot, UserStats,
+  AnswerResult, SpecialtyStats, Specialty, DiagnosticSnapshot, UserStats, SessionSummary,
 } from '@/types/exam'
-import { TRIAL_DAYS, TRIAL_MS } from './constants'
+import { TRIAL_MS } from './constants'
 
 export { TRIAL_MS }
 
@@ -166,6 +166,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
       bySpecialty: [],
       diagnosticHistory: [],
       lastDiagnosticAt: null,
+      sessionHistory: [],
     }
   }
 
@@ -200,6 +201,16 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     bySpecialty: s.bySpecialty,
   }))
 
+  const sessionHistory: SessionSummary[] = sessions.slice(0, 20).map(s => ({
+    sessionId: s.id,
+    examType: s.examType,
+    finishedAt: s.finishedAt,
+    totalQuestions: s.totalQuestions,
+    correctAnswers: s.correctAnswers,
+    pct: s.totalQuestions > 0 ? Math.round((s.correctAnswers / s.totalQuestions) * 100) : 0,
+    timeTakenSeconds: s.timeTakenSeconds,
+  }))
+
   return {
     totalSessions: sessions.length,
     totalQuestions: totalQ,
@@ -208,6 +219,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     bySpecialty,
     diagnosticHistory,
     lastDiagnosticAt: diagnostics[0]?.finishedAt ?? null,
+    sessionHistory,
   }
 }
 

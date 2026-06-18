@@ -82,6 +82,16 @@ export interface DiagnosticSnapshot {
   bySpecialty: SpecialtyStats[]
 }
 
+export interface SessionSummary {
+  sessionId: string
+  examType: ExamType
+  finishedAt: number
+  totalQuestions: number
+  correctAnswers: number
+  pct: number
+  timeTakenSeconds: number
+}
+
 export interface UserStats {
   totalSessions: number
   totalQuestions: number
@@ -90,6 +100,7 @@ export interface UserStats {
   bySpecialty: SpecialtyStats[]
   diagnosticHistory: DiagnosticSnapshot[]
   lastDiagnosticAt: number | null
+  sessionHistory: SessionSummary[]
 }
 
 export interface UserProfile {

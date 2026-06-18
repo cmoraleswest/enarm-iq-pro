@@ -6,7 +6,7 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
   LineChart, Line, ResponsiveContainer, CartesianGrid,
 } from 'recharts'
-import type { UserStats, SpecialtyStats } from '@/types/exam'
+import type { UserStats } from '@/types/exam'
 
 // Colores por especialidad
 const SP_COLORS: Record<string, string> = {
@@ -25,10 +25,6 @@ export default function PerfilPage() {
   const [error, setError]   = useState('')
   const [tab, setTab]       = useState<'overview' | 'diagnostics' | 'history'>('overview')
 
-  useEffect(() => {
-    fetchStats()
-  }, [])
-
   const fetchStats = async () => {
     setLoading(true)
     try {
@@ -43,6 +39,10 @@ export default function PerfilPage() {
     }
   }
 
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
   if (loading) {
     return (
       <main style={S.main}>
@@ -55,7 +55,7 @@ export default function PerfilPage() {
     return (
       <main style={S.main}>
         <p style={{ color: '#f87171', textAlign: 'center', marginTop: 80 }}>{error || 'Sin datos disponibles aún.'}</p>
-        <button onClick={() => router.push('/')} style={S.btnBack}>← Inicio</button>
+        <button onClick={() => window.location.href = '/home'} style={S.btnBack}>← Inicio</button>
       </main>
     )
   }
@@ -88,7 +88,7 @@ export default function PerfilPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}>←</button>
+          <button onClick={() => window.location.href = '/home'} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}>←</button>
           <h1 style={{ color: '#D4AF37', fontSize: '1.8rem', margin: 0, letterSpacing: 2 }}>MI PERFIL</h1>
         </div>
         <button onClick={fetchStats} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'Georgia, serif' }}>↺ Actualizar</button>
@@ -286,12 +286,41 @@ export default function PerfilPage() {
       {tab === 'history' && (
         <div style={S.card}>
           <h2 style={S.cardTitle}>SESIONES RECIENTES</h2>
-          {stats.totalSessions === 0 ? (
+          {(!stats.sessionHistory || stats.sessionHistory.length === 0) ? (
             <p style={{ color: '#475569', textAlign: 'center' }}>Aún no has completado ningún examen.</p>
           ) : (
-            <p style={{ color: '#64748b', textAlign: 'center', fontSize: '0.85rem' }}>
-              Historial disponible después de completar exámenes.
-            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {stats.sessionHistory.map((s) => {
+                const pctColor = s.pct >= 70 ? '#4ade80' : s.pct >= 50 ? '#fbbf24' : '#f87171'
+                const label: Record<string, string> = {
+                  diagnostico: 'Diagnóstico',
+                  diario: 'Diario',
+                  personalizado: 'Personalizado',
+                  simulador_cronometrado: 'Simulador Real',
+                  simulador_libre: 'Simulador Libre',
+                }
+                const formatTime = (sec: number) => {
+                  const h = Math.floor(sec / 3600)
+                  const m = Math.floor((sec % 3600) / 60)
+                  return h > 0 ? `${h}h ${m}m` : `${m}m`
+                }
+                return (
+                  <div key={s.sessionId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#0d1117', borderRadius: 10, border: '1px solid #1e293b' }}>
+                    <div>
+                      <div style={{ color: '#e2e8f0', fontSize: '0.9rem', fontWeight: 'bold' }}>{label[s.examType] ?? s.examType}</div>
+                      <div style={{ color: '#475569', fontSize: '0.75rem', marginTop: 2 }}>
+                        {new Date(s.finishedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {s.timeTakenSeconds > 0 && ` · ${formatTime(s.timeTakenSeconds)}`}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ color: pctColor, fontSize: '1.2rem', fontWeight: 'bold' }}>{s.pct}%</div>
+                      <div style={{ color: '#475569', fontSize: '0.72rem' }}>{s.correctAnswers}/{s.totalQuestions}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
         </div>
       )}

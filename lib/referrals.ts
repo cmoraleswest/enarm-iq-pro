@@ -1,3 +1,4 @@
+import admin from 'firebase-admin'
 import { adminFirestore } from './firebase-admin'
 import { REFERRAL_CREDIT } from './stripe'
 
@@ -32,9 +33,7 @@ export async function creditReferrerIfExists(paidUserId: string): Promise<void> 
   const referral = snap.docs[0]
   const referrerId = referral.data().referrerId
   const userRef = db.collection('users').doc(referrerId)
-  const userSnap = await userRef.get()
-  const currentBalance = userSnap.data()?.creditBalance ?? 0
-  await userRef.update({ creditBalance: currentBalance + REFERRAL_CREDIT })
+  await userRef.update({ creditBalance: admin.firestore.FieldValue.increment(REFERRAL_CREDIT) })
   await referral.ref.update({ paid: true, paidAt: Date.now() })
 }
 

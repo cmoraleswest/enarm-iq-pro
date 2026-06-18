@@ -19,8 +19,6 @@ export default function DiarioPage() {
   const [resultSessionId, setResultSessionId] = useState('')
   const [error, setError]               = useState('')
 
-  useEffect(() => { startExam() }, [])
-
   const startExam = async () => {
     setPhase('loading')
     try {
@@ -44,6 +42,8 @@ export default function DiarioPage() {
       setPhase('exam')
     }
   }
+
+  useEffect(() => { startExam() }, [])
 
   const responder = async (selected: string) => {
     if (currentResult) return
@@ -108,7 +108,7 @@ export default function DiarioPage() {
 
   return (
     <main style={S.main}>
-      <Header title="SIMULADOR DIARIO" subtitle="10 preguntas · Justificación inmediata" onBack={() => router.push('/')} />
+      <Header title="SIMULADOR DIARIO" subtitle="10 preguntas · Justificación inmediata" onBack={() => window.location.href = '/home'} />
 
       {/* Progreso */}
       <div style={{ marginBottom: 20 }}>

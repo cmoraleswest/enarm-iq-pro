@@ -16,39 +16,44 @@ export default function ResultadoPage() {
   )
 }
 
+function getSessionResult(sessionId: string): SubmitExamResponse | null {
+  if (typeof window === 'undefined') return null
+  const raw = sessionStorage.getItem(`exam_result_${sessionId}`)
+  return raw ? JSON.parse(raw) as SubmitExamResponse : null
+}
+
 function ResultadoContent() {
   const router       = useRouter()
   const params       = useSearchParams()
   const sessionId    = params.get('session') ?? ''
   const timeUp       = params.get('timeup') === '1'
 
-  const [result, setResult]     = useState<SubmitExamResponse | null>(null)
-  const [loading, setLoading]   = useState(true)
+  const [result, setResult] = useState<SubmitExamResponse | null>(() => getSessionResult(sessionId))
+  const [loading, setLoading] = useState(!result && !!sessionId)
   const [filter, setFilter]     = useState<'todos' | 'incorrectas'>('todos')
   const [expandIdx, setExpandIdx] = useState<number | null>(null)
 
   useEffect(() => {
-    const raw = sessionStorage.getItem(`exam_result_${sessionId}`)
-    if (raw) {
-      setResult(JSON.parse(raw) as SubmitExamResponse)
-      setLoading(false)
-    } else {
-      setLoading(false)
-    }
-  }, [sessionId])
-
-  // La página de resultado recibe los datos via sessionStorage
-  // (se guarda desde la página del examen antes de navegar)
+    if (result || !sessionId) return
+    fetch(`/api/exam?session=${sessionId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setResult(data as SubmitExamResponse) })
+      .finally(() => setLoading(false))
+  }, [result, sessionId])
 
   if (loading) {
-    return <Screen><p style={{ color: '#D4AF37' }}>Cargando resultados...</p></Screen>
+    return (
+      <Screen>
+        <p style={{ color: '#D4AF37' }}>Cargando resultados...</p>
+      </Screen>
+    )
   }
 
   if (!result) {
     return (
       <Screen>
         <p style={{ color: '#f87171', marginBottom: 16 }}>No se encontraron los resultados de este examen.</p>
-        <button onClick={() => router.push('/')} style={S.btnGold}>Volver al inicio</button>
+        <button onClick={() => window.location.href = '/home'} style={S.btnGold}>Volver al inicio</button>
       </Screen>
     )
   }
@@ -77,7 +82,7 @@ function ResultadoContent() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <h1 style={{ color: '#D4AF37', fontSize: '1.6rem', margin: 0, letterSpacing: 2 }}>RESULTADOS</h1>
-        <button onClick={() => router.push('/')} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'Georgia, serif' }}>
+        <button onClick={() => window.location.href = '/home'} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'Georgia, serif' }}>
           Inicio
         </button>
       </div>
@@ -135,7 +140,7 @@ function ResultadoContent() {
       </div>
 
       <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-        <button onClick={() => router.push('/')} style={{ flex: 1, padding: 14, backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 12, cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
+        <button onClick={() => window.location.href = '/home'} style={{ flex: 1, padding: 14, backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 12, cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
           Volver al inicio
         </button>
         <button onClick={() => router.push('/perfil')} style={{ flex: 1, padding: 14, backgroundColor: '#D4AF37', color: '#0f0f1a', border: 'none', borderRadius: 12, cursor: 'pointer', fontWeight: 'bold', fontFamily: 'Georgia, serif' }}>

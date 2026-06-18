@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Webhook inválido' }, { status: 400 })
   }
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as any
+    const session = event.data.object as { metadata?: { uid?: string; plan?: string }; customer?: string; id?: string }
     const uid = session.metadata?.uid
     if (uid) {
       await adminFirestore.collection('users').doc(uid).update({
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
   }
   if (event.type === 'customer.subscription.deleted') {
-    const sub = event.data.object as any
+    const sub = event.data.object as { customer?: string }
     const snap = await adminFirestore.collection('users')
       .where('stripeCustomerId', '==', sub.customer).limit(1).get()
     if (!snap.empty) {

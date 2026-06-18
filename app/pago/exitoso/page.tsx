@@ -1,10 +1,7 @@
 'use client'
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-
 export default function PagoExitoso() {
-  const router = useRouter()
-  useEffect(() => { setTimeout(() => router.push('/'), 4000) }, [router])
+  useEffect(() => { setTimeout(() => { window.location.href = '/home' }, 4000) }, [])
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', textAlign: 'center', padding: 24 }}>
       <div>

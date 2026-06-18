@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { QuestionForClient, ClientAnswer } from '@/types/exam'
 
@@ -66,7 +66,7 @@ export default function DiagnosticoPage() {
     return (
       <main style={S.main}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <button onClick={() => router.push('/')} style={S.back}>←</button>
+          <button onClick={() => window.location.href = '/home'} style={S.back}>←</button>
           <h1 style={S.h1}>EXAMEN DIAGNÓSTICO</h1>
         </div>
 
