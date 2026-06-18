@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import { generateFingerprint, getClientIp } from '@/lib/fingerprint'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -20,10 +21,12 @@ export default function LoginPage() {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password)
       const idToken = await cred.user.getIdToken()
+      const fingerprint = generateFingerprint()
+      const ip = await getClientIp()
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'login', idToken }),
+        body: JSON.stringify({ action: 'login', idToken, fingerprint, ip }),
       })
       const data = await res.json()
       if (!res.ok) {

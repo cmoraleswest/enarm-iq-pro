@@ -148,7 +148,20 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 40 }}>
+      <div style={{ marginTop: 40, padding: '16px 20px', backgroundColor: '#111827', borderRadius: 12, border: '1px solid #1e293b' }}>
+        <p style={{ color: '#475569', fontSize: '0.68rem', letterSpacing: '2px', margin: '0 0 8px 0' }}>VERSIÓN</p>
+        <p style={{ color: '#64748b', fontSize: '0.82rem', margin: '0 0 4px 0' }}>v1.1.0 — 18 junio 2026, 12:00 hrs</p>
+        <ul style={{ color: '#475569', fontSize: '0.75rem', margin: '8px 0 0 0', paddingLeft: 16, lineHeight: '1.8' }}>
+          <li>Fix: sesión persistente — ya no te saca al login al navegar</li>
+          <li>Fix: perfil se genera automáticamente al iniciar sesión</li>
+          <li>Fix: resultados de examen muestran respuesta correcta y justificación</li>
+          <li>Fix: resultados se recuperan del servidor si se pierde sessionStorage</li>
+          <li>Nuevo: tab Historial en perfil con sesiones anteriores</li>
+          <li>Seguridad: autenticación reforzada en registro y API</li>
+        </ul>
+      </div>
+
+      <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 16 }}>
         Simula ENARM · Banco Maestro 2025
       </p>
     </main>

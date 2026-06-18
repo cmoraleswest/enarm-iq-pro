@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import type { SubmitExamResponse, AnswerResult, SpecialtyStats } from '@/types/exam'
 
 function getSessionResult(sessionId: string): SubmitExamResponse | null {
@@ -12,13 +12,31 @@ function getSessionResult(sessionId: string): SubmitExamResponse | null {
 
 export default function ResultadoPage() {
   const router       = useRouter()
-  const params       = useSearchParams()
-  const sessionId    = params.get('session') ?? ''
-  const timeUp       = params.get('timeup') === '1'
+  const routeParams  = useParams()
+  const searchParams = useSearchParams()
+  const sessionId    = (routeParams.sessionId as string) ?? searchParams.get('session') ?? ''
+  const timeUp       = searchParams.get('timeup') === '1'
 
-  const [result]     = useState<SubmitExamResponse | null>(() => getSessionResult(sessionId))
+  const [result, setResult] = useState<SubmitExamResponse | null>(() => getSessionResult(sessionId))
+  const [loading, setLoading] = useState(!result && !!sessionId)
   const [filter, setFilter]     = useState<'todos' | 'incorrectas'>('todos')
   const [expandIdx, setExpandIdx] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (result || !sessionId) return
+    fetch(`/api/exam?session=${sessionId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setResult(data as SubmitExamResponse) })
+      .finally(() => setLoading(false))
+  }, [result, sessionId])
+
+  if (loading) {
+    return (
+      <Screen>
+        <p style={{ color: '#D4AF37' }}>Cargando resultados...</p>
+      </Screen>
+    )
+  }
 
   if (!result) {
     return (

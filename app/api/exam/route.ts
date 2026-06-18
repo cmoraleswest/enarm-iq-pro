@@ -9,6 +9,7 @@ import {
   storePendingSession,
   fetchPendingSession,
   removePendingSession,
+  getExamSession,
 } from '@/lib/firestore'
 import type {
   ExamType, Specialty, ClientAnswer, StartExamResponse, SubmitExamResponse,
@@ -22,6 +23,36 @@ async function getSessionUid(): Promise<string | null> {
     const data = JSON.parse(Buffer.from(raw, 'base64').toString()) as { uid: string }
     return data.uid || null
   } catch { return null }
+}
+
+// GET /api/exam?session=xxx — recuperar resultado guardado
+export async function GET(request: Request) {
+  const uid = await getSessionUid()
+  if (!uid) {
+    return NextResponse.json({ error: 'No autenticado.' }, { status: 401 })
+  }
+
+  const { searchParams } = new URL(request.url)
+  const sessionId = searchParams.get('session')
+  if (!sessionId) {
+    return NextResponse.json({ error: 'Falta session ID.' }, { status: 400 })
+  }
+
+  const session = await getExamSession(sessionId)
+  if (!session || session.userId !== uid) {
+    return NextResponse.json({ error: 'Resultado no encontrado.' }, { status: 404 })
+  }
+
+  return NextResponse.json({
+    sessionId: session.id,
+    correctAnswers: session.correctAnswers,
+    totalQuestions: session.totalQuestions,
+    pct: session.totalQuestions > 0 ? Math.round((session.correctAnswers / session.totalQuestions) * 100) : 0,
+    timeTakenSeconds: session.timeTakenSeconds,
+    bySpecialty: session.bySpecialty,
+    answers: session.answers,
+    examType: session.examType,
+  })
 }
 
 // POST /api/exam — iniciar o calificar examen

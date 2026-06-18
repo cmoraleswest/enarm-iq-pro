@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { SubmitExamResponse, AnswerResult, SpecialtyStats } from '@/types/exam'
 
@@ -28,9 +28,26 @@ function ResultadoContent() {
   const sessionId    = params.get('session') ?? ''
   const timeUp       = params.get('timeup') === '1'
 
-  const [result]     = useState<SubmitExamResponse | null>(() => getSessionResult(sessionId))
+  const [result, setResult] = useState<SubmitExamResponse | null>(() => getSessionResult(sessionId))
+  const [loading, setLoading] = useState(!result && !!sessionId)
   const [filter, setFilter]     = useState<'todos' | 'incorrectas'>('todos')
   const [expandIdx, setExpandIdx] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (result || !sessionId) return
+    fetch(`/api/exam?session=${sessionId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setResult(data as SubmitExamResponse) })
+      .finally(() => setLoading(false))
+  }, [result, sessionId])
+
+  if (loading) {
+    return (
+      <Screen>
+        <p style={{ color: '#D4AF37' }}>Cargando resultados...</p>
+      </Screen>
+    )
+  }
 
   if (!result) {
     return (
