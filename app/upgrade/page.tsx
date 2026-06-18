@@ -12,7 +12,7 @@ export default function UpgradePage() {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    fetch('/api/auth', { method: 'GET' }).then(r => r.json())
+    fetch('/api/auth', { method: 'GET', credentials: 'include' }).then(r => r.json())
       .then(d => { if (d.user) setUserInfo({ creditBalance: d.user.creditBalance ?? 0, referralCode: d.user.uid?.slice(0, 8).toUpperCase() ?? '' }) })
       .catch(() => {})
   }, [])
@@ -90,7 +90,7 @@ export default function UpgradePage() {
           </div>
         )}
 
-        <button onClick={() => router.push('/login')}
+        <button onClick={() => window.location.href = '/login'}
           style={{ width: '100%', padding: 12, backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', borderRadius: 10, cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'Georgia, serif', marginTop: 12 }}>
           Iniciar sesión con otra cuenta
         </button>

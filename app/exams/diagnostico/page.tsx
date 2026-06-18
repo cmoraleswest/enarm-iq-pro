@@ -23,6 +23,7 @@ export default function DiagnosticoPage() {
       const res  = await fetch('/api/exam', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body:    JSON.stringify({ action: 'start', examType: 'diagnostico' }),
       })
       const data = await res.json() as { sessionId: string; questions: QuestionForClient[] }
@@ -50,6 +51,7 @@ export default function DiagnosticoPage() {
       const res = await fetch('/api/exam', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
       })
       const data = await res.json()

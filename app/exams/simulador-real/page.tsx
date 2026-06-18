@@ -37,6 +37,7 @@ export default function SimuladorRealPage() {
     const res = await fetch('/api/exam', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
     })
     const data = await res.json()
@@ -68,6 +69,7 @@ export default function SimuladorRealPage() {
       const res  = await fetch('/api/exam', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body:    JSON.stringify({ action: 'start', examType: 'simulador_cronometrado' }),
       })
       const data = await res.json() as { sessionId: string; questions: QuestionForClient[] }
