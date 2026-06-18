@@ -5,20 +5,6 @@ import { createUserProfile, getUserProfile, isTrialActive, trialDaysLeft, detect
 const SESSION_COOKIE = 'enarm_sess'
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 días
 
-function buildCookieHeader(value: string): string {
-  const parts = [
-    `${SESSION_COOKIE}=${value}`,
-    'Path=/',
-    `Max-Age=${SESSION_MAX_AGE}`,
-    'HttpOnly',
-    'SameSite=Lax',
-  ]
-  if (process.env.NODE_ENV === 'production') {
-    parts.push('Secure')
-  }
-  return parts.join('; ')
-}
-
 // POST: login (verificar idToken, crear cookie de sesión)
 export async function POST(request: Request) {
   const body = await request.json() as {
@@ -86,7 +72,6 @@ async function handleLogin(idToken: string, fingerprint: string, ip: string) {
       maxAge:   SESSION_MAX_AGE,
       path:     '/',
     })
-    response.headers.append('Set-Cookie', buildCookieHeader(cookieValue))
 
     return response
   } catch (err) {
@@ -134,6 +119,5 @@ export async function PUT(request: Request) {
 export async function DELETE() {
   const response = NextResponse.json({ ok: true })
   response.cookies.set(SESSION_COOKIE, '', { maxAge: 0, path: '/' })
-  response.headers.append('Set-Cookie', `${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`)
   return response
 }
