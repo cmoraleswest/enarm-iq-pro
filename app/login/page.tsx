@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth as clientAuth } from '@/lib/firebase'
+import { auth } from '@/lib/firebase'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -18,7 +18,7 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     try {
-      const cred = await signInWithEmailAndPassword(clientAuth, email, password)
+      const cred = await signInWithEmailAndPassword(auth, email, password)
       const idToken = await cred.user.getIdToken()
       const res = await fetch('/api/auth', {
         method: 'POST',
@@ -28,17 +28,19 @@ export default function LoginPage() {
       const data = await res.json()
       if (!res.ok) {
         if (data.code === 'TRIAL_EXPIRED') { router.push('/upgrade'); return }
-        setError(data.error || 'Error al iniciar sesión')
+        setError(data.error || 'Error al iniciar sesion')
         return
       }
       if (data.uid) localStorage.setItem('enarm_user_info', JSON.stringify({ uid: data.uid, email: data.email, isPaid: data.isPaid, daysLeft: data.daysLeft }))
-      router.push('/')
+      router.push('/home')
     } catch {
-      setError('Correo o contraseña incorrectos')
+      setError('Correo o contrasena incorrectos')
     } finally {
       setLoading(false)
     }
   }
+
+  const inp = { width: '100%', padding: '12px 16px', backgroundColor: '#1a1a2e', border: '1px solid #1e3a5f', borderRadius: 10, color: '#e2e8f0', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' as const, fontFamily: 'DM Sans, Arial, sans-serif' }
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#0a0a14', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'DM Sans, Arial, sans-serif' }}>
@@ -58,27 +60,30 @@ export default function LoginPage() {
         </div>
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: 20 }}>
-            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CORREO ELECTRÓNICO</label>
-            <input style={{ width: '100%', padding: '12px 16px', backgroundColor: '#1a1a2e', border: '1px solid #1e3a5f', borderRadius: 10, color: '#e2e8f0', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'DM Sans, Arial, sans-serif' }} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@correo.com" required />
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CORREO ELECTRONICO</label>
+            <input style={inp} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@correo.com" required />
           </div>
-          <div style={{ marginBottom: 24, position: "relative" }}>
-            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CONTRASEÑA</label>
-            <input style={{ width: '100%', padding: '12px 16px', backgroundColor: '#1a1a2e', border: '1px solid #1e3a5f', borderRadius: 10, color: '#e2e8f0', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'DM Sans, Arial, sans-serif' }} type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
-          </div>
-          <button type="button" onClick={() => setShowPass(!showPass)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"#475569",cursor:"pointer",fontSize:"1.1rem"}}>{showPass ? "🙈" : "👁"}</button
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CONTRASENA</label>
+            <div style={{ position: 'relative' }}>
+              <input style={inp} type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Minimo 6 caracteres" required />
+              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.1rem' }}>
+                {showPass ? '🙈' : '👁'}
+              </button>
+            </div>
           </div>
           {error && <p style={{ color: '#ff006e', fontSize: '0.85rem', marginBottom: 16, textAlign: 'center' }}>{error}</p>}
           <button style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #ff006e, #00d9ff)', border: 'none', borderRadius: 10, color: '#fff', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'DM Sans, Arial, sans-serif' }} type="submit" disabled={loading}>
-            {loading ? 'Ingresando...' : 'INGRESAR →'}
+            {loading ? 'Ingresando...' : 'INGRESAR'}
           </button>
         </form>
         <p style={{ textAlign: 'center', marginTop: 20, color: '#475569', fontSize: '0.85rem' }}>
-          ¿No tienes cuenta? <a href="/register" style={{ color: '#00d9ff' }}>Regístrate gratis →</a>
+          No tienes cuenta? <a href="/register" style={{ color: '#00d9ff' }}>Registrate gratis</a>
         </p>
-        <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #1a1a2e', display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-          <a href="/terminos" style={{ color: '#334155', fontSize: '0.72rem' }}>Términos</a>
+        <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #1a1a2e', display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' as const }}>
+          <a href="/terminos" style={{ color: '#334155', fontSize: '0.72rem' }}>Terminos</a>
           <a href="/privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Privacidad</a>
-          <a href="/aviso-privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Aviso de Privacidad</a>
+          <a href="/aviso-privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Aviso</a>
         </div>
       </div>
     </main>
