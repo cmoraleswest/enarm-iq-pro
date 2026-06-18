@@ -9,7 +9,7 @@ export const metadata = {
 export default async function Root() {
   const cookieStore = await cookies()
   const session = cookieStore.get("enarm_sess")
-  if (session) redirect("/home")
+  // if (session) redirect("/home")
   return <Landing />
 }
 
