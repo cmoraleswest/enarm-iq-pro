@@ -17,7 +17,7 @@ const EXAM_MODULES = [
     section:  'A',
     title:    'Diagnóstico Inicial',
     desc:     '180 preguntas · 36 por especialidad · Genera tu perfil académico completo',
-    color:    '#D4AF37',
+    color:    '#00d9ff',
     href:     '/exams/diagnostico',
     tag:      'OPCIONAL · CADA 30-45 DÍAS',
   },
@@ -87,7 +87,7 @@ export default function DashboardPage() {
     <main style={S.main}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-        <h1 style={S.logo}>ENARM IQ</h1>
+        <h1 style={S.logo}>Simula ENARM</h1>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={() => router.push('/perfil')} style={S.btnGhost}>Mi perfil</button>
           <button onClick={handleLogout} disabled={loggingOut} style={{ ...S.btnGhost, color: '#475569' }}>
@@ -134,7 +134,7 @@ export default function DashboardPage() {
           <button
             key={m.id}
             onClick={() => router.push(m.href)}
-            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: 'pointer', transition: 'border-color 0.2s', fontFamily: 'Georgia, serif' }}
+            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: 'pointer', transition: 'border-color 0.2s', fontFamily: 'DM Sans, Arial, sans-serif' }}
             onMouseEnter={e => (e.currentTarget.style.borderColor = m.color)}
             onMouseLeave={e => (e.currentTarget.style.borderColor = '#1e293b')}
           >
@@ -151,14 +151,14 @@ export default function DashboardPage() {
       </div>
 
       <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 40 }}>
-        ENARM IQ · Banco Maestro 2025
+        Simula ENARM · Banco Maestro 2025
       </p>
     </main>
   )
 }
 
 const S: Record<string, React.CSSProperties> = {
-  main:     { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 700, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
-  logo:     { color: '#D4AF37', fontSize: '2rem', margin: 0, letterSpacing: 3 },
-  btnGhost: { backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'Georgia, serif' },
+  main:     { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 700, margin: '0 auto', backgroundColor: '#0a0a14', minHeight: '100vh', color: '#e2e8f0' },
+  logo:     { color: '#00d9ff', fontSize: '2rem', margin: 0, letterSpacing: 3 },
+  btnGhost: { backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'DM Sans, Arial, sans-serif' },
 }
