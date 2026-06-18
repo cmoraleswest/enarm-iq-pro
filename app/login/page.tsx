@@ -23,7 +23,7 @@ export default function LoginPage() {
       const ip = await getClientIp()
       const res = await fetch('/api/auth', {
         method: 'POST',
-        credentials: 'same-origin',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'login', idToken, fingerprint, ip }),
       })
@@ -34,6 +34,10 @@ export default function LoginPage() {
         return
       }
       if (data.uid) localStorage.setItem('enarm_user_info', JSON.stringify({ uid: data.uid, email: data.email, isPaid: data.isPaid, daysLeft: data.daysLeft }))
+      const check = await fetch('/api/check-session', { credentials: 'include' }).then(r => r.json()).catch(() => null)
+      if (check?.status !== 'OK') {
+        console.warn('Cookie verification failed:', check)
+      }
       window.location.href = '/home'
     } catch {
       setError('Correo o contrasena incorrectos')

@@ -5,15 +5,18 @@ import { createUserProfile, getUserProfile, isTrialActive, trialDaysLeft, detect
 const SESSION_COOKIE = 'enarm_sess'
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 días
 
-function setSessionCookie(response: NextResponse, sessionData: string) {
-  response.cookies.set(SESSION_COOKIE, Buffer.from(sessionData).toString('base64'), {
-    httpOnly: true,
-    secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge:   SESSION_MAX_AGE,
-    path:     '/',
-  })
-  return response
+function buildCookieHeader(value: string): string {
+  const parts = [
+    `${SESSION_COOKIE}=${value}`,
+    'Path=/',
+    `Max-Age=${SESSION_MAX_AGE}`,
+    'HttpOnly',
+    'SameSite=Lax',
+  ]
+  if (process.env.NODE_ENV === 'production') {
+    parts.push('Secure')
+  }
+  return parts.join('; ')
 }
 
 // POST: login (verificar idToken, crear cookie de sesión)
@@ -42,7 +45,6 @@ async function handleLogin(idToken: string, fingerprint: string, ip: string) {
 
     let profile = await getUserProfile(decoded.uid)
 
-    // Auto-crear perfil si no existe (caso: registro completó Firebase Auth pero falló el PUT)
     if (!profile) {
       await createUserProfile(decoded.uid, decoded.email ?? '', fingerprint, ip)
       profile = await getUserProfile(decoded.uid)
@@ -67,8 +69,26 @@ async function handleLogin(idToken: string, fingerprint: string, ip: string) {
       trialActive: active,
     })
 
-    const response = NextResponse.json({ ok: true, uid: decoded.uid, email: decoded.email, isPaid: profile.isPaid, daysLeft })
-    return setSessionCookie(response, sessionData)
+    const cookieValue = Buffer.from(sessionData).toString('base64')
+    const response = NextResponse.json({
+      ok: true,
+      uid: decoded.uid,
+      email: decoded.email,
+      isPaid: profile.isPaid,
+      daysLeft,
+      cookieSet: true,
+    })
+
+    response.cookies.set(SESSION_COOKIE, cookieValue, {
+      httpOnly: true,
+      secure:   process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge:   SESSION_MAX_AGE,
+      path:     '/',
+    })
+    response.headers.append('Set-Cookie', buildCookieHeader(cookieValue))
+
+    return response
   } catch (err) {
     console.error('Login error:', err)
     return NextResponse.json({ error: 'Token inválido o expirado.' }, { status: 401 })
@@ -76,7 +96,6 @@ async function handleLogin(idToken: string, fingerprint: string, ip: string) {
 }
 
 async function handleRegister(fingerprint: string, ip: string) {
-  // Verificación anti-fraude — solo bloquea si hay trial expirado en mismo dispositivo/IP
   const isFraud = await detectFraud(fingerprint, ip)
   if (isFraud) {
     return NextResponse.json({
@@ -115,5 +134,6 @@ export async function PUT(request: Request) {
 export async function DELETE() {
   const response = NextResponse.json({ ok: true })
   response.cookies.set(SESSION_COOKIE, '', { maxAge: 0, path: '/' })
+  response.headers.append('Set-Cookie', `${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`)
   return response
 }

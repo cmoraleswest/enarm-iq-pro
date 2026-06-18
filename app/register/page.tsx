@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
       const fraudCheck = await fetch('/api/auth', {
         method:  'POST',
-        credentials: 'same-origin',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ action: 'register', fingerprint, ip }),
       })
@@ -46,7 +46,7 @@ export default function RegisterPage() {
       const idToken = await cred.user.getIdToken()
       await fetch('/api/auth', {
         method:  'PUT',
-        credentials: 'same-origin',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ idToken, fingerprint, ip }),
       })
