@@ -28,7 +28,7 @@ export default function PerfilPage() {
   const fetchStats = async () => {
     setLoading(true)
     try {
-      const res  = await fetch('/api/stats')
+      const res  = await fetch('/api/stats', { credentials: 'include' })
       const data = await res.json() as { stats?: UserStats; error?: string }
       if (!res.ok) throw new Error(data.error)
       setStats(data.stats ?? null)

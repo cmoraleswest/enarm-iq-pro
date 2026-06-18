@@ -25,6 +25,7 @@ export default function DiarioPage() {
       const res  = await fetch('/api/exam', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body:    JSON.stringify({ action: 'start', examType: 'diario' }),
       })
       const data = await res.json() as { sessionId: string; questions: QuestionForClient[] }
@@ -58,6 +59,7 @@ export default function DiarioPage() {
       const res = await fetch('/api/exam', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         // partial=true → califica sin borrar sesión (para feedback inmediato)
         // partial=false → submit final, guarda en Firestore
         body:    JSON.stringify({ action: 'submit', sessionId, answers: newAnswers, startedAt, partial: !isLast }),

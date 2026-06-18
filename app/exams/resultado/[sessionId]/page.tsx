@@ -24,7 +24,7 @@ export default function ResultadoPage() {
 
   useEffect(() => {
     if (result || !sessionId) return
-    fetch(`/api/exam?session=${sessionId}`)
+    fetch(`/api/exam?session=${sessionId}`, { credentials: 'include' })
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data) setResult(data as SubmitExamResponse) })
       .finally(() => setLoading(false))

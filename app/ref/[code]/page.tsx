@@ -8,7 +8,7 @@ export default function ReferralPage() {
   const code = params.code as string
   useEffect(() => {
     if (code) localStorage.setItem('referralCode', code.toUpperCase())
-    router.push('/register')
+    window.location.href = '/register'
   }, [code, router])
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', textAlign: 'center' }}>

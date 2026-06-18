@@ -14,7 +14,7 @@ export default function VerifyEmailPage() {
 
   const resend = async () => {
     const user = auth.currentUser
-    if (!user) { router.push('/login'); return }
+    if (!user) { window.location.href = '/login'; return }
     try {
       await sendEmailVerification(user, { url: `${window.location.origin}/login` })
       setSent(true)
@@ -25,13 +25,13 @@ export default function VerifyEmailPage() {
 
   const checkVerification = async () => {
     const user = auth.currentUser
-    if (!user) { router.push('/login'); return }
+    if (!user) { window.location.href = '/login'; return }
     setChecking(true)
     setError('')
     try {
       await reload(user)
       if (user.emailVerified) {
-        router.push('/login')
+        window.location.href = '/login'
       } else {
         setError('Aún no hemos recibido la verificación. Revisa tu bandeja de entrada.')
       }
