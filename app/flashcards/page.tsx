@@ -94,7 +94,7 @@ export default function FlashcardsPage() {
   const pctDominio = stats.total > 0 ? Math.round((stats.dominio / stats.total) * 100) : 0
 
   return (
-    <main style={{ padding: '24px', fontFamily: 'Georgia, serif', maxWidth: '600px', margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' }}>
+    <main style={{ padding: '24px', fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: '600px', margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
@@ -105,7 +105,7 @@ export default function FlashcardsPage() {
         >
           ←
         </button>
-        <h1 style={{ color: '#D4AF37', fontSize: '1.8rem', margin: 0, letterSpacing: '2px' }}>FLASHCARDS</h1>
+        <h1 style={{ color: '#00d9ff', fontSize: '1.8rem', margin: 0, letterSpacing: '2px' }}>FLASHCARDS</h1>
       </div>
       <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '24px' }}>
         Estudio rápido · Toca la tarjeta para revelar
@@ -146,12 +146,12 @@ export default function FlashcardsPage() {
             onClick={() => setCategoria(cat)}
             style={{
               padding: '7px 14px', borderRadius: '20px',
-              border: `1px solid ${categoria === cat ? '#D4AF37' : '#334155'}`,
-              backgroundColor: categoria === cat ? '#D4AF37' : 'transparent',
+              border: `1px solid ${categoria === cat ? '#00d9ff' : '#334155'}`,
+              backgroundColor: categoria === cat ? '#00d9ff' : 'transparent',
               color: categoria === cat ? '#0f0f1a' : '#64748b',
               cursor: 'pointer', fontSize: '0.78rem',
               fontWeight: categoria === cat ? 'bold' : 'normal',
-              fontFamily: 'Georgia, serif',
+              fontFamily: 'DM Sans, Arial, sans-serif',
             }}
           >
             {cat}
@@ -166,11 +166,11 @@ export default function FlashcardsPage() {
           disabled={cargando}
           style={{
             width: '100%', padding: '16px',
-            backgroundColor: cargando ? '#78600a' : '#D4AF37',
+            backgroundColor: cargando ? '#78600a' : '#00d9ff',
             color: '#0f0f1a', border: 'none', borderRadius: '12px',
             fontSize: '1rem', fontWeight: 'bold',
             cursor: cargando ? 'not-allowed' : 'pointer',
-            letterSpacing: '1px', fontFamily: 'Georgia, serif',
+            letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif',
             minHeight: '54px',
           }}
         >
@@ -195,7 +195,7 @@ export default function FlashcardsPage() {
               cursor: 'pointer',
               minHeight: '220px',
               borderRadius: '16px',
-              border: `2px solid ${volteada ? '#1d4ed8' : '#D4AF37'}`,
+              border: `2px solid ${volteada ? '#ff006e' : '#00d9ff'}`,
               backgroundColor: volteada ? '#0d1117' : '#1a1f2e',
               padding: '28px',
               marginBottom: '20px',
@@ -208,7 +208,7 @@ export default function FlashcardsPage() {
             <div style={{
               position: 'absolute', top: '14px', right: '16px',
               fontSize: '0.7rem', letterSpacing: '1px',
-              color: volteada ? '#3b82f6' : '#D4AF37',
+              color: volteada ? '#3b82f6' : '#00d9ff',
             }}>
               {volteada ? 'REVERSO' : 'ANVERSO'} ↕
             </div>
@@ -228,8 +228,8 @@ export default function FlashcardsPage() {
                 <p style={{ color: '#4ade80', fontSize: '1.05rem', fontWeight: 'bold', margin: '0 0 16px 0', lineHeight: '1.5' }}>
                   {pregunta.respuesta_correcta}
                 </p>
-                <p style={{ color: '#60a5fa', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 8px 0' }}>JUSTIFICACIÓN</p>
-                <p style={{ margin: 0, lineHeight: '1.8', color: '#bfdbfe', fontSize: '0.88rem' }}>
+                <p style={{ color: '#00d9ff', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 8px 0' }}>JUSTIFICACIÓN</p>
+                <p style={{ margin: 0, lineHeight: '1.8', color: '#94a3b8', fontSize: '0.88rem' }}>
                   {pregunta.justificacion}
                 </p>
               </div>
@@ -245,7 +245,7 @@ export default function FlashcardsPage() {
                   flex: 1, padding: '16px', borderRadius: '12px',
                   border: '2px solid #fbbf24', backgroundColor: 'transparent',
                   color: '#fbbf24', fontSize: '1rem', fontWeight: 'bold',
-                  cursor: 'pointer', fontFamily: 'Georgia, serif',
+                  cursor: 'pointer', fontFamily: 'DM Sans, Arial, sans-serif',
                   minHeight: '54px',
                 }}
               >
@@ -257,7 +257,7 @@ export default function FlashcardsPage() {
                   flex: 1, padding: '16px', borderRadius: '12px',
                   border: '2px solid #4ade80', backgroundColor: '#14532d',
                   color: '#4ade80', fontSize: '1rem', fontWeight: 'bold',
-                  cursor: 'pointer', fontFamily: 'Georgia, serif',
+                  cursor: 'pointer', fontFamily: 'DM Sans, Arial, sans-serif',
                   minHeight: '54px',
                 }}
               >
@@ -273,9 +273,9 @@ export default function FlashcardsPage() {
               style={{
                 width: '100%', padding: '16px',
                 backgroundColor: 'transparent', border: '2px solid #D4AF37',
-                color: '#D4AF37', borderRadius: '12px',
+                color: '#00d9ff', borderRadius: '12px',
                 fontSize: '1rem', fontWeight: 'bold',
-                cursor: 'pointer', letterSpacing: '1px', fontFamily: 'Georgia, serif',
+                cursor: 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif',
                 minHeight: '54px',
               }}
             >
