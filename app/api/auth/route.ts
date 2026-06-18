@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   return handleLogin(body.idToken ?? '', request)
 }
 
-async function handleLogin(idToken: string, request: Request) {
+async function handleLogin(idToken: string, _request: Request) {
   try {
     const decoded = await adminAuth.verifyIdToken(idToken)
 

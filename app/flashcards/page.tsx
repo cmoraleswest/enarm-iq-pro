@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Pregunta {
@@ -41,12 +41,8 @@ export default function FlashcardsPage() {
   const [volteada, setVolteada] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [categoria, setCategoria] = useState('Todas')
-  const [stats, setStats] = useState<FlashStats>({ dominio: 0, repasar: 0, total: 0 })
+  const [stats, setStats] = useState<FlashStats>(loadStats)
   const [respuestaVisible, setRespuestaVisible] = useState(false)
-
-  useEffect(() => {
-    setStats(loadStats())
-  }, [])
 
   const cargarTarjeta = async () => {
     setCargando(true)

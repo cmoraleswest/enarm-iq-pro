@@ -6,7 +6,7 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
   LineChart, Line, ResponsiveContainer, CartesianGrid,
 } from 'recharts'
-import type { UserStats, SpecialtyStats } from '@/types/exam'
+import type { UserStats } from '@/types/exam'
 
 // Colores por especialidad
 const SP_COLORS: Record<string, string> = {
@@ -25,10 +25,6 @@ export default function PerfilPage() {
   const [error, setError]   = useState('')
   const [tab, setTab]       = useState<'overview' | 'diagnostics' | 'history'>('overview')
 
-  useEffect(() => {
-    fetchStats()
-  }, [])
-
   const fetchStats = async () => {
     setLoading(true)
     try {
@@ -42,6 +38,10 @@ export default function PerfilPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
 
   if (loading) {
     return (

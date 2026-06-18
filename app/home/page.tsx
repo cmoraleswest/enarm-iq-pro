@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { TRIAL_MS } from '@/lib/constants'
 
 interface UserInfo {
   uid:      string
@@ -67,7 +66,7 @@ export default function DashboardPage() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('enarm_user_info')
-      if (raw) setUserInfo(JSON.parse(raw) as UserInfo)
+      if (raw) { const parsed = JSON.parse(raw) as UserInfo; setUserInfo(parsed) }
     } catch { /* sin datos previos */ }
   }, [])
 
@@ -81,7 +80,6 @@ export default function DashboardPage() {
 
   const daysLeft  = userInfo?.daysLeft ?? 0
   const isDemo    = !userInfo?.isPaid
-  const trialPct  = Math.max(0, Math.min(100, (daysLeft / (TRIAL_MS / 86400000)) * 100))
 
   return (
     <main style={S.main}>

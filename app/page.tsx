@@ -1,5 +1,4 @@
 import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
 
 export const metadata = {
   title: "Simula ENARM — Practica hoy. Aprueba manana.",
@@ -7,9 +6,7 @@ export const metadata = {
 }
 
 export default async function Root() {
-  const cookieStore = await cookies()
-  const session = cookieStore.get("enarm_sess")
-  // if (session) redirect("/home")
+  await cookies()
   return <Landing />
 }
 

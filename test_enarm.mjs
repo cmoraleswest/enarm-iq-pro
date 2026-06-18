@@ -4,8 +4,6 @@
  */
 
 import admin from 'firebase-admin'
-import { readFileSync } from 'fs'
-import { createPrivateKey } from 'crypto'
 
 const PROJECT_ID    = 'enarm-iq'
 const API_KEY       = 'AIzaSyDquVZNBV5o-WM-ZeJFoTS-2IsLIk6s98k'

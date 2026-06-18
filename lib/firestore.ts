@@ -3,7 +3,7 @@ import type {
   UserProfile, ExamSession, SubmitExamResponse,
   AnswerResult, SpecialtyStats, Specialty, DiagnosticSnapshot, UserStats,
 } from '@/types/exam'
-import { TRIAL_DAYS, TRIAL_MS } from './constants'
+import { TRIAL_MS } from './constants'
 
 export { TRIAL_MS }
 

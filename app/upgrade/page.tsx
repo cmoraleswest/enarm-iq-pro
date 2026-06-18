@@ -49,7 +49,7 @@ export default function UpgradePage() {
         {[{ key: 'annual', label: 'Plan Anual', sub: 'AHORRA 41% · Más popular', price: '$599', per: 'MXN/año', color: '#4ade80' },
           { key: 'monthly', label: 'Plan Mensual', sub: 'Cancela cuando quieras', price: '$99', per: 'MXN/mes', color: '#94a3b8' }
         ].map(p => (
-          <div key={p.key} onClick={() => setPlan(p.key as any)}
+          <div key={p.key} onClick={() => setPlan(p.key as 'monthly' | 'annual')}
             style={{ padding: 16, borderRadius: 12, border: `2px solid ${plan === p.key ? '#D4AF37' : '#1e3a5f'}`, backgroundColor: plan === p.key ? '#1a1500' : '#0f172a', cursor: 'pointer', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ color: '#fff', fontWeight: 'bold' }}>{p.label}</div>

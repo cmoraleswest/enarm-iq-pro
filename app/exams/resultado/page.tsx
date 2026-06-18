@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { SubmitExamResponse, AnswerResult, SpecialtyStats } from '@/types/exam'
 
@@ -16,33 +16,21 @@ export default function ResultadoPage() {
   )
 }
 
+function getSessionResult(sessionId: string): SubmitExamResponse | null {
+  if (typeof window === 'undefined') return null
+  const raw = sessionStorage.getItem(`exam_result_${sessionId}`)
+  return raw ? JSON.parse(raw) as SubmitExamResponse : null
+}
+
 function ResultadoContent() {
   const router       = useRouter()
   const params       = useSearchParams()
   const sessionId    = params.get('session') ?? ''
   const timeUp       = params.get('timeup') === '1'
 
-  const [result, setResult]     = useState<SubmitExamResponse | null>(null)
-  const [loading, setLoading]   = useState(true)
+  const [result]     = useState<SubmitExamResponse | null>(() => getSessionResult(sessionId))
   const [filter, setFilter]     = useState<'todos' | 'incorrectas'>('todos')
   const [expandIdx, setExpandIdx] = useState<number | null>(null)
-
-  useEffect(() => {
-    const raw = sessionStorage.getItem(`exam_result_${sessionId}`)
-    if (raw) {
-      setResult(JSON.parse(raw) as SubmitExamResponse)
-      setLoading(false)
-    } else {
-      setLoading(false)
-    }
-  }, [sessionId])
-
-  // La página de resultado recibe los datos via sessionStorage
-  // (se guarda desde la página del examen antes de navegar)
-
-  if (loading) {
-    return <Screen><p style={{ color: '#D4AF37' }}>Cargando resultados...</p></Screen>
-  }
 
   if (!result) {
     return (

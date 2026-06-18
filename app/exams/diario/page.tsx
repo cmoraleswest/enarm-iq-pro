@@ -19,8 +19,6 @@ export default function DiarioPage() {
   const [resultSessionId, setResultSessionId] = useState('')
   const [error, setError]               = useState('')
 
-  useEffect(() => { startExam() }, [])
-
   const startExam = async () => {
     setPhase('loading')
     try {
@@ -44,6 +42,8 @@ export default function DiarioPage() {
       setPhase('exam')
     }
   }
+
+  useEffect(() => { startExam() }, [])
 
   const responder = async (selected: string) => {
     if (currentResult) return

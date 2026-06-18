@@ -34,4 +34,5 @@ export const db = new Proxy({} as Firestore, {
   get(_t, prop) { return (getFirebaseDb() as unknown as Record<string, unknown>)[prop as string] },
 })
 
-export default { getApp }
+const firebase = { getApp }
+export default firebase

@@ -54,6 +54,19 @@ export default function SimuladorLibrePage() {
     }
   }
 
+  const submitExam = async () => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    setPhase('submitting')
+    const res = await fetch('/api/exam', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
+    })
+    const data = await res.json()
+    sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
+    router.push(`/exams/resultado?session=${data.sessionId}`)
+  }
+
   const responder = (op: string) => {
     if (respondido) return
     setSeleccion(op)
@@ -66,19 +79,6 @@ export default function SimuladorLibrePage() {
     setCurrentIdx(i => i + 1)
     setRespondido(false)
     setSeleccion('')
-  }
-
-  const submitExam = async () => {
-    if (timerRef.current) clearInterval(timerRef.current)
-    setPhase('submitting')
-    const res = await fetch('/api/exam', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
-    })
-    const data = await res.json()
-    sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
-    router.push(`/exams/resultado?session=${data.sessionId}`)
   }
 
   if (phase === 'intro') {

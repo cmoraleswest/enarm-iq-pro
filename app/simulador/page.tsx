@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Caso {
@@ -49,14 +49,9 @@ export default function SimuladorPage() {
   const [seleccion, setSeleccion] = useState<string | null>(null)
   const [respondido, setRespondido] = useState(false)
   const [categoria, setCategoria] = useState('Todas')
-  const [stats, setStats] = useState<Stats>({ correctas: 0, incorrectas: 0, porCategoria: {} })
+  const [stats, setStats] = useState<Stats>(loadStats)
   const [verResumen, setVerResumen] = useState(false)
   const [showJustif, setShowJustif] = useState(false)
-
-  // Cargar stats persistidos
-  useEffect(() => {
-    setStats(loadStats())
-  }, [])
 
   const cargarPregunta = async () => {
     setCargando(true)

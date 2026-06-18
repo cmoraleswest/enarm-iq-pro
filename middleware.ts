@@ -3,12 +3,18 @@ import type { NextRequest } from 'next/server'
 
 const SESSION = 'enarm_sess'
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Permitir siempre: login, assets de Next.js
   if (
     pathname === '/login' ||
+    pathname === '/register' ||
+    pathname === '/verify-email' ||
+    pathname === '/terminos' ||
+    pathname === '/privacidad' ||
+    pathname === '/aviso-privacidad' ||
+    pathname.startsWith('/ref/') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon')
   ) {

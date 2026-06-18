@@ -39,4 +39,5 @@ export const adminFirestore = new Proxy({} as admin.firestore.Firestore, {
   },
 })
 
-export default { app: getApp }
+const firebaseAdmin = { app: getApp }
+export default firebaseAdmin
