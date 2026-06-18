@@ -1,11 +1,5 @@
 import Stripe from 'stripe'
 
-export function getStripe() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2026-05-27.dahlia',
-  })
-}
-
 export const PLANS = {
   monthly: {
     priceId: 'price_1TjYGuFqy3VFvYx2KBZQD6L5',
@@ -22,3 +16,11 @@ export const PLANS = {
 } as const
 
 export const REFERRAL_CREDIT = 150
+
+export function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error('STRIPE_SECRET_KEY no definida')
+  return new Stripe(key, {
+    apiVersion: '2025-05-28.basil',
+  })
+}
