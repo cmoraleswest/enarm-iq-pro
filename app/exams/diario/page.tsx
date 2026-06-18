@@ -108,7 +108,7 @@ export default function DiarioPage() {
 
   return (
     <main style={S.main}>
-      <Header title="SIMULADOR DIARIO" subtitle="10 preguntas · Justificación inmediata" onBack={() => router.push('/')} />
+      <Header title="SIMULADOR DIARIO" subtitle="10 preguntas · Justificación inmediata" onBack={() => router.push('/home')} />
 
       {/* Progreso */}
       <div style={{ marginBottom: 20 }}>

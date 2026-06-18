@@ -87,7 +87,7 @@ export default function PersonalizadoPage() {
     return (
       <main style={S.main}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
-          <button onClick={() => router.push('/')} style={S.backBtn}>←</button>
+          <button onClick={() => router.push('/home')} style={S.backBtn}>←</button>
           <h1 style={S.title}>EXAMEN PERSONALIZADO</h1>
         </div>
         <p style={S.sub}>Elige tus especialidades y número de preguntas</p>
@@ -137,7 +137,7 @@ export default function PersonalizadoPage() {
   return (
     <main style={S.main}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
-        <button onClick={() => router.push('/')} style={S.backBtn}>←</button>
+        <button onClick={() => router.push('/home')} style={S.backBtn}>←</button>
         <h1 style={S.title}>PERSONALIZADO</h1>
         <span style={{ marginLeft: 'auto', color: '#94a3b8', fontSize: '0.82rem' }}>{currentIdx + 1}/{questions.length}</span>
       </div>

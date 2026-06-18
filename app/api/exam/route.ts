@@ -14,19 +14,22 @@ import type {
   ExamType, Specialty, ClientAnswer, StartExamResponse, SubmitExamResponse,
 } from '@/types/exam'
 
-async function getSessionUid(): Promise<string> {
+async function getSessionUid(): Promise<string | null> {
   const cookieStore = await cookies()
   const raw = cookieStore.get('enarm_sess')?.value
-  if (!raw) return 'anonymous'
+  if (!raw) return null
   try {
     const data = JSON.parse(Buffer.from(raw, 'base64').toString()) as { uid: string }
-    return data.uid || 'anonymous'
-  } catch { return 'anonymous' }
+    return data.uid || null
+  } catch { return null }
 }
 
 // POST /api/exam — iniciar o calificar examen
 export async function POST(request: Request) {
   const uid = await getSessionUid()
+  if (!uid) {
+    return NextResponse.json({ error: 'No autenticado. Inicia sesión.' }, { status: 401 })
+  }
 
   const body = await request.json() as {
     action: 'start' | 'submit'

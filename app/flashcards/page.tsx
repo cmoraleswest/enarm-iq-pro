@@ -95,7 +95,7 @@ export default function FlashcardsPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push('/home')}
           style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: '0', lineHeight: 1 }}
           title="Volver al dashboard"
         >

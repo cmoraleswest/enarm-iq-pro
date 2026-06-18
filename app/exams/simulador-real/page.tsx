@@ -100,7 +100,7 @@ export default function SimuladorRealPage() {
     return (
       <main style={S.main}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <button onClick={() => router.push('/')} style={S.back}>←</button>
+          <button onClick={() => router.push('/home')} style={S.back}>←</button>
           <h1 style={S.h1}>SIMULADOR REAL CRONOMETRADO</h1>
         </div>
 

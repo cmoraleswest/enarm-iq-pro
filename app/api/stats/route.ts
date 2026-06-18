@@ -6,9 +6,16 @@ export async function GET() {
   const cookieStore = await cookies()
   const raw = cookieStore.get('enarm_sess')?.value
 
+  if (!raw) {
+    return NextResponse.json({ error: 'No autenticado.' }, { status: 401 })
+  }
+
   try {
-    const uid = raw ? (JSON.parse(Buffer.from(raw, 'base64').toString()) as { uid: string }).uid : 'anonymous'
-    const stats = await getUserStats(uid)
+    const parsed = JSON.parse(Buffer.from(raw, 'base64').toString()) as { uid: string }
+    if (!parsed.uid) {
+      return NextResponse.json({ error: 'Sesión inválida.' }, { status: 401 })
+    }
+    const stats = await getUserStats(parsed.uid)
     return NextResponse.json({ stats })
   } catch {
     return NextResponse.json({ error: 'Error al obtener estadísticas.' }, { status: 500 })
