@@ -21,6 +21,6 @@ export function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY
   if (!key) throw new Error('STRIPE_SECRET_KEY no definida')
   return new Stripe(key, {
-    apiVersion: '2025-05-28.basil',
+    apiVersion: '2026-05-27.dahlia',
   })
 }
