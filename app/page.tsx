@@ -1,164 +1,110 @@
-'use client'
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { TRIAL_MS } from '@/lib/constants'
-
-interface UserInfo {
-  uid:      string
-  email:    string
-  isPaid:   boolean
-  daysLeft: number
+export const metadata = {
+  title: "Simula ENARM — Practica hoy. Aprueba manana.",
+  description: "Preparate para el ENARM con 2,000 preguntas reales y 5 simuladores. Desde 99 MXN/mes.",
 }
 
-const EXAM_MODULES = [
-  {
-    id:       'diagnostico',
-    section:  'A',
-    title:    'Diagnóstico Inicial',
-    desc:     '180 preguntas · 36 por especialidad · Genera tu perfil académico completo',
-    color:    '#D4AF37',
-    href:     '/exams/diagnostico',
-    tag:      'OPCIONAL · CADA 30-45 DÍAS',
-  },
-  {
-    id:       'diario',
-    section:  'B',
-    title:    'Simulador Diario',
-    desc:     '10 preguntas aleatorias · Justificación inmediata después de cada respuesta',
-    color:    '#4ade80',
-    href:     '/exams/diario',
-    tag:      'RECOMENDADO DIARIO',
-  },
-  {
-    id:       'personalizado',
-    section:  'C',
-    title:    'Examen Personalizado',
-    desc:     'Elige entre 10 y 40 preguntas · Selecciona una o varias especialidades',
-    color:    '#a78bfa',
-    href:     '/exams/personalizado',
-    tag:      'A TU RITMO',
-  },
-  {
-    id:       'simulador_real',
-    section:  'D',
-    title:    'Simulador Real',
-    desc:     '360 preguntas · Cronómetro de 6 horas · Condiciones del ENARM real',
-    color:    '#f87171',
-    href:     '/exams/simulador-real',
-    tag:      'ALTA INTENSIDAD',
-  },
-  {
-    id:       'simulador_libre',
-    section:  'E',
-    title:    'Simulador Sin Límite',
-    desc:     '360 preguntas · Sin cronómetro · Registra tu tiempo real al terminar',
-    color:    '#60a5fa',
-    href:     '/exams/simulador-libre',
-    tag:      'ESTUDIO PROFUNDO',
-  },
-]
+export default async function Root() {
+  const cookieStore = await cookies()
+  const session = cookieStore.get("enarm_sess")
+  if (session) redirect("/home")
+  return <Landing />
+}
 
-export default function DashboardPage() {
-  const router = useRouter()
-  const [userInfo, setUserInfo]   = useState<UserInfo | null>(null)
-  const [loggingOut, setLoggingOut] = useState(false)
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('enarm_user_info')
-      if (raw) setUserInfo(JSON.parse(raw) as UserInfo)
-    } catch { /* sin datos previos */ }
-  }, [])
-
-  const handleLogout = async () => {
-    setLoggingOut(true)
-    await fetch('/api/auth', { method: 'DELETE' })
-    localStorage.removeItem('enarm_user_info')
-    router.push('/login')
-    router.refresh()
-  }
-
-  const daysLeft  = userInfo?.daysLeft ?? 0
-  const isDemo    = !userInfo?.isPaid
-  const trialPct  = Math.max(0, Math.min(100, (daysLeft / (TRIAL_MS / 86400000)) * 100))
-
+function Landing() {
   return (
-    <main style={S.main}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-        <h1 style={S.logo}>ENARM IQ</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => router.push('/perfil')} style={S.btnGhost}>Mi perfil</button>
-          <button onClick={handleLogout} disabled={loggingOut} style={{ ...S.btnGhost, color: '#475569' }}>
-            {loggingOut ? '...' : 'Salir'}
-          </button>
+    <main style={{background:"#0a0a14",color:"#e2e8f0",fontFamily:"DM Sans,Arial,sans-serif",minHeight:"100vh"}}>
+      <nav style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"20px 40px",borderBottom:"1px solid #1a1a2e",position:"sticky",top:0,background:"#0a0a14",zIndex:100}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,fontSize:"1.3rem",fontWeight:700}}>
+          <svg width="32" height="32" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="none" stroke="#00d9ff" strokeWidth="2" opacity="0.3"/><path d="M 15 40 L 28 40 L 32 28 L 40 52 L 48 40 L 65 40" fill="none" stroke="#ff006e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="28" cy="40" r="2.5" fill="#ff006e"/><circle cx="48" cy="40" r="2.5" fill="#ff006e"/><circle cx="65" cy="40" r="2.5" fill="#ff006e"/></svg>
+          Simula<span style={{color:"#00d9ff"}}>ENARM</span>
         </div>
-      </div>
-      <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: 20 }}>
-        {userInfo?.email ?? 'Cargando...'} · Banco maestro 2,000 preguntas
-      </p>
+        <a href="/register" style={{background:"linear-gradient(135deg,#ff006e,#00d9ff)",color:"#fff",border:"none",padding:"10px 20px",borderRadius:10,fontSize:"0.85rem",fontWeight:700,cursor:"pointer",textDecoration:"none"}}>Empieza gratis</a>
+      </nav>
 
-      {/* Banner trial */}
-      {isDemo && userInfo && (
-        <div style={{ backgroundColor: '#0f172a', border: '1px solid #1e3a5f', borderRadius: 12, padding: '14px 18px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <p style={{ color: '#60a5fa', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 3px 0' }}>◉ PERÍODO DE PRUEBA</p>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
-              {daysLeft <= 0 ? 'Tu prueba ha expirado' : `${daysLeft} día${daysLeft !== 1 ? 's' : ''} restante${daysLeft !== 1 ? 's' : ''}`}
-            </p>
+      <section style={{minHeight:"90vh",display:"flex",alignItems:"center",justifyContent:"center",padding:"80px 24px",textAlign:"center"}}>
+        <div style={{maxWidth:800}}>
+          <p style={{color:"#00d9ff",fontSize:"0.72rem",letterSpacing:3,marginBottom:16}}>LA PLATAFORMA DE PREPARACION ENARM MAS ACCESIBLE</p>
+          <h1 style={{fontSize:"clamp(2.5rem,6vw,4rem)",fontWeight:700,lineHeight:1.15,marginBottom:24}}>
+            Practica hoy.<br/>
+            <span style={{background:"linear-gradient(135deg,#ff006e,#00d9ff)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Aprueba manana.</span>
+          </h1>
+          <p style={{fontSize:"1.1rem",color:"#64748b",marginBottom:40,lineHeight:1.7}}>2,000 preguntas reales · 5 simuladores · Estadisticas por especialidad</p>
+          <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap",marginBottom:48}}>
+            <a href="/register" style={{background:"linear-gradient(135deg,#ff006e,#00d9ff)",color:"#fff",border:"none",padding:"16px 32px",borderRadius:12,fontSize:"1rem",fontWeight:700,cursor:"pointer",textDecoration:"none"}}>Empieza gratis 2 dias</a>
+            <a href="#precios" style={{background:"transparent",color:"#e2e8f0",border:"1px solid #1a1a2e",padding:"14px 28px",borderRadius:12,fontSize:"1rem",textDecoration:"none"}}>Ver planes</a>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ color: '#3b82f6', fontSize: '1.6rem', fontWeight: 'bold', lineHeight: 1 }}>{daysLeft}</div>
-            <div style={{ color: '#475569', fontSize: '0.65rem' }}>días</div>
-          </div>
-        </div>
-      )}
-
-      {/* Flashcards rápidas */}
-      <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-        onClick={() => router.push('/flashcards')}>
-        <div>
-          <p style={{ color: '#fbbf24', fontSize: '0.7rem', letterSpacing: '2px', margin: '0 0 4px 0' }}>MÓDULO EXTRA</p>
-          <h3 style={{ color: '#e2e8f0', margin: 0, fontSize: '1.1rem' }}>Flashcards</h3>
-          <p style={{ color: '#64748b', fontSize: '0.8rem', margin: '4px 0 0 0' }}>Tarjetas rápidas · Anverso/Reverso · 2 minutos entre pacientes</p>
-        </div>
-        <span style={{ color: '#334155', fontSize: '1.5rem' }}>→</span>
-      </div>
-
-      {/* Módulos de examen */}
-      <h2 style={{ color: '#475569', fontSize: '0.72rem', letterSpacing: '2px', margin: '20px 0 12px 0' }}>5 TIPOS DE EXAMEN</h2>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {EXAM_MODULES.map(m => (
-          <button
-            key={m.id}
-            onClick={() => router.push(m.href)}
-            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: 'pointer', transition: 'border-color 0.2s', fontFamily: 'Georgia, serif' }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = m.color)}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = '#1e293b')}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-              <div>
-                <p style={{ color: m.color, fontSize: '0.68rem', letterSpacing: '2px', margin: '0 0 5px 0' }}>SECCIÓN {m.section} — {m.tag}</p>
-                <h3 style={{ color: '#e2e8f0', fontSize: '1.15rem', margin: 0, fontWeight: 'bold' }}>{m.title}</h3>
+          <div style={{display:"flex",gap:40,justifyContent:"center",flexWrap:"wrap"}}>
+            {[["2,000","Preguntas reales"],["5","Simuladores"],["$99","MXN/mes"],["38%","Aprueba el ENARM"]].map(([n,l])=>(
+              <div key={l} style={{textAlign:"center"}}>
+                <div style={{fontSize:"2rem",fontWeight:700,background:"linear-gradient(135deg,#ff006e,#00d9ff)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{n}</div>
+                <div style={{color:"#475569",fontSize:"0.82rem",marginTop:4}}>{l}</div>
               </div>
-              <span style={{ color: '#334155', fontSize: '1.5rem', lineHeight: 1, flexShrink: 0 }}>→</span>
-            </div>
-            <p style={{ color: '#64748b', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}>{m.desc}</p>
-          </button>
-        ))}
-      </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 40 }}>
-        ENARM IQ · Banco Maestro 2025
-      </p>
+      <section style={{background:"#0f0f1a",padding:"80px 24px",textAlign:"center"}}>
+        <p style={{color:"#00d9ff",fontSize:"0.72rem",letterSpacing:3,marginBottom:12}}>EL PROBLEMA</p>
+        <h2 style={{fontSize:"clamp(1.8rem,4vw,2.5rem)",fontWeight:700,marginBottom:16}}>50,000 medicos presentan el ENARM.<br/>Solo el 38% obtiene plaza.</h2>
+        <p style={{color:"#64748b",maxWidth:600,margin:"0 auto",lineHeight:1.7}}>La diferencia no es talento. Es practica constante y medicion real de tu desempeno.</p>
+      </section>
+
+      <section style={{padding:"80px 24px"}}>
+        <div style={{maxWidth:1100,margin:"0 auto"}}>
+          <p style={{color:"#00d9ff",fontSize:"0.72rem",letterSpacing:3,marginBottom:12}}>6 SIMULADORES</p>
+          <h2 style={{fontSize:"clamp(1.8rem,4vw,2.5rem)",fontWeight:700,marginBottom:40}}>Todo lo que necesitas para aprobar.</h2>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:16}}>
+            {[["#ff006e","CADA 30-45 DIAS","Diagnostico Inicial","180 preguntas. Genera tu perfil academico completo."],["#00d9ff","HOY","Simulador Diario","10 preguntas con justificacion inmediata. Habito diario."],["#a78bfa","A TU RITMO","Examen Personalizado","10-40 preguntas. Filtra por especialidad."],["#ff006e","ALTA INTENSIDAD","Simulador Real ENARM","360 preguntas. Cronometro 6 horas. Condiciones reales."],["#00d9ff","ESTUDIO PROFUNDO","Simulador Sin Limite","360 preguntas sin cronometro. Analisis detallado."],["#a78bfa","REPASO RAPIDO","Flashcards","Tarjetas anverso/reverso. Ideal entre pacientes."]].map(([c,t,ti,d])=>(
+              <div key={ti as string} style={{background:"#0f0f1a",border:"1px solid #1a1a2e",borderRadius:16,padding:28}}>
+                <p style={{color:c as string,fontSize:"0.68rem",letterSpacing:2,marginBottom:8}}>{t}</p>
+                <h3 style={{fontSize:"1rem",fontWeight:600,marginBottom:8}}>{ti}</h3>
+                <p style={{color:"#475569",fontSize:"0.83rem",lineHeight:1.6}}>{d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="precios" style={{background:"#0f0f1a",padding:"80px 24px",textAlign:"center"}}>
+        <p style={{color:"#00d9ff",fontSize:"0.72rem",letterSpacing:3,marginBottom:12}}>PRECIOS</p>
+        <h2 style={{fontSize:"clamp(1.8rem,4vw,2.5rem)",fontWeight:700,marginBottom:8}}>Elige tu plan</h2>
+        <p style={{color:"#64748b",marginBottom:40}}>2 dias gratis · Sin tarjeta · Cancela cuando quieras</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:20,maxWidth:800,margin:"0 auto"}}>
+          <div style={{background:"#0a0a14",border:"1px solid #1a1a2e",borderRadius:16,padding:32,textAlign:"left"}}>
+            <p style={{color:"#475569",fontSize:"0.75rem",letterSpacing:2}}>MENSUAL</p>
+            <div style={{fontSize:"2.2rem",fontWeight:700,margin:"8px 0 4px"}}>$99 <span style={{fontSize:"1rem",color:"#475569"}}>MXN</span></div>
+            <p style={{color:"#475569",fontSize:"0.82rem",marginBottom:20}}>por mes</p>
+            <a href="/register" style={{display:"block",textAlign:"center",border:"1px solid #1a1a2e",color:"#e2e8f0",padding:"12px",borderRadius:10,textDecoration:"none"}}>Empezar</a>
+          </div>
+          <div style={{background:"linear-gradient(135deg,#00d9ff08,#ff006e08)",border:"1px solid #00d9ff44",borderRadius:16,padding:32,textAlign:"left"}}>
+            <span style={{background:"linear-gradient(135deg,#ff006e,#00d9ff)",color:"#fff",fontSize:"0.68rem",fontWeight:700,padding:"4px 10px",borderRadius:20,display:"inline-block",marginBottom:12}}>MAS POPULAR · AHORRA 41%</span>
+            <p style={{color:"#475569",fontSize:"0.75rem",letterSpacing:2}}>ANUAL</p>
+            <div style={{fontSize:"2.2rem",fontWeight:700,margin:"8px 0 4px"}}>$599 <span style={{fontSize:"1rem",color:"#475569"}}>MXN</span></div>
+            <p style={{color:"#475569",fontSize:"0.82rem",marginBottom:20}}>por ano · equivale a $50/mes</p>
+            <a href="/register" style={{display:"block",textAlign:"center",background:"linear-gradient(135deg,#ff006e,#00d9ff)",color:"#fff",padding:"12px",borderRadius:10,textDecoration:"none",fontWeight:700}}>Empezar gratis</a>
+          </div>
+        </div>
+      </section>
+
+      <section style={{padding:"80px 24px",textAlign:"center"}}>
+        <p style={{color:"#00d9ff",fontSize:"0.72rem",letterSpacing:3,marginBottom:12}}>EMPIEZA HOY</p>
+        <h2 style={{fontSize:"clamp(1.8rem,4vw,2.5rem)",fontWeight:700,marginBottom:16}}>2 dias gratis. Sin tarjeta.</h2>
+        <a href="/register" style={{display:"inline-block",background:"linear-gradient(135deg,#ff006e,#00d9ff)",color:"#fff",padding:"18px 40px",borderRadius:12,fontSize:"1.1rem",fontWeight:700,textDecoration:"none"}}>Crear cuenta gratis</a>
+      </section>
+
+      <footer style={{borderTop:"1px solid #1a1a2e",padding:"40px 24px",textAlign:"center"}}>
+        <div style={{display:"flex",gap:20,justifyContent:"center",flexWrap:"wrap",marginBottom:12}}>
+          {[["Terminos","/terminos"],["Privacidad","/privacidad"],["Aviso de Privacidad","/aviso-privacidad"],["Acceso a la app","/login"],["contacto@simulaenarm.com","mailto:contacto@simulaenarm.com"]].map(([l,h])=>(
+            <a key={h as string} href={h as string} style={{color:"#334155",fontSize:"0.78rem",textDecoration:"none"}}>{l}</a>
+          ))}
+        </div>
+        <p style={{color:"#334155",fontSize:"0.78rem",marginBottom:8}}>2026 SimulaENARM. Todos los derechos reservados. Cuernavaca, Morelos, Mexico</p>
+        <p style={{color:"#1e293b",fontSize:"0.7rem",maxWidth:680,margin:"0 auto",lineHeight:1.6}}>Simula ENARM es una plataforma educativa independiente. No esta afiliada a la CIFRHS ni a la Secretaria de Salud. El termino ENARM es meramente descriptivo. Pagos procesados por Stripe. SimulaENARM marca en tramite ante el IMPI.</p>
+      </footer>
     </main>
   )
-}
-
-const S: Record<string, React.CSSProperties> = {
-  main:     { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 700, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
-  logo:     { color: '#D4AF37', fontSize: '2rem', margin: 0, letterSpacing: 3 },
-  btnGhost: { backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'Georgia, serif' },
 }
