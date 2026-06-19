@@ -20,6 +20,16 @@ export default function SimuladorLibrePage() {
   const timerRef                    = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
+    try {
+      const raw = localStorage.getItem('enarm_user_info')
+      if (raw) {
+        const u = JSON.parse(raw)
+        if (!u.isPaid && u.daysLeft <= 0) window.location.href = '/upgrade'
+      }
+    } catch { /* ignore */ }
+  }, [])
+
+  useEffect(() => {
     if (phase !== 'exam') return
     timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }

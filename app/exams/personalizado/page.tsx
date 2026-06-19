@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { QuestionForClient, ClientAnswer, Specialty } from '@/types/exam'
 import { ALL_SPECIALTIES } from '@/types/exam'
@@ -20,6 +20,16 @@ export default function PersonalizadoPage() {
   const [respondido, setRespondido] = useState(false)
   const [seleccion, setSeleccion]   = useState('')
   const [error, setError]           = useState('')
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('enarm_user_info')
+      if (raw) {
+        const u = JSON.parse(raw)
+        if (!u.isPaid && u.daysLeft <= 0) window.location.href = '/upgrade'
+      }
+    } catch { /* ignore */ }
+  }, [])
 
   const toggleSpecialty = (sp: Specialty) => {
     setSelected(prev =>

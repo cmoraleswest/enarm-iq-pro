@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Pregunta {
   id: number
@@ -35,6 +35,16 @@ function saveStats(s: FlashStats) {
 }
 
 export default function FlashcardsPage() {
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('enarm_user_info')
+      if (raw) {
+        const u = JSON.parse(raw)
+        if (!u.isPaid && u.daysLeft <= 0) window.location.href = '/upgrade'
+      }
+    } catch { /* ignore */ }
+  }, [])
+
   const [pregunta, setPregunta] = useState<Pregunta | null>(null)
   const [volteada, setVolteada] = useState(false)
   const [cargando, setCargando] = useState(false)

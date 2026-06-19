@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { QuestionForClient, ClientAnswer } from '@/types/exam'
 
@@ -16,6 +16,16 @@ export default function DiagnosticoPage() {
   const [answers, setAnswers]       = useState<ClientAnswer[]>([])
   const [seleccion, setSeleccion]   = useState('')
   const [respondido, setRespondido] = useState(false)
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('enarm_user_info')
+      if (raw) {
+        const u = JSON.parse(raw)
+        if (!u.isPaid && u.daysLeft <= 0) window.location.href = '/upgrade'
+      }
+    } catch { /* ignore */ }
+  }, [])
 
   const startExam = async () => {
     setPhase('loading')

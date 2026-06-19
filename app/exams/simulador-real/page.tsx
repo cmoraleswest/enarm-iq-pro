@@ -22,6 +22,16 @@ export default function SimuladorRealPage() {
   const timerRef                    = useRef<ReturnType<typeof setInterval> | null>(null)
   const submitExamRef               = useRef<(timeUp: boolean) => void>(() => {})
 
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('enarm_user_info')
+      if (raw) {
+        const u = JSON.parse(raw)
+        if (!u.isPaid && u.daysLeft <= 0) window.location.href = '/upgrade'
+      }
+    } catch { /* ignore */ }
+  }, [])
+
   const formatTime = (s: number) => {
     const h = Math.floor(s / 3600)
     const m = Math.floor((s % 3600) / 60)

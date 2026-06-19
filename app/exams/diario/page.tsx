@@ -44,7 +44,16 @@ export default function DiarioPage() {
     }
   }
 
-  useEffect(() => { startExam() }, [])
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('enarm_user_info')
+      if (raw) {
+        const u = JSON.parse(raw)
+        if (!u.isPaid && u.daysLeft <= 0) { window.location.href = '/upgrade'; return }
+      }
+    } catch { /* ignore */ }
+    startExam()
+  }, [])
 
   const responder = async (selected: string) => {
     if (currentResult) return

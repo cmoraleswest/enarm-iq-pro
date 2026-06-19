@@ -83,6 +83,7 @@ export default function DashboardPage() {
 
   const daysLeft  = userInfo?.daysLeft ?? 0
   const isDemo    = !userInfo?.isPaid
+  const isExpired = isDemo && daysLeft <= 0 && !!userInfo
 
   return (
     <main style={S.main}>
@@ -117,8 +118,8 @@ export default function DashboardPage() {
       )}
 
       {/* Flashcards rápidas */}
-      <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-        onClick={() => router.push('/flashcards')}>
+      <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: isExpired ? 'not-allowed' : 'pointer', opacity: isExpired ? 0.5 : 1 }}
+        onClick={() => isExpired ? router.push('/upgrade') : router.push('/flashcards')}>
         <div>
           <p style={{ color: '#fbbf24', fontSize: '0.7rem', letterSpacing: '2px', margin: '0 0 4px 0' }}>MÓDULO EXTRA</p>
           <h3 style={{ color: '#e2e8f0', margin: 0, fontSize: '1.1rem' }}>Flashcards</h3>
@@ -134,9 +135,9 @@ export default function DashboardPage() {
         {EXAM_MODULES.map(m => (
           <button
             key={m.id}
-            onClick={() => router.push(m.href)}
-            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: 'pointer', transition: 'border-color 0.2s', fontFamily: 'DM Sans, Arial, sans-serif' }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = m.color)}
+            onClick={() => isExpired ? router.push('/upgrade') : router.push(m.href)}
+            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: isExpired ? 'not-allowed' : 'pointer', transition: 'border-color 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', opacity: isExpired ? 0.5 : 1 }}
+            onMouseEnter={e => !isExpired && (e.currentTarget.style.borderColor = m.color)}
             onMouseLeave={e => (e.currentTarget.style.borderColor = '#1e293b')}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
