@@ -95,7 +95,7 @@ export default function LoginPage() {
           <a href="/privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Privacidad</a>
           <a href="/aviso-privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Aviso</a>
         </div>
-        <p style={{ textAlign: 'center', marginTop: 12, color: '#1e293b', fontSize: '0.65rem' }}>v1.3.2</p>
+        <p style={{ textAlign: 'center', marginTop: 12, color: '#1e293b', fontSize: '0.65rem' }}>v1.3.3</p>
       </div>
     </main>
   )

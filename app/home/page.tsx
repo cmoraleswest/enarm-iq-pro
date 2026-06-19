@@ -68,7 +68,7 @@ export default function DashboardPage() {
     const raw = localStorage.getItem('enarm_user_info')
     const path = window.location.pathname
     const keys = Object.keys(localStorage)
-    setDebugInfo(`v1.3.1 | path=${path} | keys=[${keys.join(',')}] | hasData=${!!raw}`)
+    setDebugInfo(`v1.3.3 | path=${path} | keys=[${keys.join(',')}] | hasData=${!!raw}`)
     if (raw) {
       try { setUserInfo(JSON.parse(raw) as UserInfo) } catch { /* corrupt data */ }
     }
@@ -153,7 +153,7 @@ export default function DashboardPage() {
 
       <div style={{ marginTop: 40, padding: '16px 20px', backgroundColor: '#111827', borderRadius: 12, border: '1px solid #1e293b' }}>
         <p style={{ color: '#475569', fontSize: '0.68rem', letterSpacing: '2px', margin: '0 0 8px 0' }}>VERSIÓN</p>
-        <p style={{ color: '#64748b', fontSize: '0.82rem', margin: '0 0 4px 0' }}>v1.3.0 — 19 junio 2026, 02:00 hrs</p>
+        <p style={{ color: '#64748b', fontSize: '0.82rem', margin: '0 0 4px 0' }}>v1.3.3 — 19 junio 2026</p>
         <ul style={{ color: '#475569', fontSize: '0.75rem', margin: '8px 0 0 0', paddingLeft: 16, lineHeight: '1.8' }}>
           <li>Fix: eliminado proxy/middleware del servidor — causa raíz del redirect a login</li>
           <li>Fix: navegación libre entre secciones sin kicks a login</li>
