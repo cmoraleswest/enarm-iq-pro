@@ -3,19 +3,24 @@
 import { useEffect, useState } from "react"
 
 export default function Root() {
-  const [checking, setChecking] = useState(true)
+  const [view, setView] = useState<"loading" | "landing" | "dashboard">("loading")
 
   useEffect(() => {
     const user = localStorage.getItem("enarm_user_info")
-    console.log("[SimulaENARM] Landing page loaded. localStorage has user:", !!user, "path:", window.location.pathname)
     if (user) {
-      window.location.href = "/home"
+      window.location.replace("/home")
     } else {
-      setChecking(false)
+      setView("landing")
     }
   }, [])
 
-  if (checking) return null
+  if (view === "loading") {
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: "#0a0a14", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "#00d9ff", fontFamily: "DM Sans, Arial, sans-serif", fontSize: "1.2rem" }}>Cargando SimulaENARM...</p>
+      </div>
+    )
+  }
 
   return <Landing />
 }

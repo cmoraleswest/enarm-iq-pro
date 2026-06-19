@@ -7,7 +7,8 @@ import { generateFingerprint, getClientIp } from '@/lib/fingerprint'
 
 export default function LoginPage() {
   useEffect(() => {
-    console.log("[SimulaENARM] Login page loaded. localStorage:", !!localStorage.getItem("enarm_user_info"), "referrer:", document.referrer, "path:", window.location.pathname)
+    const user = localStorage.getItem("enarm_user_info")
+    if (user) { window.location.replace('/home'); return }
   }, [])
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -41,7 +42,7 @@ export default function LoginPage() {
       if (check?.status !== 'OK') {
         console.warn('Cookie verification failed:', check)
       }
-      window.location.href = '/home'
+      window.location.replace('/home')
     } catch {
       setError('Correo o contrasena incorrectos')
     } finally {
@@ -94,6 +95,7 @@ export default function LoginPage() {
           <a href="/privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Privacidad</a>
           <a href="/aviso-privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Aviso</a>
         </div>
+        <p style={{ textAlign: 'center', marginTop: 12, color: '#1e293b', fontSize: '0.65rem' }}>v1.3.2</p>
       </div>
     </main>
   )
