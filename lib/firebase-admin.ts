@@ -12,9 +12,9 @@ function getApp(): App {
   }
 
   // .trim() evita \n al final de los valores copiados desde la consola de Firebase
-  const projectId   = process.env.FIREBASE_ADMIN_PROJECT_ID?.trim()
-  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL?.trim()
-  const privateKey  = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n').trim()
+  const projectId   = (process.env.FIREBASE_ADMIN_PROJECT_ID   || 'enarm-iq').trim()
+  const clientEmail = (process.env.FIREBASE_ADMIN_CLIENT_EMAIL || '').trim()
+  const privateKey  = (process.env.FIREBASE_ADMIN_PRIVATE_KEY  || '').replace(/\\n/g, '\n').trim()
 
   _app = admin.initializeApp({
     credential: admin.credential.cert({

@@ -13,12 +13,12 @@ function getApp(): FirebaseApp {
     return _app
   }
   _app = initializeApp({
-    apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId:         process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket:     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY            || 'AIzaSyDquVZNBV5o-WM-ZeJFoTS-2IsLIk6s98k',
+    authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN        || 'enarm-iq.firebaseapp.com',
+    projectId:         process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID         || 'enarm-iq',
+    storageBucket:     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET     || 'enarm-iq.firebasestorage.app',
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '450463906653',
+    appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID             || '1:450463906653:web:8cc410586984fef0cbc6b4',
   })
   return _app
 }
