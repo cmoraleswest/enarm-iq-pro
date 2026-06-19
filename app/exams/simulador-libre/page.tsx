@@ -126,7 +126,7 @@ export default function SimuladorLibrePage() {
           <div style={{ color: '#60a5fa', fontSize: '1.4rem', fontWeight: 'bold', fontFamily: 'monospace' }}>{formatElapsed(elapsed)}</div>
           <div style={{ color: '#475569', fontSize: '0.65rem' }}>TIEMPO TRANSCURRIDO</div>
         </div>
-        <button onClick={submitExam} style={{ backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'Georgia, serif' }}>
+        <button onClick={submitExam} style={{ backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>
           Terminar
         </button>
       </div>
@@ -148,7 +148,7 @@ export default function SimuladorLibrePage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
         {q.opciones.map((op, i) => (
           <button key={i} onClick={() => responder(op)} disabled={respondido}
-            style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'Georgia, serif', lineHeight: '1.5', minHeight: 54, backgroundColor: seleccion === op && respondido ? '#1e3a5f' : '#1e293b', border: seleccion === op && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0' }}>
+            style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: seleccion === op && respondido ? '#1e3a5f' : '#1e293b', border: seleccion === op && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0' }}>
             <span style={{ fontWeight: 'bold', marginRight: 10, color: respondido ? 'inherit' : '#60a5fa' }}>{String.fromCharCode(65 + i)})</span>
             {op}
           </button>
@@ -165,9 +165,9 @@ export default function SimuladorLibrePage() {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  main:    { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
+  main:    { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
   h1:      { color: '#60a5fa', fontSize: '1.5rem', margin: 0, letterSpacing: 1 },
   back:    { background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 },
   stat:    { display: 'flex', alignItems: 'center', gap: 12, backgroundColor: '#111827', borderRadius: 10, padding: '12px 16px', border: '1px solid #1e293b', marginBottom: 10 },
-  btnBlue: { width: '100%', padding: 16, backgroundColor: '#1d4ed8', color: '#bfdbfe', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'Georgia, serif', minHeight: 54 },
+  btnBlue: { width: '100%', padding: 16, backgroundColor: '#1d4ed8', color: '#bfdbfe', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif', minHeight: 54 },
 }

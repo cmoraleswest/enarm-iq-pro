@@ -43,12 +43,12 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'Georgia, serif' }}>
+    <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'DM Sans, Arial, sans-serif' }}>
       <div style={{ width: '100%', maxWidth: 420, backgroundColor: '#111827', borderRadius: 16, padding: '40px 32px', border: '1px solid #1e293b', textAlign: 'center' }}>
         {/* Ícono de email */}
         <div style={{ fontSize: '3rem', marginBottom: 16 }}>✉️</div>
 
-        <h1 style={{ color: '#D4AF37', fontSize: '1.5rem', margin: '0 0 8px 0', letterSpacing: 2 }}>
+        <h1 style={{ color: '#00d9ff', fontSize: '1.5rem', margin: '0 0 8px 0', letterSpacing: 2 }}>
           VERIFICA TU CORREO
         </h1>
         <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: 32 }}>
@@ -59,14 +59,14 @@ export default function VerifyEmailPage() {
         <button
           onClick={checkVerification}
           disabled={checking}
-          style={{ width: '100%', padding: 14, backgroundColor: '#D4AF37', color: '#0f0f1a', border: 'none', borderRadius: 10, fontSize: '1rem', fontWeight: 'bold', cursor: checking ? 'not-allowed' : 'pointer', marginBottom: 12, fontFamily: 'Georgia, serif' }}
+          style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #ff006e, #00d9ff)', color: '#0f0f1a', border: 'none', borderRadius: 10, fontSize: '1rem', fontWeight: 'bold', cursor: checking ? 'not-allowed' : 'pointer', marginBottom: 12, fontFamily: 'DM Sans, Arial, sans-serif' }}
         >
           {checking ? 'Verificando...' : 'Ya verifiqué mi correo →'}
         </button>
 
         <button
           onClick={resend}
-          style={{ width: '100%', padding: 12, backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', borderRadius: 10, fontSize: '0.88rem', cursor: 'pointer', fontFamily: 'Georgia, serif' }}
+          style={{ width: '100%', padding: 12, backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', borderRadius: 10, fontSize: '0.88rem', cursor: 'pointer', fontFamily: 'DM Sans, Arial, sans-serif' }}
         >
           {sent ? '✓ Correo reenviado' : 'Reenviar correo'}
         </button>

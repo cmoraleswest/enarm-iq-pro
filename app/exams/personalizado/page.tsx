@@ -96,9 +96,9 @@ export default function PersonalizadoPage() {
 
         {/* Número de preguntas */}
         <div style={S.section}>
-          <p style={S.sectionLabel}>NÚMERO DE PREGUNTAS: <span style={{ color: '#D4AF37' }}>{numQ}</span></p>
+          <p style={S.sectionLabel}>NÚMERO DE PREGUNTAS: <span style={{ color: '#00d9ff' }}>{numQ}</span></p>
           <input type="range" min={10} max={40} step={5} value={numQ} onChange={e => setNumQ(Number(e.target.value))}
-            style={{ width: '100%', accentColor: '#D4AF37' }} />
+            style={{ width: '100%', accentColor: '#00d9ff' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569', fontSize: '0.75rem', marginTop: 4 }}>
             <span>10</span><span>40</span>
           </div>
@@ -110,8 +110,8 @@ export default function PersonalizadoPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {ALL_SPECIALTIES.map(sp => (
               <button key={sp} onClick={() => toggleSpecialty(sp)}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, border: `1px solid ${selected.includes(sp) ? '#D4AF37' : '#334155'}`, backgroundColor: selected.includes(sp) ? '#1a1f2e' : 'transparent', color: selected.includes(sp) ? '#e2e8f0' : '#64748b', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.9rem', textAlign: 'left' }}>
-                <span style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${selected.includes(sp) ? '#D4AF37' : '#334155'}`, backgroundColor: selected.includes(sp) ? '#D4AF37' : 'transparent', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: '#0f0f1a', flexShrink: 0 }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, border: `1px solid ${selected.includes(sp) ? '#00d9ff' : '#334155'}`, backgroundColor: selected.includes(sp) ? '#1a1f2e' : 'transparent', color: selected.includes(sp) ? '#e2e8f0' : '#64748b', cursor: 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.9rem', textAlign: 'left' }}>
+                <span style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${selected.includes(sp) ? '#00d9ff' : '#334155'}`, backgroundColor: selected.includes(sp) ? '#00d9ff' : 'transparent', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: '#0f0f1a', flexShrink: 0 }}>
                   {selected.includes(sp) ? '✓' : ''}
                 </span>
                 {sp}
@@ -144,7 +144,7 @@ export default function PersonalizadoPage() {
         <span style={{ marginLeft: 'auto', color: '#94a3b8', fontSize: '0.82rem' }}>{currentIdx + 1}/{questions.length}</span>
       </div>
       <div style={{ height: 6, backgroundColor: '#1e293b', borderRadius: 99, marginBottom: 24, overflow: 'hidden' }}>
-        <div style={{ width: `${prog}%`, height: '100%', backgroundColor: '#D4AF37', transition: 'width 0.4s' }} />
+        <div style={{ width: `${prog}%`, height: '100%', backgroundColor: '#00d9ff', transition: 'width 0.4s' }} />
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -162,8 +162,8 @@ export default function PersonalizadoPage() {
           const border = respondido && isSelected ? '2px solid #3b82f6' : '1px solid #475569'
           return (
             <button key={i} onClick={() => responder(op)} disabled={respondido}
-              style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'Georgia, serif', lineHeight: '1.5', minHeight: 54, backgroundColor: bg, border, color: '#e2e8f0' }}>
-              <span style={{ fontWeight: 'bold', marginRight: 10, color: respondido ? 'inherit' : '#D4AF37' }}>{String.fromCharCode(65 + i)})</span>
+              style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: bg, border, color: '#e2e8f0' }}>
+              <span style={{ fontWeight: 'bold', marginRight: 10, color: respondido ? 'inherit' : '#00d9ff' }}>{String.fromCharCode(65 + i)})</span>
               {op}
             </button>
           )
@@ -182,18 +182,18 @@ export default function PersonalizadoPage() {
 function LoadingScreen({ msg = 'Cargando...' }) {
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#D4AF37', fontFamily: 'Georgia, serif', fontSize: '1.1rem' }}>{msg}</p>
+      <p style={{ color: '#00d9ff', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '1.1rem' }}>{msg}</p>
     </main>
   )
 }
 
 const S: Record<string, React.CSSProperties> = {
-  main:         { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
-  title:        { color: '#D4AF37', fontSize: '1.6rem', margin: 0, letterSpacing: 2 },
+  main:         { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
+  title:        { color: '#00d9ff', fontSize: '1.6rem', margin: 0, letterSpacing: 2 },
   sub:          { color: '#64748b', fontSize: '0.82rem', marginBottom: 28, paddingLeft: 32 },
   backBtn:      { background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 },
   section:      { backgroundColor: '#111827', borderRadius: 12, padding: 20, marginBottom: 20, border: '1px solid #1e293b' },
   sectionLabel: { color: '#94a3b8', fontSize: '0.78rem', letterSpacing: '1px', margin: '0 0 14px 0' },
-  caso:         { backgroundColor: '#1a1f2e', borderLeft: '4px solid #D4AF37', borderRadius: 10, padding: 22, marginBottom: 20 },
-  btnGold:      { width: '100%', padding: 16, backgroundColor: '#D4AF37', color: '#0f0f1a', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'Georgia, serif', minHeight: 54 },
+  caso:         { backgroundColor: '#1a1f2e', borderLeft: '4px solid #00d9ff', borderRadius: 10, padding: 22, marginBottom: 20 },
+  btnGold:      { width: '100%', padding: 16, background: 'linear-gradient(135deg, #ff006e, #00d9ff)', color: '#0f0f1a', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif', minHeight: 54 },
 }

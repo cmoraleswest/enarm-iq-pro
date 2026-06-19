@@ -1,15 +1,21 @@
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
+"use client"
 
-export const metadata = {
-  title: "Simula ENARM — Practica hoy. Aprueba manana.",
-  description: "Preparate para el ENARM con 2,000 preguntas reales y 5 simuladores. Desde 99 MXN/mes.",
-}
+import { useEffect, useState } from "react"
 
-export default async function Root() {
-  const cookieStore = await cookies()
-  const session = cookieStore.get("enarm_sess")
-  if (session) redirect("/home")
+export default function Root() {
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    const user = localStorage.getItem("enarm_user_info")
+    if (user) {
+      window.location.href = "/home"
+    } else {
+      setChecking(false)
+    }
+  }, [])
+
+  if (checking) return null
+
   return <Landing />
 }
 

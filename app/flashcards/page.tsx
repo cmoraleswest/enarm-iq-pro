@@ -267,7 +267,7 @@ export default function FlashcardsPage() {
               onClick={voltear}
               style={{
                 width: '100%', padding: '16px',
-                backgroundColor: 'transparent', border: '2px solid #D4AF37',
+                backgroundColor: 'transparent', border: '2px solid #00d9ff',
                 color: '#00d9ff', borderRadius: '12px',
                 fontSize: '1rem', fontWeight: 'bold',
                 cursor: 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif',

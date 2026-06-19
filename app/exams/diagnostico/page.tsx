@@ -76,7 +76,7 @@ export default function DiagnosticoPage() {
           <p style={S.badge}>◉ EVALUACIÓN INICIAL</p>
           <h2 style={{ color: '#e2e8f0', margin: '0 0 16px 0', fontSize: '1.3rem' }}>¿Cuál es tu nivel real?</h2>
           <p style={{ color: '#94a3b8', lineHeight: 1.7, margin: 0 }}>
-            Este examen evalúa tu nivel en las 5 especialidades del ENARM con <strong style={{ color: '#D4AF37' }}>180 preguntas</strong> (36 por área).
+            Este examen evalúa tu nivel en las 5 especialidades del ENARM con <strong style={{ color: '#00d9ff' }}>180 preguntas</strong> (36 por área).
             Al terminar verás tu perfil académico detallado con fortalezas y áreas de mejora.
           </p>
         </div>
@@ -89,7 +89,7 @@ export default function DiagnosticoPage() {
             ['~', 'sin límite de tiempo'],
           ].map(([val, label]) => (
             <div key={label} style={S.stat}>
-              <span style={{ color: '#D4AF37', fontSize: '1.3rem', fontWeight: 'bold', minWidth: 32 }}>{val}</span>
+              <span style={{ color: '#00d9ff', fontSize: '1.3rem', fontWeight: 'bold', minWidth: 32 }}>{val}</span>
               <span style={{ color: '#94a3b8', fontSize: '0.88rem' }}>{label}</span>
             </div>
           ))}
@@ -107,7 +107,7 @@ export default function DiagnosticoPage() {
   if (phase === 'loading' || phase === 'submitting') {
     return (
       <main style={{ ...S.main, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: '#D4AF37', fontSize: '1.1rem' }}>{phase === 'submitting' ? 'Generando tu perfil académico...' : 'Preparando 180 preguntas...'}</p>
+        <p style={{ color: '#00d9ff', fontSize: '1.1rem' }}>{phase === 'submitting' ? 'Generando tu perfil académico...' : 'Preparando 180 preguntas...'}</p>
       </main>
     )
   }
@@ -130,7 +130,7 @@ export default function DiagnosticoPage() {
       {/* Barra de progreso con secciones */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ height: 6, backgroundColor: '#1e293b', borderRadius: 99, overflow: 'hidden', marginBottom: 6 }}>
-          <div style={{ width: `${prog}%`, height: '100%', backgroundColor: '#D4AF37', transition: 'width 0.3s' }} />
+          <div style={{ width: `${prog}%`, height: '100%', backgroundColor: '#00d9ff', transition: 'width 0.3s' }} />
         </div>
         <p style={{ color: '#475569', fontSize: '0.75rem', margin: 0 }}>Área actual: <span style={{ color: '#94a3b8' }}>{currentSp}</span></p>
       </div>
@@ -148,8 +148,8 @@ export default function DiagnosticoPage() {
           const isSelected = seleccion === op
           return (
             <button key={i} onClick={() => responder(op)} disabled={respondido}
-              style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'Georgia, serif', lineHeight: '1.5', minHeight: 54, backgroundColor: isSelected && respondido ? '#1e3a5f' : '#1e293b', border: isSelected && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0' }}>
-              <span style={{ fontWeight: 'bold', marginRight: 10, color: respondido ? 'inherit' : '#D4AF37' }}>{String.fromCharCode(65 + i)})</span>
+              style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: isSelected && respondido ? '#1e3a5f' : '#1e293b', border: isSelected && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0' }}>
+              <span style={{ fontWeight: 'bold', marginRight: 10, color: respondido ? 'inherit' : '#00d9ff' }}>{String.fromCharCode(65 + i)})</span>
               {op}
             </button>
           )
@@ -167,12 +167,12 @@ export default function DiagnosticoPage() {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  main:     { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
-  h1:       { color: '#D4AF37', fontSize: '1.6rem', margin: 0, letterSpacing: 2 },
+  main:     { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
+  h1:       { color: '#00d9ff', fontSize: '1.6rem', margin: 0, letterSpacing: 2 },
   back:     { background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 },
-  badge:    { color: '#D4AF37', fontSize: '0.72rem', letterSpacing: '2px', margin: '0 0 8px 0' },
+  badge:    { color: '#00d9ff', fontSize: '0.72rem', letterSpacing: '2px', margin: '0 0 8px 0' },
   infoCard: { backgroundColor: '#111827', borderRadius: 14, padding: 24, marginBottom: 20, border: '1px solid #1e293b' },
   stat:     { display: 'flex', alignItems: 'center', gap: 12, backgroundColor: '#111827', borderRadius: 10, padding: '12px 16px', border: '1px solid #1e293b' },
-  caso:     { backgroundColor: '#1a1f2e', borderLeft: '4px solid #D4AF37', borderRadius: 10, padding: 22, marginBottom: 20 },
-  btnGold:  { width: '100%', padding: 16, backgroundColor: '#D4AF37', color: '#0f0f1a', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'Georgia, serif', minHeight: 54 },
+  caso:     { backgroundColor: '#1a1f2e', borderLeft: '4px solid #00d9ff', borderRadius: 10, padding: 22, marginBottom: 20 },
+  btnGold:  { width: '100%', padding: 16, background: 'linear-gradient(135deg, #ff006e, #00d9ff)', color: '#0f0f1a', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif', minHeight: 54 },
 }

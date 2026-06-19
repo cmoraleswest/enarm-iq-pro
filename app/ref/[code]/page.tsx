@@ -11,10 +11,10 @@ export default function ReferralPage() {
     window.location.href = '/register'
   }, [code, router])
   return (
-    <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', textAlign: 'center' }}>
+    <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'DM Sans, Arial, sans-serif', textAlign: 'center' }}>
       <div>
         <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🎓</div>
-        <p style={{ color: '#D4AF37', fontSize: '1rem' }}>Cargando tu invitación...</p>
+        <p style={{ color: '#00d9ff', fontSize: '1rem' }}>Cargando tu invitación...</p>
       </div>
     </main>
   )

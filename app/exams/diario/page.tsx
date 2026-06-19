@@ -100,7 +100,7 @@ export default function DiarioPage() {
     return (
       <main style={S.main}>
         <p style={{ color: '#f87171', textAlign: 'center', marginTop: 80 }}>{error || 'Error al cargar el examen.'}</p>
-        <button onClick={startExam} style={{ ...S.btnPrimary, backgroundColor: '#D4AF37', marginTop: 16 }}>Reintentar</button>
+        <button onClick={startExam} style={{ ...S.btnPrimary, background: 'linear-gradient(135deg, #ff006e, #00d9ff)', marginTop: 16 }}>Reintentar</button>
       </main>
     )
   }
@@ -116,9 +116,9 @@ export default function DiarioPage() {
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
           <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>Pregunta {currentIdx + 1} de {questions.length}</span>
-          <span style={{ color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold' }}>{Math.round(prog)}%</span>
+          <span style={{ color: '#00d9ff', fontSize: '0.8rem', fontWeight: 'bold' }}>{Math.round(prog)}%</span>
         </div>
-        <ProgressBar pct={prog} color="#D4AF37" />
+        <ProgressBar pct={prog} color="#00d9ff" />
       </div>
 
       {/* Badge */}
@@ -138,8 +138,8 @@ export default function DiarioPage() {
           }
           return (
             <button key={i} onClick={() => responder(op)} disabled={!!currentResult}
-              style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: currentResult ? 'default' : 'pointer', transition: 'all 0.2s', fontFamily: 'Georgia, serif', lineHeight: '1.5', minHeight: 54, backgroundColor: bg, border, color }}>
-              <span style={{ fontWeight: 'bold', marginRight: 10, color: currentResult ? 'inherit' : '#D4AF37' }}>{String.fromCharCode(65 + i)})</span>
+              style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: currentResult ? 'default' : 'pointer', transition: 'all 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: bg, border, color }}>
+              <span style={{ fontWeight: 'bold', marginRight: 10, color: currentResult ? 'inherit' : '#00d9ff' }}>{String.fromCharCode(65 + i)})</span>
               {op}
               {currentResult?.correcta === op   && <span style={{ float: 'right' }}>✓</span>}
               {currentResult?.selected === op && !currentResult.isCorrect && <span style={{ float: 'right' }}>✗</span>}
@@ -157,7 +157,7 @@ export default function DiarioPage() {
       )}
 
       {currentResult && (
-        <button onClick={siguiente} style={{ ...S.btnPrimary, backgroundColor: '#D4AF37' }}>
+        <button onClick={siguiente} style={{ ...S.btnPrimary, background: 'linear-gradient(135deg, #ff006e, #00d9ff)' }}>
           {currentIdx >= questions.length - 1 ? 'Ver resultados →' : 'Siguiente pregunta →'}
         </button>
       )}
@@ -171,7 +171,7 @@ export default function DiarioPage() {
 function LoadingScreen() {
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#D4AF37', fontFamily: 'Georgia, serif', fontSize: '1.1rem' }}>Cargando preguntas...</p>
+      <p style={{ color: '#00d9ff', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '1.1rem' }}>Cargando preguntas...</p>
     </main>
   )
 }
@@ -181,14 +181,14 @@ function Header({ title, subtitle, onBack }: { title: string; subtitle: string; 
     <div style={{ marginBottom: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}>←</button>
-        <h1 style={{ color: '#D4AF37', fontSize: '1.6rem', margin: 0, letterSpacing: 2 }}>{title}</h1>
+        <h1 style={{ color: '#00d9ff', fontSize: '1.6rem', margin: 0, letterSpacing: 2 }}>{title}</h1>
       </div>
       <p style={{ color: '#64748b', fontSize: '0.82rem', marginBottom: 24, paddingLeft: 32 }}>{subtitle}</p>
     </div>
   )
 }
 
-function ProgressBar({ pct, color = '#D4AF37' }: { pct: number; color?: string }) {
+function ProgressBar({ pct, color = '#00d9ff' }: { pct: number; color?: string }) {
   return (
     <div style={{ backgroundColor: '#1e293b', borderRadius: 99, height: 6, overflow: 'hidden' }}>
       <div style={{ width: `${pct}%`, height: '100%', backgroundColor: color, transition: 'width 0.4s' }} />
@@ -207,9 +207,9 @@ function Badges({ q }: { q: QuestionForClient }) {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  main:       { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
-  caso:       { backgroundColor: '#1a1f2e', borderLeft: '4px solid #D4AF37', borderRadius: 10, padding: 22, marginBottom: 20 },
-  btnPrimary: { width: '100%', padding: 16, color: '#0f0f1a', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'Georgia, serif', minHeight: 54 },
+  main:       { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
+  caso:       { backgroundColor: '#1a1f2e', borderLeft: '4px solid #00d9ff', borderRadius: 10, padding: 22, marginBottom: 20 },
+  btnPrimary: { width: '100%', padding: 16, color: '#0f0f1a', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif', minHeight: 54, background: 'linear-gradient(135deg, #ff006e, #00d9ff)' },
 }
 
 export { LoadingScreen, Header, ProgressBar, Badges, S }
