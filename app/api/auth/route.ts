@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { adminAuth } from '@/lib/firebase-admin'
 import { createUserProfile, getUserProfile, isTrialActive, trialDaysLeft, detectFraud } from '@/lib/firestore'
+import { encodeSession } from '@/lib/session'
 
 const SESSION_COOKIE = 'enarm_sess'
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 días
@@ -47,15 +48,13 @@ async function handleLogin(idToken: string, fingerprint: string, ip: string) {
       return NextResponse.json({ error: 'Tu período de prueba ha finalizado.', code: 'TRIAL_EXPIRED' }, { status: 402 })
     }
 
-    const sessionData = JSON.stringify({
+    const cookieValue = encodeSession({
       uid:         decoded.uid,
-      email:       decoded.email,
+      email:       decoded.email ?? '',
       isPaid:      profile.isPaid,
       daysLeft,
       trialActive: active,
     })
-
-    const cookieValue = Buffer.from(sessionData).toString('base64')
     const response = NextResponse.json({
       ok: true,
       uid: decoded.uid,

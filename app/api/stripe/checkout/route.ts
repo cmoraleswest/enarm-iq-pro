@@ -1,23 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { getStripe, PLANS } from '@/lib/stripe'
 import { getUserProfile } from '@/lib/firestore'
 import { getCreditBalance } from '@/lib/referrals'
-
-const SESSION_COOKIE = 'enarm_sess'
+import { getSessionFromCookie } from '@/lib/session'
 
 export async function POST(req: NextRequest) {
   try {
     const { plan } = await req.json()
 
-    // Leer sesión desde cookie
-    const cookieStore = await cookies()
-    const raw = cookieStore.get(SESSION_COOKIE)?.value
-    if (!raw) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
-
-    const session = JSON.parse(Buffer.from(raw, 'base64').toString())
-    const uid = session?.uid
-    if (!uid) return NextResponse.json({ error: 'Sesión inválida' }, { status: 401 })
+    const session = await getSessionFromCookie()
+    if (!session?.uid) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    const uid = session.uid
 
     const profile = await getUserProfile(uid)
     if (!profile) return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })

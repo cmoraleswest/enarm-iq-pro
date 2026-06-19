@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import {
   loadBanco, selectDiagnosticQuestions, selectMixedQuestions,
   selectSimulatorQuestions, toClientQuestion, gradeAnswers, EXAM_CONFIG,
@@ -11,18 +10,14 @@ import {
   removePendingSession,
   getExamSession,
 } from '@/lib/firestore'
+import { getSessionFromCookie } from '@/lib/session'
 import type {
   ExamType, Specialty, ClientAnswer, StartExamResponse, SubmitExamResponse,
 } from '@/types/exam'
 
 async function getSessionUid(): Promise<string | null> {
-  const cookieStore = await cookies()
-  const raw = cookieStore.get('enarm_sess')?.value
-  if (!raw) return null
-  try {
-    const data = JSON.parse(Buffer.from(raw, 'base64').toString()) as { uid: string }
-    return data.uid || null
-  } catch { return null }
+  const session = await getSessionFromCookie()
+  return session?.uid || null
 }
 
 // GET /api/exam?session=xxx — recuperar resultado guardado

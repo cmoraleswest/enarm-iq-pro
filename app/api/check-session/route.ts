@@ -1,24 +1,16 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-
-const SESSION_COOKIE = 'enarm_sess'
+import { getSessionFromCookie } from '@/lib/session'
 
 export async function GET() {
-  const store = await cookies()
-  const sess = store.get(SESSION_COOKIE)
+  const session = await getSessionFromCookie()
 
-  if (!sess?.value) {
-    return NextResponse.json({ status: 'NO_COOKIE', cookies: store.getAll().map(c => c.name) })
+  if (!session) {
+    return NextResponse.json({ status: 'NO_COOKIE' })
   }
 
-  try {
-    const decoded = JSON.parse(Buffer.from(sess.value, 'base64').toString())
-    return NextResponse.json({
-      status: 'OK',
-      uid: decoded.uid,
-      email: decoded.email,
-    })
-  } catch {
-    return NextResponse.json({ status: 'INVALID' })
-  }
+  return NextResponse.json({
+    status: 'OK',
+    uid: session.uid,
+    email: session.email,
+  })
 }
