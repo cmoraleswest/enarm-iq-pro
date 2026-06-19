@@ -64,25 +64,10 @@ export default function DashboardPage() {
   const [loggingOut, setLoggingOut] = useState(false)
 
   useEffect(() => {
-    fetch('/api/check-session', { credentials: 'include' })
-      .then(r => r.json())
-      .then(data => {
-        if (data.status === 'OK') {
-          const raw = localStorage.getItem('enarm_user_info')
-          if (raw) setUserInfo(JSON.parse(raw) as UserInfo)
-          else setUserInfo({ uid: data.uid, email: data.email, isPaid: false, daysLeft: 0 })
-        } else {
-          const raw = localStorage.getItem('enarm_user_info')
-          if (raw) setUserInfo(JSON.parse(raw) as UserInfo)
-          else window.location.href = '/login'
-        }
-      })
-      .catch(() => {
-        try {
-          const raw = localStorage.getItem('enarm_user_info')
-          if (raw) setUserInfo(JSON.parse(raw) as UserInfo)
-        } catch { /* no data */ }
-      })
+    const raw = localStorage.getItem('enarm_user_info')
+    if (raw) {
+      try { setUserInfo(JSON.parse(raw) as UserInfo) } catch { /* corrupt data */ }
+    }
   }, [])
 
   const handleLogout = async () => {
@@ -164,18 +149,16 @@ export default function DashboardPage() {
 
       <div style={{ marginTop: 40, padding: '16px 20px', backgroundColor: '#111827', borderRadius: 12, border: '1px solid #1e293b' }}>
         <p style={{ color: '#475569', fontSize: '0.68rem', letterSpacing: '2px', margin: '0 0 8px 0' }}>VERSIÓN</p>
-        <p style={{ color: '#64748b', fontSize: '0.82rem', margin: '0 0 4px 0' }}>v1.2.0 — 18 junio 2026, 18:00 hrs</p>
+        <p style={{ color: '#64748b', fontSize: '0.82rem', margin: '0 0 4px 0' }}>v1.3.0 — 19 junio 2026, 02:00 hrs</p>
         <ul style={{ color: '#475569', fontSize: '0.75rem', margin: '8px 0 0 0', paddingLeft: 16, lineHeight: '1.8' }}>
-          <li>Fix: cookie de sesión con triple capa (response.cookies + Set-Cookie header + verificación)</li>
-          <li>Fix: verificación de cookie post-login con /api/check-session</li>
-          <li>Fix: credentials include en todas las llamadas fetch</li>
-          <li>Fix: navegación con window.location.href (recarga completa, no soft nav)</li>
+          <li>Fix: eliminado proxy/middleware del servidor — causa raíz del redirect a login</li>
+          <li>Fix: navegación libre entre secciones sin kicks a login</li>
+          <li>Fix: sesión basada en localStorage (no depende de cookies del servidor)</li>
           <li>Fix: perfil se genera automáticamente al iniciar sesión</li>
-          <li>Fix: resultados de examen muestran respuesta correcta y justificación</li>
+          <li>Fix: resultados de examen con respuesta correcta y justificación</li>
           <li>Fix: resultados se recuperan del servidor si se pierde sessionStorage</li>
-          <li>Nuevo: endpoint /api/check-session para diagnóstico de cookies</li>
-          <li>Nuevo: validación de sesión al cargar dashboard</li>
-          <li>Rebrand: SimulaENARM con colores cyan/pink</li>
+          <li>Rebrand: toda la app con colores SimulaENARM (cyan/pink)</li>
+          <li>Rebrand: fuente DM Sans en todas las pantallas</li>
         </ul>
       </div>
 
