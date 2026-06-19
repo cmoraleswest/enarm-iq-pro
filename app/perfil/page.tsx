@@ -29,11 +29,18 @@ export default function PerfilPage() {
     setLoading(true)
     try {
       const res  = await fetch('/api/stats', { credentials: 'include' })
-      const data = await res.json() as { stats?: UserStats; error?: string }
-      if (!res.ok) throw new Error(data.error)
+      const data = await res.json() as { stats?: UserStats; error?: string; debug?: string }
+      if (!res.ok) {
+        if (data.debug === 'no_session') {
+          setError('Sesión expirada. Cierra sesión y vuelve a iniciar.')
+        } else {
+          setError('Error al cargar estadísticas. Intenta de nuevo.')
+        }
+        return
+      }
       setStats(data.stats ?? null)
     } catch {
-      setError('No se pudieron cargar las estadísticas.')
+      setError('Error de conexión. Verifica tu internet.')
     } finally {
       setLoading(false)
     }

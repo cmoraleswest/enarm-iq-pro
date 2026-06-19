@@ -6,13 +6,14 @@ export async function GET() {
   const session = await getSessionFromCookie()
 
   if (!session?.uid) {
-    return NextResponse.json({ error: 'No autenticado.' }, { status: 401 })
+    return NextResponse.json({ error: 'No autenticado.', debug: 'no_session' }, { status: 401 })
   }
 
   try {
     const stats = await getUserStats(session.uid)
     return NextResponse.json({ stats })
-  } catch {
-    return NextResponse.json({ error: 'Error al obtener estadísticas.' }, { status: 500 })
+  } catch (err) {
+    console.error('Stats error for uid:', session.uid, err)
+    return NextResponse.json({ error: 'Error al obtener estadísticas.', debug: 'firestore_error' }, { status: 500 })
   }
 }
