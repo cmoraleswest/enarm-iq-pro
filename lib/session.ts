@@ -2,7 +2,7 @@ import { createHmac } from 'crypto'
 import { cookies } from 'next/headers'
 
 const SESSION_COOKIE = 'enarm_sess'
-const SECRET = process.env.SESSION_SECRET || process.env.FIREBASE_ADMIN_PRIVATE_KEY || 'enarm-iq-session-secret-change-me'
+const SECRET = process.env.SESSION_SECRET || 'enarm-iq-hmac-secret-2026'
 
 interface SessionData {
   uid: string
@@ -23,9 +23,10 @@ export function encodeSession(data: SessionData): string {
 }
 
 export function decodeSession(cookie: string): SessionData | null {
-  const parts = cookie.split('.')
-  if (parts.length !== 2) return null
-  const [payload, sig] = parts
+  const lastDot = cookie.lastIndexOf('.')
+  if (lastDot === -1) return null
+  const payload = cookie.substring(0, lastDot)
+  const sig = cookie.substring(lastDot + 1)
   if (sign(payload) !== sig) return null
   try {
     return JSON.parse(Buffer.from(payload, 'base64').toString()) as SessionData
@@ -38,5 +39,12 @@ export async function getSessionFromCookie(): Promise<SessionData | null> {
   const store = await cookies()
   const cookie = store.get(SESSION_COOKIE)
   if (!cookie?.value) return null
-  return decodeSession(cookie.value)
+  const signed = decodeSession(cookie.value)
+  if (signed) return signed
+  // Fallback: try legacy unsigned base64 cookie (for existing sessions)
+  try {
+    const data = JSON.parse(Buffer.from(cookie.value, 'base64').toString()) as SessionData
+    if (data.uid) return data
+  } catch { /* not valid legacy cookie */ }
+  return null
 }
