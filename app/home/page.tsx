@@ -62,9 +62,13 @@ export default function DashboardPage() {
   const router = useRouter()
   const [userInfo, setUserInfo]   = useState<UserInfo | null>(null)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [debugInfo, setDebugInfo] = useState('')
 
   useEffect(() => {
     const raw = localStorage.getItem('enarm_user_info')
+    const path = window.location.pathname
+    const keys = Object.keys(localStorage)
+    setDebugInfo(`v1.3.1 | path=${path} | keys=[${keys.join(',')}] | hasData=${!!raw}`)
     if (raw) {
       try { setUserInfo(JSON.parse(raw) as UserInfo) } catch { /* corrupt data */ }
     }
@@ -161,6 +165,12 @@ export default function DashboardPage() {
           <li>Rebrand: fuente DM Sans en todas las pantallas</li>
         </ul>
       </div>
+
+      {debugInfo && (
+        <div style={{ marginTop: 16, padding: 12, backgroundColor: '#1a0a2e', border: '1px solid #6b21a8', borderRadius: 8, fontSize: '0.7rem', color: '#c084fc', wordBreak: 'break-all' }}>
+          🔍 DEBUG: {debugInfo}
+        </div>
+      )}
 
       <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 16 }}>
         Simula ENARM · Banco Maestro 2025

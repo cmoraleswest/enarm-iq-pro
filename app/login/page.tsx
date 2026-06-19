@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { generateFingerprint, getClientIp } from '@/lib/fingerprint'
 
 export default function LoginPage() {
+  useEffect(() => {
+    console.log("[SimulaENARM] Login page loaded. localStorage:", !!localStorage.getItem("enarm_user_info"), "referrer:", document.referrer, "path:", window.location.pathname)
+  }, [])
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')

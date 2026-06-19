@@ -7,6 +7,7 @@ export default function Root() {
 
   useEffect(() => {
     const user = localStorage.getItem("enarm_user_info")
+    console.log("[SimulaENARM] Landing page loaded. localStorage has user:", !!user, "path:", window.location.pathname)
     if (user) {
       window.location.href = "/home"
     } else {
