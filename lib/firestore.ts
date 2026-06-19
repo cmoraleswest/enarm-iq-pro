@@ -141,13 +141,24 @@ export async function getExamSession(sessionId: string): Promise<ExamSession | n
 }
 
 export async function getUserSessions(userId: string, limit = 20): Promise<ExamSession[]> {
-  const snap = await adminFirestore
-    .collection('examSessions')
-    .where('userId', '==', userId)
-    .orderBy('finishedAt', 'desc')
-    .limit(limit)
-    .get()
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as ExamSession)
+  try {
+    const snap = await adminFirestore
+      .collection('examSessions')
+      .where('userId', '==', userId)
+      .orderBy('finishedAt', 'desc')
+      .limit(limit)
+      .get()
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }) as ExamSession)
+  } catch (err) {
+    console.error('getUserSessions error (may need Firestore index):', err)
+    // Fallback without orderBy (no index required)
+    const snap = await adminFirestore
+      .collection('examSessions')
+      .where('userId', '==', userId)
+      .limit(limit)
+      .get()
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }) as ExamSession)
+  }
 }
 
 // ──────────────────────────────────────────────
