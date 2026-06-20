@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 interface Caso {
   id: number
@@ -47,21 +46,15 @@ function saveStats(s: Stats) {
 }
 
 export default function SimuladorPage() {
-  const router = useRouter()
   const [caso, setCaso] = useState<Caso | null>(null)
   const [cargando, setCargando] = useState(false)
   const [seleccion, setSeleccion] = useState<string | null>(null)
   const [respondido, setRespondido] = useState(false)
   const [categoria, setCategoria] = useState('Todas')
-  const [stats, setStats] = useState<Stats>({ correctas: 0, incorrectas: 0, porCategoria: {} })
+  const [stats, setStats] = useState<Stats>(loadStats)
   const [verResumen, setVerResumen] = useState(false)
   const [showJustif, setShowJustif] = useState(false)
   const [verifyResult, setVerifyResult] = useState<VerifyResult | null>(null)
-
-  // Cargar stats persistidos
-  useEffect(() => {
-    setStats(loadStats())
-  }, [])
 
   const cargarPregunta = async () => {
     setCargando(true)
@@ -75,6 +68,7 @@ export default function SimuladorPage() {
       const res = await fetch('/api/generar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ categoria: categoria === 'Todas' ? undefined : categoria }),
       })
       const data = await res.json()
@@ -137,7 +131,7 @@ export default function SimuladorPage() {
     const base: React.CSSProperties = {
       width: '100%', padding: '16px 20px', borderRadius: '12px',
       fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer',
-      transition: 'all 0.2s', fontFamily: 'Georgia, serif', lineHeight: '1.5',
+      transition: 'all 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5',
       minHeight: '54px',
     }
     if (estado === 'correcto')   return { ...base, backgroundColor: '#14532d', border: '2px solid #4ade80', color: '#bbf7d0', fontWeight: 'bold' }
@@ -157,24 +151,24 @@ export default function SimuladorPage() {
   }
 
   return (
-    <main style={{ padding: '24px', fontFamily: 'Georgia, serif', maxWidth: '780px', margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' }}>
+    <main style={{ padding: '24px', fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: '780px', margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => window.location.href = '/home'}
             style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: '0', lineHeight: 1 }}
             title="Volver al dashboard"
           >
             ←
           </button>
-          <h1 style={{ color: '#D4AF37', fontSize: '1.8rem', margin: 0, letterSpacing: '2px' }}>SIMULADOR PRO</h1>
+          <h1 style={{ color: '#00d9ff', fontSize: '1.8rem', margin: 0, letterSpacing: '2px' }}>SIMULADOR PRO</h1>
         </div>
         {total > 0 && (
           <button
             onClick={() => setVerResumen(!verResumen)}
-            style={{ backgroundColor: 'transparent', border: '1px solid #D4AF37', color: '#D4AF37', padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'Georgia, serif' }}
+            style={{ backgroundColor: 'transparent', border: '1px solid #00d9ff', color: '#00d9ff', padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'DM Sans, Arial, sans-serif' }}
           >
             {verResumen ? '← Volver' : `📊 ${pct}% (${stats.correctas}/${total})`}
           </button>
@@ -187,7 +181,7 @@ export default function SimuladorPage() {
       {/* Panel de resumen */}
       {verResumen && (
         <div style={{ backgroundColor: '#111827', borderRadius: '14px', padding: '24px', marginBottom: '24px', border: '1px solid #1e293b' }}>
-          <h2 style={{ color: '#D4AF37', margin: '0 0 20px 0', fontSize: '1rem', letterSpacing: '1px' }}>📊 RESUMEN DE SESIÓN</h2>
+          <h2 style={{ color: '#00d9ff', margin: '0 0 20px 0', fontSize: '1rem', letterSpacing: '1px' }}>📊 RESUMEN DE SESIÓN</h2>
 
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
             {[
@@ -227,7 +221,7 @@ export default function SimuladorPage() {
 
           <button
             onClick={resetStats}
-            style={{ marginTop: '20px', width: '100%', padding: '10px', backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'Georgia, serif' }}
+            style={{ marginTop: '20px', width: '100%', padding: '10px', backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'DM Sans, Arial, sans-serif' }}
           >
             Reiniciar estadísticas
           </button>
@@ -245,12 +239,12 @@ export default function SimuladorPage() {
                 onClick={() => setCategoria(cat)}
                 style={{
                   padding: '7px 14px', borderRadius: '20px',
-                  border: `1px solid ${categoria === cat ? '#D4AF37' : '#334155'}`,
-                  backgroundColor: categoria === cat ? '#D4AF37' : 'transparent',
+                  border: `1px solid ${categoria === cat ? '#00d9ff' : '#334155'}`,
+                  backgroundColor: categoria === cat ? '#00d9ff' : 'transparent',
                   color: categoria === cat ? '#0f0f1a' : '#64748b',
                   cursor: 'pointer', fontSize: '0.78rem',
                   fontWeight: categoria === cat ? 'bold' : 'normal',
-                  fontFamily: 'Georgia, serif',
+                  fontFamily: 'DM Sans, Arial, sans-serif',
                 }}
               >
                 {cat}
@@ -264,11 +258,11 @@ export default function SimuladorPage() {
             disabled={cargando}
             style={{
               width: '100%', padding: '16px',
-              backgroundColor: cargando ? '#78600a' : '#D4AF37',
+              background: cargando ? '#555' : 'linear-gradient(135deg, #ff006e, #00d9ff)',
               color: '#0f0f1a', border: 'none', borderRadius: '12px',
               fontSize: '1rem', fontWeight: 'bold',
               cursor: cargando ? 'not-allowed' : 'pointer',
-              letterSpacing: '1px', marginBottom: '28px', fontFamily: 'Georgia, serif',
+              letterSpacing: '1px', marginBottom: '28px', fontFamily: 'DM Sans, Arial, sans-serif',
               minHeight: '54px',
             }}
           >
@@ -284,7 +278,7 @@ export default function SimuladorPage() {
                 ))}
               </div>
 
-              <div style={{ backgroundColor: '#1a1f2e', borderLeft: '4px solid #D4AF37', borderRadius: '10px', padding: '22px', marginBottom: '20px' }}>
+              <div style={{ backgroundColor: '#1a1f2e', borderLeft: '4px solid #00d9ff', borderRadius: '10px', padding: '22px', marginBottom: '20px' }}>
                 <p style={{ margin: 0, lineHeight: '1.85', whiteSpace: 'pre-wrap', color: '#e2e8f0' }}>{caso.caso}</p>
               </div>
 
@@ -293,7 +287,7 @@ export default function SimuladorPage() {
                   const estado = estadoBoton(opcion)
                   return (
                     <button key={i} onClick={() => responder(opcion)} style={estiloBoton(estado)}>
-                      <span style={{ fontWeight: 'bold', marginRight: '10px', color: estado === 'idle' ? '#D4AF37' : 'inherit' }}>
+                      <span style={{ fontWeight: 'bold', marginRight: '10px', color: estado === 'idle' ? '#00d9ff' : 'inherit' }}>
                         {String.fromCharCode(65 + i)})
                       </span>
                       {opcion}

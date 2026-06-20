@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simula ENARM — Practica hoy. Aprueba mañana.</title>
+<meta name="description" content="Prepárate para el ENARM con 2,000 preguntas reales y 5 simuladores. Desde 99 MXN/mes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a14;color:#e2e8f0;font-family:'DM Sans',-apple-system,sans-serif}
+a{text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,#ff006e,#00d9ff);color:#fff;border:none;padding:16px 32px;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-secondary{background:transparent;color:#e2e8f0;border:1px solid #1a1a2e;padding:14px 28px;border-radius:12px;font-size:1rem;cursor:pointer;font-family:'DM Sans',sans-serif}
+nav{display:flex;justify-content:space-between;align-items:center;padding:20px 40px;border-bottom:1px solid #1a1a2e;position:sticky;top:0;background:#0a0a14;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:700}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 24px;text-align:center;position:relative;overflow:hidden}
+.hero-glow-1{position:absolute;top:-20%;right:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(0,217,255,0.1) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-20%;left:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(255,0,110,0.08) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:700;line-height:1.15;margin-bottom:24px}
+.highlight{background:linear-gradient(135deg,#ff006e,#00d9ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:1.2rem;color:#64748b;margin-bottom:40px;line-height:1.7}
+.cta-group{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+.stats{display:flex;gap:40px;justify-content:center;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#ff006e,#00d9ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{color:#475569;font-size:0.85rem;margin-top:4px}
+section{padding:80px 24px}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-tag{color:#00d9ff;font-size:0.75rem;letter-spacing:3px;margin-bottom:12px}
+.section-title{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:700;margin-bottom:16px}
+.section-sub{color:#64748b;font-size:1rem;line-height:1.7;max-width:600px}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:48px}
+.module-card{background:#0f0f1a;border:1px solid #1a1a2e;border-radius:16px;padding:28px;transition:border-color 0.2s}
+.module-card:hover{border-color:#00d9ff44}
+.module-tag{font-size:0.7rem;letter-spacing:2px;margin-bottom:8px}
+.module-title{font-size:1.1rem;font-weight:600;margin-bottom:8px}
+.module-desc{color:#475569;font-size:0.85rem;line-height:1.6}
+.pricing{background:#0f0f1a;border-radius:24px;padding:60px 40px;text-align:center;max-width:900px;margin:0 auto}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:40px}
+.plan{background:#0a0a14;border:1px solid #1a1a2e;border-radius:16px;padding:32px;text-align:left}
+.plan.featured{border-color:#00d9ff44;background:linear-gradient(135deg,#00d9ff08,#ff006e08)}
+.plan-badge{background:linear-gradient(135deg,#ff006e,#00d9ff);color:#fff;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.plan-price{font-size:2.5rem;font-weight:700;margin:12px 0 4px}
+.plan-period{color:#475569;font-size:0.85rem;margin-bottom:20px}
+.plan-features{list-style:none;margin-bottom:24px}
+.plan-features li{color:#94a3b8;font-size:0.85rem;padding:6px 0;border-bottom:1px solid #1a1a2e11}
+.plan-features li::before{content:"✓ ";color:#00d9ff}
+.faq{max-width:700px;margin:48px auto 0}
+.faq-item{border-bottom:1px solid #1a1a2e;padding:24px 0}
+.faq-q{font-weight:600;margin-bottom:10px;font-size:1rem}
+.faq-a{color:#64748b;font-size:0.9rem;line-height:1.7}
+footer{border-top:1px solid #1a1a2e;padding:40px 24px;text-align:center}
+.footer-links{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.footer-links a{color:#334155;font-size:0.8rem}
+.footer-legal{color:#1e293b;font-size:0.72rem;max-width:700px;margin:16px auto 0;line-height:1.6}
+@media(max-width:600px){nav{padding:16px 20px}.plans{grid-template-columns:1fr}.cta-group{flex-direction:column;align-items:center}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <svg width="32" height="32" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="38" fill="none" stroke="#00d9ff" stroke-width="2" opacity="0.3"/>
+      <path d="M 15 40 L 28 40 L 32 28 L 40 52 L 48 40 L 65 40" fill="none" stroke="#ff006e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="28" cy="40" r="2.5" fill="#ff006e"/>
+      <circle cx="48" cy="40" r="2.5" fill="#ff006e"/>
+      <circle cx="65" cy="40" r="2.5" fill="#ff006e"/>
+    </svg>
+    Simula<span style="color:#00d9ff">ENARM</span>
+  </div>
+  <a href="https://simulaenarm.com/register"><button class="btn-primary" style="padding:10px 20px;font-size:0.85rem">Empieza gratis →</button></a>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div style="max-width:800px;position:relative;z-index:1">
+    <p class="section-tag">LA PLATAFORMA DE PREPARACIÓN ENARM MÁS ACCESIBLE</p>
+    <h1>Practica hoy.<br><span class="highlight">Aprueba mañana.</span></h1>
+    <p class="subtitle">2,000 preguntas reales · 5 simuladores · Estadísticas por especialidad<br>La alternativa inteligente a los cursos de $20,000</p>
+    <div class="cta-group">
+      <a href="https://simulaenarm.com/register"><button class="btn-primary">Empieza gratis 2 días →</button></a>
+      <a href="#precios"><button class="btn-secondary">Ver planes</button></a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-num">2,000</div><div class="stat-label">Preguntas reales</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">Simuladores</div></div>
+      <div class="stat"><div class="stat-num">$99</div><div class="stat-label">MXN/mes</div></div>
+      <div class="stat"><div class="stat-num">38%</div><div class="stat-label">Aprueba el ENARM</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#0f0f1a;padding:80px 24px">
+  <div class="section-inner" style="text-align:center">
+    <p class="section-tag">EL PROBLEMA</p>
+    <h2 class="section-title">Cada año, 50,000 médicos presentan el ENARM.<br>Solo el 38% obtiene plaza.</h2>
+    <p class="section-sub" style="margin:0 auto">La diferencia entre aprobar y repetir un año no es talento — es práctica constante y medición real de tu desempeño. Los cursos de $20,000 no son la única opción.</p>
+  </div>
+</section>
+
+<section>
+  <div class="section-inner">
+    <p class="section-tag">6 SIMULADORES</p>
+    <h2 class="section-title">Todo lo que necesitas<br>para aprobar.</h2>
+    <div class="modules-grid">
+      <div class="module-card"><p class="module-tag" style="color:#ff006e">CADA 30-45 DÍAS</p><h3 class="module-title">Diagnóstico Inicial</h3><p class="module-desc">180 preguntas · 36 por especialidad · Genera tu perfil académico completo e identifica tus áreas débiles.</p></div>
+      <div class="module-card"><p class="module-tag" style="color:#00d9ff">RECOMENDADO HOY</p><h3 class="module-title">Simulador Diario</h3><p class="module-desc">10 preguntas aleatorias con justificación inmediata. Construye el hábito de estudiar todos los días.</p></div>
+      <div class="module-card"><p class="module-tag" style="color:#a78bfa">A TU RITMO</p><h3 class="module-title">Examen Personalizado</h3><p class="module-desc">10 a 40 preguntas · Elige especialidad: Medicina Interna, Pediatría, Ginecología, Cirugía o Urgencias.</p></div>
+      <div class="module-card"><p class="module-tag" style="color:#ff006e">ALTA INTENSIDAD</p><h3 class="module-title">Simulador Real ENARM</h3><p class="module-desc">360 preguntas · Cronómetro de 6 horas exactas · Condiciones idénticas al examen oficial.</p></div>
+      <div class="module-card"><p class="module-tag" style="color:#00d9ff">ESTUDIO PROFUNDO</p><h3 class="module-title">Simulador Sin Límite</h3><p class="module-desc">360 preguntas sin cronómetro. Para estudio profundo y análisis detallado de cada respuesta.</p></div>
+      <div class="module-card"><p class="module-tag" style="color:#a78bfa">REPASO RÁPIDO</p><h3 class="module-title">Flashcards</h3><p class="module-desc">Tarjetas de memorización anverso/reverso. Ideal para repasar entre pacientes en 2 minutos.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="precios" style="background:#0f0f1a">
+  <div class="section-inner">
+    <div class="pricing">
+      <p class="section-tag" style="text-align:center">PRECIOS</p>
+      <h2 class="section-title" style="text-align:center">Elige tu plan</h2>
+      <p style="color:#64748b;text-align:center">Prueba gratuita de 2 días · Sin tarjeta de crédito · Cancela cuando quieras</p>
+      <div class="plans">
+        <div class="plan">
+          <p style="color:#475569;font-size:0.8rem;letter-spacing:2px">MENSUAL</p>
+          <div class="plan-price">$99 <span style="font-size:1rem;color:#475569">MXN</span></div>
+          <p class="plan-period">por mes · renovación automática</p>
+          <ul class="plan-features">
+            <li>2,000 preguntas reales</li>
+            <li>6 simuladores completos</li>
+            <li>Perfil académico</li>
+            <li>Cancela cuando quieras</li>
+          </ul>
+          <a href="https://simulaenarm.com/register"><button class="btn-secondary" style="width:100%">Empezar →</button></a>
+        </div>
+        <div class="plan featured">
+          <span class="plan-badge">MÁS POPULAR · AHORRA 41%</span>
+          <p style="color:#475569;font-size:0.8rem;letter-spacing:2px">ANUAL</p>
+          <div class="plan-price">$599 <span style="font-size:1rem;color:#475569">MXN</span></div>
+          <p class="plan-period">por año · equivale a $50/mes</p>
+          <ul class="plan-features">
+            <li>Todo del plan mensual</li>
+            <li>12 meses de acceso</li>
+            <li>Ahorra $589 MXN vs mensual</li>
+            <li>Ideal para preparación completa</li>
+          </ul>
+          <a href="https://simulaenarm.com/register"><button class="btn-primary" style="width:100%">Empezar gratis →</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-inner" style="text-align:center">
+    <p class="section-tag">REFERIDOS</p>
+    <h2 class="section-title">Gana $150 MXN por cada amigo</h2>
+    <p class="section-sub" style="margin:0 auto 32px">Comparte tu link único. Cuando un amigo pague su suscripción, recibes $150 MXN de saldo automático en tu cuenta. Sin límite de referidos.</p>
+    <a href="https://simulaenarm.com/register"><button class="btn-primary">Obtener mi link →</button></a>
+  </div>
+</section>
+
+<section style="background:#0f0f1a">
+  <div class="section-inner">
+    <p class="section-tag" style="text-align:center">PREGUNTAS FRECUENTES</p>
+    <h2 class="section-title" style="text-align:center;margin-bottom:0">Todo lo que necesitas saber</h2>
+    <div class="faq">
+      <div class="faq-item"><p class="faq-q">¿Es un curso oficial del ENARM?</p><p class="faq-a">No. Simula ENARM es una plataforma independiente de práctica. No estamos afiliados a la CIFRHS, Secretaría de Salud ni ningún organismo gubernamental.</p></div>
+      <div class="faq-item"><p class="faq-q">¿Cuántas preguntas tiene el banco?</p><p class="faq-a">2,000 casos clínicos reales estilo ENARM con justificación detallada, distribuidos en 5 especialidades y 3 niveles de dificultad.</p></div>
+      <div class="faq-item"><p class="faq-q">¿Puedo cancelar cuando quiera?</p><p class="faq-a">Sí, en cualquier momento desde tu perfil. Al cancelar mantienes acceso hasta el fin del período pagado.</p></div>
+      <div class="faq-item"><p class="faq-q">¿Hay app móvil?</p><p class="faq-a">La plataforma funciona en cualquier navegador móvil sin necesidad de descargar nada. App nativa próximamente.</p></div>
+      <div class="faq-item"><p class="faq-q">¿Mis datos y pagos están seguros?</p><p class="faq-a">Sí. Pagos procesados por Stripe (certificación PCI DSS Level 1). Autenticación por Firebase de Google. Conexión cifrada HTTPS.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="text-align:center;padding:80px 24px">
+  <p class="section-tag">EMPIEZA HOY</p>
+  <h2 class="section-title">2 días gratis.<br>Sin tarjeta de crédito.</h2>
+  <p class="section-sub" style="margin:0 auto 32px">Únete a los médicos que ya se preparan de forma inteligente para el ENARM.</p>
+  <a href="https://simulaenarm.com/register"><button class="btn-primary" style="font-size:1.1rem;padding:18px 40px">Crear cuenta gratis →</button></a>
+</section>
+
+<footer>
+  <div class="logo" style="justify-content:center;margin-bottom:24px">
+    <svg width="28" height="28" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="38" fill="none" stroke="#00d9ff" stroke-width="2" opacity="0.3"/>
+      <path d="M 15 40 L 28 40 L 32 28 L 40 52 L 48 40 L 65 40" fill="none" stroke="#ff006e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="28" cy="40" r="2.5" fill="#ff006e"/>
+      <circle cx="48" cy="40" r="2.5" fill="#ff006e"/>
+      <circle cx="65" cy="40" r="2.5" fill="#ff006e"/>
+    </svg>
+    <span style="font-size:1.1rem;font-weight:700">Simula<span style="color:#00d9ff">ENARM</span></span>
+  </div>
+  <div class="footer-links">
+    <a href="/terminos">Términos y Condiciones</a>
+    <a href="/privacidad">Política de Privacidad</a>
+    <a href="/aviso-privacidad">Aviso de Privacidad</a>
+    <a href="mailto:contacto@simulaenarm.com">contacto@simulaenarm.com</a>
+  </div>
+  <p style="color:#334155;font-size:0.8rem;margin-bottom:12px">© 2026 SimulaENARM ™ · Todos los derechos reservados · Cuernavaca, Morelos, México</p>
+  <p class="footer-legal">Simula ENARM es una plataforma educativa independiente. No está afiliada, patrocinada ni avalada por la CIFRHS, la Secretaría de Salud ni ningún organismo gubernamental mexicano. El uso del término "ENARM" es meramente descriptivo del tipo de preparación ofrecida. Los resultados pueden variar. La plataforma no garantiza la aprobación del examen oficial. Pagos procesados por Stripe. SimulaENARM ™ — Marca en trámite de registro ante el IMPI.</p>
+</footer>
+
+</body>
+</html>

@@ -12,9 +12,15 @@ function getApp(): App {
   }
 
   // .trim() evita \n al final de los valores copiados desde la consola de Firebase
-  const projectId   = process.env.FIREBASE_ADMIN_PROJECT_ID?.trim()
-  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL?.trim()
-  const privateKey  = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n').trim()
+  const projectId   = (process.env.FIREBASE_ADMIN_PROJECT_ID   || 'enarm-iq').trim()
+  const clientEmail = (process.env.FIREBASE_ADMIN_CLIENT_EMAIL || '').trim()
+  const rawKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY || ''
+  const privateKey  = rawKey.replace(/\\n/g, '\n').trim()
+
+  if (!clientEmail || !privateKey) {
+    console.error('FIREBASE_ADMIN_CLIENT_EMAIL and FIREBASE_ADMIN_PRIVATE_KEY are not set. Server APIs will not work.')
+    throw new Error('Firebase Admin credentials not configured. Set FIREBASE_ADMIN_CLIENT_EMAIL and FIREBASE_ADMIN_PRIVATE_KEY in Vercel Environment Variables.')
+  }
 
   _app = admin.initializeApp({
     credential: admin.credential.cert({
@@ -41,4 +47,5 @@ export const adminFirestore = new Proxy({} as admin.firestore.Firestore, {
   },
 })
 
-export default { app: getApp }
+const firebaseAdmin = { app: getApp }
+export default firebaseAdmin

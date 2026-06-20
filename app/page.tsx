@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -63,18 +63,20 @@ export default function DashboardPage() {
   const [loggingOut, setLoggingOut] = useState(false)
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('enarm_user_info')
-      if (raw) setUserInfo(JSON.parse(raw) as UserInfo)
-    } catch { /* sin datos previos */ }
+    const user = localStorage.getItem("enarm_user_info")
+    if (user) {
+      window.location.replace("/home")
+    } else {
+      setView("landing")
+    }
   }, [])
 
-  const handleLogout = async () => {
-    setLoggingOut(true)
-    await fetch('/api/auth', { method: 'DELETE' })
-    localStorage.removeItem('enarm_user_info')
-    router.push('/login')
-    router.refresh()
+  if (view === "loading") {
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: "#0a0a14", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "#00d9ff", fontFamily: "DM Sans, Arial, sans-serif", fontSize: "1.2rem" }}>Cargando SimulaENARM...</p>
+      </div>
+    )
   }
 
   return (
@@ -88,10 +90,8 @@ export default function DashboardPage() {
             {loggingOut ? '...' : 'Salir'}
           </button>
         </div>
-      </div>
-      <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: 20 }}>
-        {userInfo?.email ?? 'Cargando...'} · Banco maestro 2,000 preguntas
-      </p>
+        <a href="/register" style={{background:"linear-gradient(135deg,#ff006e,#00d9ff)",color:"#fff",border:"none",padding:"10px 20px",borderRadius:10,fontSize:"0.85rem",fontWeight:700,cursor:"pointer",textDecoration:"none"}}>Empieza gratis</a>
+      </nav>
 
       {/* Flashcards rápidas */}
       <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
@@ -121,22 +121,14 @@ export default function DashboardPage() {
                 <p style={{ color: m.color, fontSize: '0.68rem', letterSpacing: '2px', margin: '0 0 5px 0' }}>SECCIÓN {m.section} — {m.tag}</p>
                 <h3 style={{ color: '#e2e8f0', fontSize: '1.15rem', margin: 0, fontWeight: 'bold' }}>{m.title}</h3>
               </div>
-              <span style={{ color: '#334155', fontSize: '1.5rem', lineHeight: 1, flexShrink: 0 }}>→</span>
-            </div>
-            <p style={{ color: '#64748b', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}>{m.desc}</p>
-          </button>
-        ))}
-      </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 40 }}>
         Simula ENARM · Banco Maestro 2025
       </p>
     </main>
   )
-}
-
-const S: Record<string, React.CSSProperties> = {
-  main:     { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 700, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
-  logo:     { color: '#D4AF37', fontSize: '2rem', margin: 0, letterSpacing: 3 },
-  btnGhost: { backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'Georgia, serif' },
 }

@@ -8,6 +8,7 @@ import {
   storePendingSession,
   fetchPendingSession,
   removePendingSession,
+  getExamSession,
 } from '@/lib/firestore'
 import { getSession } from '@/lib/session'
 import type {

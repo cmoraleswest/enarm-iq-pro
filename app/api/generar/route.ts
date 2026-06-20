@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { loadBanco, shuffle } from '@/lib/exam-utils'
+import { getSessionFromCookie } from '@/lib/session'
 
 export async function POST(request: Request) {
   const session = await getSession()
@@ -9,6 +10,10 @@ export async function POST(request: Request) {
   }
 
   try {
+    const session = await getSessionFromCookie()
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
+    }
     const body = await request.json() as { categoria?: string }
     const banco = loadBanco()
 

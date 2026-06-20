@@ -1,14 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { generateFingerprint, getClientIp } from '@/lib/fingerprint'
-import Link from 'next/link'
 
 export default function RegisterPage() {
-  const router = useRouter()
   const [email, setEmail]         = useState('')
   const [pass, setPass]           = useState('')
   const [confirm, setConfirm]     = useState('')
@@ -25,12 +22,12 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      // 1. Verificación anti-fraude antes de crear la cuenta
       const fingerprint = generateFingerprint()
       const ip          = await getClientIp()
 
       const fraudCheck = await fetch('/api/auth', {
         method:  'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ action: 'register', fingerprint, ip }),
       })
@@ -40,23 +37,21 @@ export default function RegisterPage() {
         return
       }
 
-      // 2. Crear cuenta en Firebase Auth
       const cred = await createUserWithEmailAndPassword(auth, email, pass)
 
-      // 3. Enviar email de verificación
       await sendEmailVerification(cred.user, {
         url: `${window.location.origin}/login`,
       })
 
-      // 4. Guardar perfil en Firestore vía API
+      const idToken = await cred.user.getIdToken()
       await fetch('/api/auth', {
         method:  'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ uid: cred.user.uid, email, fingerprint, ip }),
+        body:    JSON.stringify({ idToken, fingerprint, ip }),
       })
 
-      // 5. Redirigir a verificar email
-      router.push('/verify-email')
+      window.location.href = '/verify-email'
     } catch (err: unknown) {
       const code = (err as { code?: string }).code
       if (code === 'auth/email-already-in-use') setError('Este correo ya tiene una cuenta registrada.')
@@ -67,6 +62,8 @@ export default function RegisterPage() {
     }
   }
 
+  const inp: React.CSSProperties = { width: '100%', padding: '12px 16px', backgroundColor: '#1a1a2e', border: '1px solid #1e3a5f', borderRadius: 10, color: '#e2e8f0', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'DM Sans, Arial, sans-serif' }
+
   return (
     <main style={styles.main}>
       <div style={styles.card}>
@@ -74,35 +71,25 @@ export default function RegisterPage() {
         <p style={styles.sub}>Crea tu cuenta para acceder al simulador</p>
 
         <form onSubmit={handleRegister}>
-          <Field label="CORREO ELECTRÓNICO">
-            <input
-              type="email" autoComplete="email" required
-              value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="tu@correo.com"
-              style={styles.input}
-            />
-          </Field>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CORREO ELECTRONICO</label>
+            <input style={inp} type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@correo.com" />
+          </div>
 
-          <Field label="CONTRASEÑA">
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CONTRASENA</label>
             <div style={{ position: 'relative' }}>
-              <input
-                type={showPass ? 'text' : 'password'} autoComplete="new-password" required
-                value={pass} onChange={e => setPass(e.target.value)}
-                placeholder="Mínimo 8 caracteres"
-                style={{ ...styles.input, paddingRight: 48 }}
-              />
-              <EyeBtn show={showPass} toggle={() => setShowPass(v => !v)} />
+              <input style={inp} type={showPass ? 'text' : 'password'} autoComplete="new-password" required value={pass} onChange={e => setPass(e.target.value)} placeholder="Minimo 8 caracteres" />
+              <button type="button" onClick={() => setShowPass(v => !v)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.1rem' }}>
+                {showPass ? '🙈' : '👁'}
+              </button>
             </div>
-          </Field>
+          </div>
 
-          <Field label="CONFIRMAR CONTRASEÑA">
-            <input
-              type={showPass ? 'text' : 'password'} autoComplete="new-password" required
-              value={confirm} onChange={e => setConfirm(e.target.value)}
-              placeholder="Repite tu contraseña"
-              style={styles.input}
-            />
-          </Field>
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CONFIRMAR CONTRASENA</label>
+            <input style={inp} type={showPass ? 'text' : 'password'} autoComplete="new-password" required value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Repite tu contrasena" />
+          </div>
 
           <button type="submit" disabled={loading} style={{ ...styles.btn, backgroundColor: loading ? '#78600a' : '#D4AF37', cursor: loading ? 'not-allowed' : 'pointer' }}>
             {loading ? 'Creando cuenta...' : 'CREAR CUENTA'}
@@ -116,10 +103,16 @@ export default function RegisterPage() {
           <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: 0 }}>2,000 preguntas · 5 tipos de examen · Desde $99 MXN/mes</p>
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: 24, color: '#475569', fontSize: '0.85rem' }}>
-          ¿Ya tienes cuenta?{' '}
-          <Link href="/login" style={{ color: '#D4AF37', textDecoration: 'none' }}>Inicia sesión</Link>
+        <p style={{ textAlign: 'center', marginTop: 20, color: '#475569', fontSize: '0.85rem' }}>
+          Ya tienes cuenta? <a href="/login" style={{ color: '#00d9ff' }}>Inicia sesion</a>
         </p>
+
+        <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #1a1a2e', display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' as const }}>
+          <a href="/terminos" style={{ color: '#334155', fontSize: '0.72rem' }}>Terminos</a>
+          <a href="/privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Privacidad</a>
+          <a href="/aviso-privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Aviso</a>
+        </div>
+        <p style={{ textAlign: 'center', marginTop: 12, color: '#1e293b', fontSize: '0.65rem' }}>v1.3.3</p>
       </div>
     </main>
   )

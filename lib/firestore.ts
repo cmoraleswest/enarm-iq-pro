@@ -1,7 +1,7 @@
 import { adminFirestore } from './firebase-admin'
 import type {
   UserProfile, ExamSession, SubmitExamResponse,
-  AnswerResult, SpecialtyStats, Specialty, DiagnosticSnapshot, UserStats,
+  AnswerResult, SpecialtyStats, Specialty, DiagnosticSnapshot, UserStats, SessionSummary,
 } from '@/types/exam'
 
 // ──────────────────────────────────────────────
@@ -89,13 +89,24 @@ export async function getExamSession(sessionId: string): Promise<ExamSession | n
 }
 
 export async function getUserSessions(userId: string, limit = 20): Promise<ExamSession[]> {
-  const snap = await adminFirestore
-    .collection('examSessions')
-    .where('userId', '==', userId)
-    .orderBy('finishedAt', 'desc')
-    .limit(limit)
-    .get()
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as ExamSession)
+  try {
+    const snap = await adminFirestore
+      .collection('examSessions')
+      .where('userId', '==', userId)
+      .orderBy('finishedAt', 'desc')
+      .limit(limit)
+      .get()
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }) as ExamSession)
+  } catch (err) {
+    console.error('getUserSessions error (may need Firestore index):', err)
+    // Fallback without orderBy (no index required)
+    const snap = await adminFirestore
+      .collection('examSessions')
+      .where('userId', '==', userId)
+      .limit(limit)
+      .get()
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }) as ExamSession)
+  }
 }
 
 // ──────────────────────────────────────────────
@@ -114,6 +125,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
       bySpecialty: [],
       diagnosticHistory: [],
       lastDiagnosticAt: null,
+      sessionHistory: [],
     }
   }
 
@@ -148,6 +160,16 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     bySpecialty: s.bySpecialty,
   }))
 
+  const sessionHistory: SessionSummary[] = sessions.slice(0, 20).map(s => ({
+    sessionId: s.id,
+    examType: s.examType,
+    finishedAt: s.finishedAt,
+    totalQuestions: s.totalQuestions,
+    correctAnswers: s.correctAnswers,
+    pct: s.totalQuestions > 0 ? Math.round((s.correctAnswers / s.totalQuestions) * 100) : 0,
+    timeTakenSeconds: s.timeTakenSeconds,
+  }))
+
   return {
     totalSessions: sessions.length,
     totalQuestions: totalQ,
@@ -156,6 +178,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     bySpecialty,
     diagnosticHistory,
     lastDiagnosticAt: diagnostics[0]?.finishedAt ?? null,
+    sessionHistory,
   }
 }
 

@@ -20,22 +20,17 @@ export default function SimuladorRealPage() {
   const [respondido, setRespondido] = useState(false)
   const [timeLeft, setTimeLeft]     = useState(TIEMPO_LIMITE)
   const timerRef                    = useRef<ReturnType<typeof setInterval> | null>(null)
+  const submitExamRef               = useRef<(timeUp: boolean) => void>(() => {})
 
-  // Cronómetro regresivo
   useEffect(() => {
-    if (phase !== 'exam') return
-    timerRef.current = setInterval(() => {
-      setTimeLeft(t => {
-        if (t <= 1) {
-          clearInterval(timerRef.current!)
-          submitExam(true)
-          return 0
-        }
-        return t - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [phase])
+    try {
+      const raw = localStorage.getItem('enarm_user_info')
+      if (raw) {
+        const u = JSON.parse(raw)
+        if (!u.isPaid && u.daysLeft <= 0) window.location.href = '/upgrade'
+      }
+    } catch { /* ignore */ }
+  }, [])
 
   const formatTime = (s: number) => {
     const h = Math.floor(s / 3600)
@@ -46,12 +41,45 @@ export default function SimuladorRealPage() {
 
   const timerColor = timeLeft < 1800 ? '#f87171' : timeLeft < 3600 ? '#fbbf24' : '#4ade80'
 
+  const submitExam = async (timeUp: boolean) => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    setPhase('submitting')
+    const res = await fetch('/api/exam', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
+    })
+    const data = await res.json()
+    sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
+    router.push(`/exams/resultado?session=${data.sessionId}${timeUp ? '&timeup=1' : ''}`)
+  }
+
+  useEffect(() => { submitExamRef.current = submitExam })
+
+  // Cronómetro regresivo
+  useEffect(() => {
+    if (phase !== 'exam') return
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current!)
+          submitExamRef.current(true)
+          return 0
+        }
+        return t - 1
+      })
+    }, 1000)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [phase])
+
   const startExam = async () => {
     setPhase('loading')
     try {
       const res  = await fetch('/api/exam', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body:    JSON.stringify({ action: 'start', examType: 'simulador_cronometrado' }),
       })
       const data = await res.json() as { sessionId: string; questions: QuestionForClient[] }
@@ -80,24 +108,11 @@ export default function SimuladorRealPage() {
     setSeleccion('')
   }
 
-  const submitExam = async (timeUp: boolean) => {
-    if (timerRef.current) clearInterval(timerRef.current)
-    setPhase('submitting')
-    const res = await fetch('/api/exam', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
-    })
-    const data = await res.json()
-    sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
-    router.push(`/exams/resultado?session=${data.sessionId}${timeUp ? '&timeup=1' : ''}`)
-  }
-
   if (phase === 'intro') {
     return (
       <main style={S.main}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <button onClick={() => router.push('/')} style={S.back}>←</button>
+          <button onClick={() => window.location.href = '/home'} style={S.back}>←</button>
           <h1 style={S.h1}>SIMULADOR REAL CRONOMETRADO</h1>
         </div>
 
@@ -138,7 +153,7 @@ export default function SimuladorRealPage() {
           <div style={{ color: timerColor, fontSize: '1.6rem', fontWeight: 'bold', fontFamily: 'monospace', letterSpacing: 2 }}>{formatTime(timeLeft)}</div>
           <div style={{ color: '#475569', fontSize: '0.65rem' }}>TIEMPO RESTANTE</div>
         </div>
-        <button onClick={() => submitExam(false)} style={{ backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'Georgia, serif' }}>
+        <button onClick={() => submitExam(false)} style={{ backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>
           Terminar
         </button>
       </div>
@@ -158,7 +173,7 @@ export default function SimuladorRealPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
         {q.opciones.map((op, i) => (
           <button key={i} onClick={() => responder(op)} disabled={respondido}
-            style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'Georgia, serif', lineHeight: '1.5', minHeight: 54, backgroundColor: seleccion === op && respondido ? '#1e3a5f' : '#1e293b', border: seleccion === op && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0' }}>
+            style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: seleccion === op && respondido ? '#1e3a5f' : '#1e293b', border: seleccion === op && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0' }}>
             <span style={{ fontWeight: 'bold', marginRight: 10, color: respondido ? 'inherit' : '#f87171' }}>{String.fromCharCode(65 + i)})</span>
             {op}
           </button>
@@ -175,10 +190,10 @@ export default function SimuladorRealPage() {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  main:    { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
+  main:    { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
   h1:      { color: '#f87171', fontSize: '1.5rem', margin: 0, letterSpacing: 1 },
   back:    { background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 },
   stat:    { display: 'flex', alignItems: 'center', gap: 12, backgroundColor: '#111827', borderRadius: 10, padding: '12px 16px', border: '1px solid #1e293b', marginBottom: 10 },
   caso:    { backgroundColor: '#1a1f2e', borderLeft: '4px solid #f87171', borderRadius: 10, padding: 22, marginBottom: 20 },
-  btnRed:  { width: '100%', padding: 16, backgroundColor: '#991b1b', color: '#fecaca', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'Georgia, serif', minHeight: 54 },
+  btnRed:  { width: '100%', padding: 16, backgroundColor: '#991b1b', color: '#fecaca', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif', minHeight: 54 },
 }

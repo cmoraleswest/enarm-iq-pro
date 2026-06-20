@@ -11,7 +11,8 @@ export async function GET() {
   try {
     const stats = await getUserStats(session.uid)
     return NextResponse.json({ stats })
-  } catch {
-    return NextResponse.json({ error: 'Error al obtener estadísticas.' }, { status: 500 })
+  } catch (err) {
+    console.error('Stats error for uid:', session.uid, err)
+    return NextResponse.json({ error: 'Error al obtener estadísticas.', debug: 'firestore_error' }, { status: 500 })
   }
 }

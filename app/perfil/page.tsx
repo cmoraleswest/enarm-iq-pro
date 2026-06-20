@@ -6,11 +6,11 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
   LineChart, Line, ResponsiveContainer, CartesianGrid,
 } from 'recharts'
-import type { UserStats, SpecialtyStats } from '@/types/exam'
+import type { UserStats } from '@/types/exam'
 
 // Colores por especialidad
 const SP_COLORS: Record<string, string> = {
-  'Medicina Interna': '#D4AF37',
+  'Medicina Interna': '#00d9ff',
   'Pediatría':        '#60a5fa',
   'Ginecología':      '#f472b6',
   'Cirugía':          '#f87171',
@@ -25,28 +25,35 @@ export default function PerfilPage() {
   const [error, setError]   = useState('')
   const [tab, setTab]       = useState<'overview' | 'diagnostics' | 'history'>('overview')
 
-  useEffect(() => {
-    fetchStats()
-  }, [])
-
   const fetchStats = async () => {
     setLoading(true)
     try {
-      const res  = await fetch('/api/stats')
-      const data = await res.json() as { stats?: UserStats; error?: string }
-      if (!res.ok) throw new Error(data.error)
+      const res  = await fetch('/api/stats', { credentials: 'include' })
+      const data = await res.json() as { stats?: UserStats; error?: string; debug?: string }
+      if (!res.ok) {
+        if (data.debug === 'no_session') {
+          setError('Sesión expirada. Cierra sesión y vuelve a iniciar.')
+        } else {
+          setError('Error al cargar estadísticas. Intenta de nuevo.')
+        }
+        return
+      }
       setStats(data.stats ?? null)
     } catch {
-      setError('No se pudieron cargar las estadísticas.')
+      setError('Error de conexión. Verifica tu internet.')
     } finally {
       setLoading(false)
     }
   }
 
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
   if (loading) {
     return (
       <main style={S.main}>
-        <p style={{ color: '#D4AF37', textAlign: 'center', marginTop: 80 }}>Cargando tu perfil...</p>
+        <p style={{ color: '#00d9ff', textAlign: 'center', marginTop: 80 }}>Cargando tu perfil...</p>
       </main>
     )
   }
@@ -55,7 +62,7 @@ export default function PerfilPage() {
     return (
       <main style={S.main}>
         <p style={{ color: '#f87171', textAlign: 'center', marginTop: 80 }}>{error || 'Sin datos disponibles aún.'}</p>
-        <button onClick={() => router.push('/')} style={S.btnBack}>← Inicio</button>
+        <button onClick={() => window.location.href = '/home'} style={S.btnBack}>← Inicio</button>
       </main>
     )
   }
@@ -88,10 +95,10 @@ export default function PerfilPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}>←</button>
-          <h1 style={{ color: '#D4AF37', fontSize: '1.8rem', margin: 0, letterSpacing: 2 }}>MI PERFIL</h1>
+          <button onClick={() => window.location.href = '/home'} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}>←</button>
+          <h1 style={{ color: '#00d9ff', fontSize: '1.8rem', margin: 0, letterSpacing: 2 }}>MI PERFIL</h1>
         </div>
-        <button onClick={fetchStats} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'Georgia, serif' }}>↺ Actualizar</button>
+        <button onClick={fetchStats} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>↺ Actualizar</button>
       </div>
       <p style={{ color: '#64748b', fontSize: '0.82rem', marginBottom: 24, paddingLeft: 32 }}>
         Perfil académico · {stats.totalSessions} exámenes · {stats.totalQuestions} preguntas respondidas
@@ -119,7 +126,7 @@ export default function PerfilPage() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
         {(['overview', 'diagnostics', 'history'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
-            style={{ padding: '8px 16px', borderRadius: 20, border: `1px solid ${tab === t ? '#D4AF37' : '#334155'}`, backgroundColor: tab === t ? '#D4AF37' : 'transparent', color: tab === t ? '#0f0f1a' : '#64748b', cursor: 'pointer', fontSize: '0.78rem', fontWeight: tab === t ? 'bold' : 'normal', fontFamily: 'Georgia, serif' }}>
+            style={{ padding: '8px 16px', borderRadius: 20, border: `1px solid ${tab === t ? '#00d9ff' : '#334155'}`, backgroundColor: tab === t ? '#00d9ff' : 'transparent', color: tab === t ? '#0f0f1a' : '#64748b', cursor: 'pointer', fontSize: '0.78rem', fontWeight: tab === t ? 'bold' : 'normal', fontFamily: 'DM Sans, Arial, sans-serif' }}>
             {t === 'overview' ? 'Resumen' : t === 'diagnostics' ? 'Diagnósticos' : 'Historial'}
           </button>
         ))}
@@ -141,7 +148,7 @@ export default function PerfilPage() {
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 8, fontFamily: 'Georgia, serif' }}
+                      contentStyle={{ backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 8, fontFamily: 'DM Sans, Arial, sans-serif' }}
                       formatter={(val, name) => {
                         const sp = pieData.find(d => d.name === name)
                         return [`${val} preg. · ${sp?.pct ?? 0}%`, name]
@@ -171,10 +178,10 @@ export default function PerfilPage() {
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={barData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 11, fontFamily: 'Georgia, serif' }} />
+                  <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 11, fontFamily: 'DM Sans, Arial, sans-serif' }} />
                   <YAxis domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 11 }} unit="%" />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 8, fontFamily: 'Georgia, serif' }}
+                    contentStyle={{ backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 8, fontFamily: 'DM Sans, Arial, sans-serif' }}
                     formatter={(val, _, props) => [`${val}%`, props.payload?.full ?? '']}
                   />
                   <Bar dataKey="pct" radius={[6, 6, 0, 0]}>
@@ -244,7 +251,7 @@ export default function PerfilPage() {
                         contentStyle={{ backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 8 }}
                         formatter={(val) => [`${val}%`, 'Efectividad']}
                       />
-                      <Line type="monotone" dataKey="pct" stroke="#D4AF37" strokeWidth={2} dot={{ fill: '#D4AF37', r: 4 }} />
+                      <Line type="monotone" dataKey="pct" stroke="#00d9ff" strokeWidth={2} dot={{ fill: '#00d9ff', r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -286,12 +293,41 @@ export default function PerfilPage() {
       {tab === 'history' && (
         <div style={S.card}>
           <h2 style={S.cardTitle}>SESIONES RECIENTES</h2>
-          {stats.totalSessions === 0 ? (
+          {(!stats.sessionHistory || stats.sessionHistory.length === 0) ? (
             <p style={{ color: '#475569', textAlign: 'center' }}>Aún no has completado ningún examen.</p>
           ) : (
-            <p style={{ color: '#64748b', textAlign: 'center', fontSize: '0.85rem' }}>
-              Historial disponible después de completar exámenes.
-            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {stats.sessionHistory.map((s) => {
+                const pctColor = s.pct >= 70 ? '#4ade80' : s.pct >= 50 ? '#fbbf24' : '#f87171'
+                const label: Record<string, string> = {
+                  diagnostico: 'Diagnóstico',
+                  diario: 'Diario',
+                  personalizado: 'Personalizado',
+                  simulador_cronometrado: 'Simulador Real',
+                  simulador_libre: 'Simulador Libre',
+                }
+                const formatTime = (sec: number) => {
+                  const h = Math.floor(sec / 3600)
+                  const m = Math.floor((sec % 3600) / 60)
+                  return h > 0 ? `${h}h ${m}m` : `${m}m`
+                }
+                return (
+                  <div key={s.sessionId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#0d1117', borderRadius: 10, border: '1px solid #1e293b' }}>
+                    <div>
+                      <div style={{ color: '#e2e8f0', fontSize: '0.9rem', fontWeight: 'bold' }}>{label[s.examType] ?? s.examType}</div>
+                      <div style={{ color: '#475569', fontSize: '0.75rem', marginTop: 2 }}>
+                        {new Date(s.finishedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {s.timeTakenSeconds > 0 && ` · ${formatTime(s.timeTakenSeconds)}`}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ color: pctColor, fontSize: '1.2rem', fontWeight: 'bold' }}>{s.pct}%</div>
+                      <div style={{ color: '#475569', fontSize: '0.72rem' }}>{s.correctAnswers}/{s.totalQuestions}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
         </div>
       )}
@@ -300,9 +336,9 @@ export default function PerfilPage() {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  main:      { padding: 24, fontFamily: 'Georgia, serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
+  main:      { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
   card:      { backgroundColor: '#111827', borderRadius: 14, padding: 20, marginBottom: 16, border: '1px solid #1e293b' },
   cardTitle: { color: '#94a3b8', fontSize: '0.75rem', letterSpacing: '2px', margin: '0 0 16px 0' },
-  btnGold:   { width: '100%', padding: 14, backgroundColor: '#D4AF37', color: '#0f0f1a', border: 'none', borderRadius: 12, fontSize: '0.95rem', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif' },
-  btnBack:   { padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', borderRadius: 10, cursor: 'pointer', fontFamily: 'Georgia, serif', marginTop: 16, display: 'block', margin: '16px auto 0' },
+  btnGold:   { width: '100%', padding: 14, background: 'linear-gradient(135deg, #ff006e, #00d9ff)', color: '#0f0f1a', border: 'none', borderRadius: 12, fontSize: '0.95rem', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'DM Sans, Arial, sans-serif' },
+  btnBack:   { padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', borderRadius: 10, cursor: 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', marginTop: 16, display: 'block', margin: '16px auto 0' },
 }
