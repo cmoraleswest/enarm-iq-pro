@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { DM_Sans } from "next/font/google"
 import "./globals.css"
 import AnalyticsProvider from "@/components/AnalyticsProvider"
@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://simulaenarm.com"),
   alternates: { canonical: "/" },
   manifest: "/manifest.json",
-  themeColor: "#D4AF37",
   openGraph: {
     title: "Simula ENARM — Simulador CIFRHS 2025",
     description: "2,000+ preguntas reales, 280 reactivos, 5 horas. Prepárate para el ENARM con simuladores calibrados.",
@@ -42,6 +41,10 @@ export const metadata: Metadata = {
     icon: "/icons/icon-192.png",
     apple: "/icons/icon-192.png",
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: "#D4AF37",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
