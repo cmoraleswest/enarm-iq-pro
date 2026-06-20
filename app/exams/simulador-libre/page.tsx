@@ -104,7 +104,7 @@ export default function SimuladorLibrePage() {
         <div style={{ backgroundColor: '#0f172a', border: '1px solid #1e3a5f', borderRadius: 12, padding: 20, marginBottom: 24 }}>
           <p style={{ color: '#93c5fd', margin: 0, fontWeight: 'bold', marginBottom: 8 }}>◉ SIMULACIÓN COMPLETA SIN PRESIÓN</p>
           <p style={{ color: '#bfdbfe', margin: 0, lineHeight: 1.7, fontSize: '0.9rem' }}>
-            360 preguntas · Sin límite de tiempo · Se registra cuánto tardas · Justificaciones al final.
+            280 reactivos · Sin límite de tiempo · Se registra cuánto tardas · Justificaciones al final.
           </p>
         </div>
 
@@ -120,7 +120,7 @@ export default function SimuladorLibrePage() {
   if (phase === 'loading' || phase === 'submitting') {
     return (
       <main style={{ ...S.main, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: '#60a5fa', fontSize: '1.1rem' }}>{phase === 'submitting' ? 'Calificando tu examen...' : 'Cargando 360 preguntas...'}</p>
+        <p style={{ color: '#60a5fa', fontSize: '1.1rem' }}>{phase === 'submitting' ? 'Calificando tu examen...' : 'Cargando 280 reactivos...'}</p>
       </main>
     )
   }

@@ -29,11 +29,11 @@ export default function UpgradePage() {
         <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>🎓</div>
         <h1 style={{ color: '#D4AF37', fontSize: '1.6rem', margin: '0 0 8px 0', letterSpacing: 2 }}>ACTIVA TU SUSCRIPCIÓN</h1>
         <p style={{ color: '#94a3b8', lineHeight: 1.7, marginBottom: 28, fontSize: '0.9rem' }}>
-          Elige tu plan para acceder al simulador completo con las 2,000 preguntas del banco ENARM.
+          Prepárate para el examen de 280 reactivos, 5 horas y compite con bases de datos calibradas para 18,515 plazas.
         </p>
 
         <div style={{ backgroundColor: '#0f172a', borderRadius: 12, padding: 16, marginBottom: 24, border: '1px solid #1e3a5f' }}>
-          {['2,000 preguntas reales ENARM', '5 tipos de simulador', 'Perfil académico y analíticas', 'Simulador cronometrado 6 horas', 'Flashcards de memorización', 'Historial y progreso completo'].map(f => (
+          {['280 reactivos formato CIFRHS 2025', '5 tipos de simulador', 'Simulación de plazas (18,515)', 'Simulador cronometrado 5 horas', 'Flashcards de memorización', 'Percentil estimado vs 45,000 aspirantes'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <span style={{ color: '#4ade80' }}>✓</span>
               <span style={{ color: '#94a3b8', fontSize: '0.85rem', textAlign: 'left' }}>{f}</span>

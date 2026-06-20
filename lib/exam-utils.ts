@@ -2,35 +2,45 @@ import fs from 'fs'
 import path from 'path'
 import type { QuestionFull, QuestionForClient, Specialty, AnswerResult, ClientAnswer } from '@/types/exam'
 
-// Parámetros de cada tipo de examen
+// CIFRHS 2025: 280 reactivos (250 español + 30 inglés), 5 horas, 4 opciones
+export const CIFRHS = {
+  totalReactivos:    280,
+  reactivosEspanol:  250,
+  reactivosIngles:   30,
+  tiempoLimiteSecs:  5 * 60 * 60, // 5 horas = 300 minutos
+  opcionesPorReactivo: 4,
+  aspirantesAnuales: 45_000,
+  plazasDisponibles: 18_515,
+} as const
+
 export const EXAM_CONFIG = {
   diagnostico: {
     totalQuestions: 180,
     perSpecialty:   36,
-    timeLimitSecs:  null,  // sin límite
+    timeLimitSecs:  null,
     showJustifImmediately: false,
   },
   diario: {
     totalQuestions: 10,
-    perSpecialty:   null,  // aleatorio mezclado
+    perSpecialty:   null,
     timeLimitSecs:  null,
     showJustifImmediately: true,
   },
   personalizado: {
-    totalQuestions: null,  // el usuario elige 10-40
+    totalQuestions: null,
     perSpecialty:   null,
     timeLimitSecs:  null,
     showJustifImmediately: false,
   },
   simulador_cronometrado: {
-    totalQuestions: 360,
-    perSpecialty:   72,
-    timeLimitSecs:  6 * 60 * 60, // 6 horas
+    totalQuestions: 280,
+    perSpecialty:   56, // 280 / 5 especialidades
+    timeLimitSecs:  CIFRHS.tiempoLimiteSecs,
     showJustifImmediately: false,
   },
   simulador_libre: {
-    totalQuestions: 360,
-    perSpecialty:   72,
+    totalQuestions: 280,
+    perSpecialty:   56,
     timeLimitSecs:  null,
     showJustifImmediately: false,
   },
@@ -53,15 +63,19 @@ export function loadBanco(): QuestionFull[] {
     dificultad: string
   }>
 
-  _banco = data.map(q => ({
-    id: q.id,
-    caso: q.caso,
-    opciones: shuffle([q.respuesta_correcta, ...q.respuestas_incorrectas]),
-    respuesta_correcta: q.respuesta_correcta,
-    justificacion: q.justificacion,
-    categoria: q.categoria as Specialty,
-    dificultad: q.dificultad,
-  }))
+  _banco = data.map(q => {
+    // CIFRHS: máximo 4 opciones (A, B, C, D)
+    const incorrectas = q.respuestas_incorrectas.slice(0, CIFRHS.opcionesPorReactivo - 1)
+    return {
+      id: q.id,
+      caso: q.caso,
+      opciones: shuffle([q.respuesta_correcta, ...incorrectas]),
+      respuesta_correcta: q.respuesta_correcta,
+      justificacion: q.justificacion,
+      categoria: q.categoria as Specialty,
+      dificultad: q.dificultad,
+    }
+  })
 
   return _banco
 }
@@ -101,15 +115,16 @@ export function selectMixedQuestions(
   return shuffle(pool).slice(0, total)
 }
 
-// Selecciona preguntas para simulador real (72 por especialidad)
+// CIFRHS: 280 reactivos distribuidos por especialidad (56 por especialidad)
 export function selectSimulatorQuestions(): QuestionFull[] {
   const banco = loadBanco()
   const specialties: Specialty[] = ['Medicina Interna', 'Pediatría', 'Ginecología', 'Cirugía', 'Urgencias']
+  const perSpecialty = CIFRHS.totalReactivos / specialties.length // 56
   const selected: QuestionFull[] = []
 
   for (const sp of specialties) {
     const pool = banco.filter(q => q.categoria === sp)
-    selected.push(...shuffle(pool).slice(0, 72))
+    selected.push(...shuffle(pool).slice(0, perSpecialty))
   }
 
   return shuffle(selected)

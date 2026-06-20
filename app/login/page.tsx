@@ -73,7 +73,7 @@ export default function LoginPage() {
             </svg>
             <span style={{ fontSize: '1.5rem', fontWeight: 700 }}>Simula<span style={{ color: '#00d9ff' }}>ENARM</span></span>
           </div>
-          <p style={{ color: '#475569', fontSize: '0.82rem' }}>2,000 preguntas reales · 5 simuladores</p>
+          <p style={{ color: '#475569', fontSize: '0.82rem' }}>280 reactivos · Formato CIFRHS 2025 · 18,515 plazas</p>
         </div>
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: 20 }}>

@@ -6,7 +6,7 @@ import type { QuestionForClient, ClientAnswer } from '@/types/exam'
 
 type Phase = 'intro' | 'loading' | 'exam' | 'submitting'
 
-const TIEMPO_LIMITE = 6 * 60 * 60 // 6 horas en segundos
+const TIEMPO_LIMITE = 5 * 60 * 60 // CIFRHS: 5 horas (300 minutos)
 
 export default function SimuladorRealPage() {
   const router = useRouter()
@@ -119,12 +119,12 @@ export default function SimuladorRealPage() {
         <div style={{ backgroundColor: '#450a0a', border: '1px solid #f87171', borderRadius: 12, padding: 20, marginBottom: 24 }}>
           <p style={{ color: '#fca5a5', margin: 0, fontWeight: 'bold', marginBottom: 8 }}>⚠ SIMULACIÓN DE CONDICIONES REALES</p>
           <p style={{ color: '#fecaca', margin: 0, lineHeight: 1.7, fontSize: '0.9rem' }}>
-            360 preguntas · Cronómetro de 6 horas · Las respuestas NO se muestran hasta el final.
+            280 reactivos · Cronómetro de 5 horas · Formato CIFRHS oficial · Las respuestas NO se muestran hasta el final.
             El examen se enviará automáticamente cuando el tiempo expire.
           </p>
         </div>
 
-        {[['360', 'preguntas — todas las especialidades'], ['6:00:00', 'tiempo límite'], ['~1 min', 'por pregunta (ritmo ENARM real)']].map(([v, l]) => (
+        {[['280', 'reactivos — formato CIFRHS 2025'], ['5:00:00', 'tiempo límite oficial'], ['~1 min', 'por reactivo (ritmo ENARM real)']].map(([v, l]) => (
           <div key={l} style={S.stat}><span style={{ color: '#f87171', fontSize: '1.2rem', fontWeight: 'bold', minWidth: 80 }}>{v}</span><span style={{ color: '#94a3b8', fontSize: '0.88rem' }}>{l}</span></div>
         ))}
 
@@ -136,7 +136,7 @@ export default function SimuladorRealPage() {
   if (phase === 'loading' || phase === 'submitting') {
     return (
       <main style={{ ...S.main, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: '#f87171', fontSize: '1.1rem' }}>{phase === 'submitting' ? 'Calificando...' : 'Preparando 360 preguntas...'}</p>
+        <p style={{ color: '#f87171', fontSize: '1.1rem' }}>{phase === 'submitting' ? 'Calificando...' : 'Preparando 280 reactivos...'}</p>
       </main>
     )
   }

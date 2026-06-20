@@ -100,7 +100,7 @@ export default function RegisterPage() {
 
         <div style={styles.infoBadge}>
           <p style={{ color: '#D4AF37', fontSize: '0.78rem', letterSpacing: '1px', margin: '0 0 4px 0' }}>◉ ACCESO PREMIUM</p>
-          <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: 0 }}>2,000 preguntas · 5 tipos de examen · Desde $99 MXN/mes</p>
+          <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: 0 }}>280 reactivos CIFRHS · 18,515 plazas · Desde $99 MXN/mes</p>
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 20, color: '#475569', fontSize: '0.85rem' }}>

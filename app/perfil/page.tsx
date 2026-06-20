@@ -7,6 +7,7 @@ import {
   LineChart, Line, ResponsiveContainer, CartesianGrid,
 } from 'recharts'
 import type { UserStats } from '@/types/exam'
+import { calcularPercentil, calcularEstatus, ESPECIALIDADES_CIFRHS, CIFRHS } from '@/lib/cifrhs-client'
 
 // Colores por especialidad
 const SP_COLORS: Record<string, string> = {
@@ -24,6 +25,7 @@ export default function PerfilPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError]   = useState('')
   const [tab, setTab]       = useState<'overview' | 'diagnostics' | 'history'>('overview')
+  const [selectedEsp, setSelectedEsp] = useState(ESPECIALIDADES_CIFRHS[0].nombre)
 
   const fetchStats = async () => {
     setLoading(true)
@@ -121,6 +123,43 @@ export default function PerfilPage() {
           </div>
         ))}
       </div>
+
+      {/* CIFRHS: Percentil y Simulación de Plazas */}
+      {stats.totalSessions > 0 && (() => {
+        const percentil = calcularPercentil(stats.overallPct)
+        const posEstimada = Math.round(CIFRHS.aspirantesAnuales * (1 - percentil / 100))
+        const resultado = calcularEstatus(stats.overallPct, selectedEsp)
+        return (
+          <div style={{ backgroundColor: '#111827', borderRadius: 16, padding: 24, marginBottom: 20, border: '1px solid #1e293b' }}>
+            <h2 style={{ color: '#00d9ff', fontSize: '0.78rem', letterSpacing: 2, margin: '0 0 16px 0' }}>SIMULACIÓN CIFRHS 2025 · {CIFRHS.plazasDisponibles.toLocaleString()} PLAZAS</h2>
+            <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, textAlign: 'center', minWidth: 100, backgroundColor: '#0f172a', borderRadius: 12, padding: 16 }}>
+                <div style={{ color: '#00d9ff', fontSize: '2.5rem', fontWeight: 'bold' }}>P{percentil}</div>
+                <div style={{ color: '#64748b', fontSize: '0.72rem' }}>Percentil estimado</div>
+                <div style={{ color: '#475569', fontSize: '0.68rem', marginTop: 4 }}>vs {CIFRHS.aspirantesAnuales.toLocaleString()} aspirantes</div>
+              </div>
+              <div style={{ flex: 1, textAlign: 'center', minWidth: 100, backgroundColor: '#0f172a', borderRadius: 12, padding: 16 }}>
+                <div style={{ color: '#94a3b8', fontSize: '2.5rem', fontWeight: 'bold' }}>#{posEstimada.toLocaleString()}</div>
+                <div style={{ color: '#64748b', fontSize: '0.72rem' }}>Posición estimada</div>
+                <div style={{ color: '#475569', fontSize: '0.68rem', marginTop: 4 }}>de {CIFRHS.aspirantesAnuales.toLocaleString()}</div>
+              </div>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ color: '#64748b', fontSize: '0.72rem', letterSpacing: 1, display: 'block', marginBottom: 8 }}>ESPECIALIDAD DESEADA</label>
+              <select value={selectedEsp} onChange={e => setSelectedEsp(e.target.value)}
+                style={{ width: '100%', padding: 12, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 10, color: '#e2e8f0', fontSize: '0.9rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                {ESPECIALIDADES_CIFRHS.map(e => (
+                  <option key={e.nombre} value={e.nombre}>{e.nombre} ({e.plazas.toLocaleString()} plazas)</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ backgroundColor: '#0f172a', borderRadius: 12, padding: 16, border: `2px solid ${resultado.color}` }}>
+              <div style={{ color: resultado.color, fontSize: '1rem', fontWeight: 'bold', letterSpacing: 1, marginBottom: 6 }}>{resultado.label}</div>
+              <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0, lineHeight: 1.6 }}>{resultado.descripcion}</p>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>

@@ -175,7 +175,7 @@ export default function SimuladorPage() {
         )}
       </div>
       <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '24px' }}>
-        2,000 preguntas reales · Banco maestro ENARM
+        Banco de casos clínicos · Formato CIFRHS 2025
       </p>
 
       {/* Panel de resumen */}

@@ -41,7 +41,7 @@ const EXAM_MODULES = [
     id:       'simulador_real',
     section:  'D',
     title:    'Simulador Real',
-    desc:     '360 preguntas · Cronómetro de 6 horas · Condiciones del ENARM real',
+    desc:     '280 reactivos · Cronómetro de 5 horas · Formato CIFRHS oficial',
     color:    '#f87171',
     href:     '/exams/simulador-real',
     tag:      'ALTA INTENSIDAD',
@@ -50,7 +50,7 @@ const EXAM_MODULES = [
     id:       'simulador_libre',
     section:  'E',
     title:    'Simulador Sin Límite',
-    desc:     '360 preguntas · Sin cronómetro · Registra tu tiempo real al terminar',
+    desc:     '280 reactivos · Sin cronómetro · Registra tu tiempo real al terminar',
     color:    '#60a5fa',
     href:     '/exams/simulador-libre',
     tag:      'ESTUDIO PROFUNDO',
@@ -94,7 +94,7 @@ export default function DashboardPage() {
         </div>
       </div>
       <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: 20 }}>
-        {userInfo?.email ?? 'Cargando...'} · Banco maestro 2,000 preguntas
+        {userInfo?.email ?? 'Cargando...'} · 280 reactivos · Formato CIFRHS 2025
       </p>
 
 

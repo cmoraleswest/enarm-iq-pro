@@ -13,8 +13,8 @@ const EXAM_MODULES = [
   { id: 'diagnostico', section: 'A', title: 'Diagnóstico Inicial', desc: '180 preguntas · 36 por especialidad · Genera tu perfil académico completo', color: '#D4AF37', href: '/exams/diagnostico', tag: 'OPCIONAL · CADA 30-45 DÍAS' },
   { id: 'diario', section: 'B', title: 'Simulador Diario', desc: '10 preguntas aleatorias · Justificación inmediata después de cada respuesta', color: '#4ade80', href: '/exams/diario', tag: 'RECOMENDADO DIARIO' },
   { id: 'personalizado', section: 'C', title: 'Examen Personalizado', desc: 'Elige entre 10 y 40 preguntas · Selecciona una o varias especialidades', color: '#a78bfa', href: '/exams/personalizado', tag: 'A TU RITMO' },
-  { id: 'simulador_real', section: 'D', title: 'Simulador Real', desc: '360 preguntas · Cronómetro de 6 horas · Condiciones del ENARM real', color: '#f87171', href: '/exams/simulador-real', tag: 'ALTA INTENSIDAD' },
-  { id: 'simulador_libre', section: 'E', title: 'Simulador Sin Límite', desc: '360 preguntas · Sin cronómetro · Registra tu tiempo real al terminar', color: '#60a5fa', href: '/exams/simulador-libre', tag: 'ESTUDIO PROFUNDO' },
+  { id: 'simulador_real', section: 'D', title: 'Simulador ENARM Real', desc: '280 reactivos · Cronómetro de 5 horas · Formato CIFRHS oficial', color: '#f87171', href: '/exams/simulador-real', tag: 'ALTA INTENSIDAD' },
+  { id: 'simulador_libre', section: 'E', title: 'Simulador Sin Límite', desc: '280 reactivos · Sin cronómetro · Registra tu tiempo real al terminar', color: '#60a5fa', href: '/exams/simulador-libre', tag: 'ESTUDIO PROFUNDO' },
 ]
 
 export default function DashboardPage() {
@@ -48,7 +48,7 @@ export default function DashboardPage() {
         </div>
       </div>
       <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: 20 }}>
-        {userInfo?.email ?? 'Cargando...'} · Banco maestro 2,000 preguntas
+        {userInfo?.email ?? 'Cargando...'} · 280 reactivos · Formato CIFRHS 2025
       </p>
 
       <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}

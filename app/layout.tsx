@@ -10,7 +10,7 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "Simula ENARM — Simulador de Casos Clínicos",
-  description: "Banco de 2,000 preguntas reales para el ENARM. 5 tipos de simulador, flashcards y perfil académico.",
+  description: "Simulador ENARM con formato CIFRHS 2025. 280 reactivos, 5 horas, 18,515 plazas. Prepárate con casos clínicos reales.",
   manifest: "/manifest.json",
   themeColor: "#00d9ff",
   appleWebApp: {
