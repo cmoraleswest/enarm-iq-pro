@@ -29,9 +29,11 @@ export async function POST(request: Request) {
       metadata: {
         uid: session.uid,
         email: session.email,
+        plan,
       },
-      success_url: `${origin}/perfil?payment=success`,
-      cancel_url: `${origin}/upgrade?payment=cancelled`,
+      success_url: `${origin}/pago/exitoso?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/upgrade`,
+      locale: 'es',
     })
 
     return NextResponse.json({ url: checkoutSession.url })

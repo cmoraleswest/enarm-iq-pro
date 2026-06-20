@@ -7,7 +7,7 @@ export const CIFRHS = {
   totalReactivos:    280,
   reactivosEspanol:  250,
   reactivosIngles:   30,
-  tiempoLimiteSecs:  5 * 60 * 60, // 5 horas = 300 minutos
+  tiempoLimiteSecs:  5 * 60 * 60,
   opcionesPorReactivo: 4,
   aspirantesAnuales: 45_000,
   plazasDisponibles: 18_515,
@@ -34,7 +34,7 @@ export const EXAM_CONFIG = {
   },
   simulador_cronometrado: {
     totalQuestions: 280,
-    perSpecialty:   56, // 280 / 5 especialidades
+    perSpecialty:   56,
     timeLimitSecs:  CIFRHS.tiempoLimiteSecs,
     showJustifImmediately: false,
   },
@@ -61,10 +61,11 @@ export function loadBanco(): QuestionFull[] {
     justificacion: string
     categoria: string
     dificultad: string
+    idioma?: string
+    casoId?: string
   }>
 
   _banco = data.map(q => {
-    // CIFRHS: máximo 4 opciones (A, B, C, D)
     const incorrectas = q.respuestas_incorrectas.slice(0, CIFRHS.opcionesPorReactivo - 1)
     return {
       id: q.id,
@@ -74,6 +75,8 @@ export function loadBanco(): QuestionFull[] {
       justificacion: q.justificacion,
       categoria: q.categoria as Specialty,
       dificultad: q.dificultad,
+      ...(q.idioma && { idioma: q.idioma as 'es' | 'en' }),
+      ...(q.casoId && { casoId: q.casoId }),
     }
   })
 
@@ -89,7 +92,6 @@ export function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-// Selecciona preguntas para un diagnóstico (36 por especialidad)
 export function selectDiagnosticQuestions(): QuestionFull[] {
   const banco = loadBanco()
   const specialties: Specialty[] = ['Medicina Interna', 'Pediatría', 'Ginecología', 'Cirugía', 'Urgencias']
@@ -103,7 +105,6 @@ export function selectDiagnosticQuestions(): QuestionFull[] {
   return shuffle(selected)
 }
 
-// Selecciona preguntas mezcladas (para diario y simulador)
 export function selectMixedQuestions(
   total: number,
   specialties?: Specialty[],
@@ -115,22 +116,53 @@ export function selectMixedQuestions(
   return shuffle(pool).slice(0, total)
 }
 
-// CIFRHS: 280 reactivos distribuidos por especialidad (56 por especialidad)
+// CIFRHS 2025: 280 total, incluye ~30 en inglés
 export function selectSimulatorQuestions(): QuestionFull[] {
   const banco = loadBanco()
   const specialties: Specialty[] = ['Medicina Interna', 'Pediatría', 'Ginecología', 'Cirugía', 'Urgencias']
-  const perSpecialty = CIFRHS.totalReactivos / specialties.length // 56
-  const selected: QuestionFull[] = []
+
+  const englishQs = banco.filter(q => q.idioma === 'en')
+  const englishIds = new Set(englishQs.map(q => q.id))
+  const selected: QuestionFull[] = [...englishQs]
+
+  const remaining = CIFRHS.totalReactivos - selected.length
+  const perSpecialty = Math.floor(remaining / specialties.length)
 
   for (const sp of specialties) {
-    const pool = banco.filter(q => q.categoria === sp)
+    const pool = banco.filter(q => q.categoria === sp && !englishIds.has(q.id))
     selected.push(...shuffle(pool).slice(0, perSpecialty))
   }
 
-  return shuffle(selected)
+  return groupSerialCases(selected)
 }
 
-// Quita la respuesta correcta para enviar al cliente
+export function groupSerialCases(questions: QuestionFull[]): QuestionFull[] {
+  const serial = new Map<string, QuestionFull[]>()
+  const standalone: QuestionFull[] = []
+
+  for (const q of questions) {
+    if (q.casoId) {
+      const group = serial.get(q.casoId) || []
+      group.push(q)
+      serial.set(q.casoId, group)
+    } else {
+      standalone.push(q)
+    }
+  }
+
+  for (const group of serial.values()) {
+    group.sort((a, b) => a.id - b.id)
+  }
+
+  const result = shuffle(standalone)
+  for (const group of serial.values()) {
+    const pos = Math.floor(Math.random() * (result.length + 1))
+    result.splice(pos, 0, ...group)
+  }
+
+  return result
+}
+
 export function toClientQuestion(q: QuestionFull): QuestionForClient {
   return {
     id: q.id,
@@ -138,10 +170,11 @@ export function toClientQuestion(q: QuestionFull): QuestionForClient {
     opciones: q.opciones,
     categoria: q.categoria,
     dificultad: q.dificultad,
+    ...(q.idioma && { idioma: q.idioma }),
+    ...(q.casoId && { casoId: q.casoId }),
   }
 }
 
-// Califica las respuestas del cliente contra el banco
 export function gradeAnswers(
   clientAnswers: ClientAnswer[],
   fullQuestions: QuestionFull[],

@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { DM_Sans } from "next/font/google"
 import "./globals.css"
+import AnalyticsProvider from "@/components/AnalyticsProvider"
+import NotificationPrompt from "@/components/NotificationPrompt"
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -12,26 +14,25 @@ export const metadata: Metadata = {
   title: "Simula ENARM — Simulador de Casos Clínicos",
   description: "Simulador ENARM con formato CIFRHS 2025. 280 reactivos, 5 horas, 18,515 plazas. Prepárate con casos clínicos reales.",
   manifest: "/manifest.json",
-  themeColor: "#00d9ff",
+  themeColor: "#D4AF37",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Simula ENARM",
   },
-};
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/icon-192.png",
+  },
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="es"
-      className={`${dmSans.variable} h-full antialiased`}
-    >
+    <html lang="es" className={`${dmSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <AnalyticsProvider />
         {children}
+        <NotificationPrompt />
         <script dangerouslySetInnerHTML={{ __html: `
           if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(() => {})
@@ -39,5 +40,5 @@ export default function RootLayout({
         `}} />
       </body>
     </html>
-  );
+  )
 }

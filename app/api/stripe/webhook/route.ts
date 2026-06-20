@@ -32,13 +32,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Metadata incompleta' }, { status: 400 })
     }
 
-    // Extraer código de promoción si existe
     let promoCode: string | null = null
     let influencerId: string | null = null
 
     if (session.discounts?.length) {
       const disc = session.discounts[0]
-      // coupon puede ser string (ID) u objeto expandido
       const coupon = disc.coupon
       if (coupon && typeof coupon === 'object') {
         promoCode = coupon.name ?? coupon.id
@@ -46,7 +44,6 @@ export async function POST(request: Request) {
         promoCode = coupon
       }
 
-      // Buscar influencer por código de promoción
       if (promoCode) {
         const snap = await adminFirestore
           .collection('influencers')
@@ -56,22 +53,36 @@ export async function POST(request: Request) {
 
         if (!snap.empty) {
           influencerId = snap.docs[0].id
+          // Actualizar stats del influencer
+          const influencerData = snap.docs[0].data()
+          await snap.docs[0].ref.update({
+            totalReferrals: (influencerData.totalReferrals || 0) + 1,
+            totalRevenue: (influencerData.totalRevenue || 0) + (session.amount_total || 0) / 100,
+          })
         }
       }
     }
 
-    // Actualizar usuario como pagado
     const updateData: Record<string, unknown> = {
       isPaid: true,
       paidAt: Date.now(),
+      plan: session.metadata?.plan || 'monthly',
       stripeCustomerId: session.customer as string ?? null,
     }
     if (promoCode) updateData.promoCode = promoCode
     if (influencerId) updateData.influencerId = influencerId
 
     await adminFirestore.collection('users').doc(uid).update(updateData)
-
     console.log(`Pago exitoso: uid=${uid}, promo=${promoCode}, influencer=${influencerId}`)
+  }
+
+  if (event.type === 'customer.subscription.deleted') {
+    const sub = event.data.object as Stripe.Subscription
+    const snap = await adminFirestore.collection('users')
+      .where('stripeCustomerId', '==', sub.customer).limit(1).get()
+    if (!snap.empty) {
+      await snap.docs[0].ref.update({ isPaid: false, plan: null })
+    }
   }
 
   return NextResponse.json({ received: true })

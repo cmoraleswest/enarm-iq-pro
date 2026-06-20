@@ -1,9 +1,11 @@
 'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { track } from '@/lib/analytics'
 
 export default function UpgradePage() {
   const [loading, setLoading] = useState<'annual' | 'monthly' | null>(null)
+
+  useEffect(() => { track.upgradeView() }, [])
 
   const checkout = async (plan: 'annual' | 'monthly') => {
     setLoading(plan)

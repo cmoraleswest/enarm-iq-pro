@@ -27,6 +27,8 @@ export interface QuestionForClient {
   opciones: string[]
   categoria: Specialty
   dificultad: string
+  idioma?: 'es' | 'en'
+  casoId?: string
 }
 
 // Pregunta completa del banco (solo en servidor)

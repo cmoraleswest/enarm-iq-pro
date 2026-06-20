@@ -1,7 +1,7 @@
 {
   "name": "Simula ENARM",
   "short_name": "SimulaENARM",
-  "description": "Simulador de Casos Clínicos — 2,000 preguntas reales ENARM",
+  "description": "Simulador ENARM con formato CIFRHS 2025 — 280 reactivos, 5 horas, 18,515 plazas",
   "start_url": "/login",
   "display": "standalone",
   "background_color": "#0a0a14",

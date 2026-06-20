@@ -1,7 +1,13 @@
 'use client'
-import { useEffect } from 'react'
-export default function PagoExitoso() {
-  useEffect(() => { setTimeout(() => { window.location.href = '/home' }, 4000) }, [])
+import { useEffect, Suspense } from 'react'
+import { track } from '@/lib/analytics'
+
+function PagoExitosoContent() {
+  useEffect(() => {
+    track.purchase('subscription', 0)
+    setTimeout(() => { window.location.href = '/home' }, 4000)
+  }, [])
+
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'DM Sans, Arial, sans-serif', textAlign: 'center', padding: 24 }}>
       <div>
@@ -11,5 +17,13 @@ export default function PagoExitoso() {
         <p style={{ color: '#60a5fa', fontSize: '0.85rem' }}>Redirigiendo en unos segundos...</p>
       </div>
     </main>
+  )
+}
+
+export default function PagoExitoso() {
+  return (
+    <Suspense>
+      <PagoExitosoContent />
+    </Suspense>
   )
 }
