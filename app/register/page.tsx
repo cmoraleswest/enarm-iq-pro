@@ -118,26 +118,6 @@ export default function RegisterPage() {
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginBottom: 20 }}>
-      <label style={styles.label}>{label}</label>
-      {children}
-    </div>
-  )
-}
-
-function EyeBtn({ show, toggle }: { show: boolean; toggle: () => void }) {
-  return (
-    <button type="button" onClick={toggle} style={styles.eyeBtn} aria-label={show ? 'Ocultar' : 'Mostrar'}>
-      {show
-        ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-        : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      }
-    </button>
-  )
-}
-
 const styles: Record<string, React.CSSProperties> = {
   main:       { minHeight: '100vh', backgroundColor: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'Georgia, serif' },
   card:       { width: '100%', maxWidth: 420, backgroundColor: '#111827', borderRadius: 16, padding: '40px 32px', border: '1px solid #1e293b' },

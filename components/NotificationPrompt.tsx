@@ -1,9 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 export default function NotificationPrompt() {
   const [show, setShow] = useState(false)
+
+  const scheduleReminder = useCallback(async () => {
+    const reg = await navigator.serviceWorker.ready
+    reg.active?.postMessage({ type: 'SCHEDULE_REMINDER' })
+  }, [])
 
   useEffect(() => {
     if (!('Notification' in window) || !('serviceWorker' in navigator)) return
@@ -11,12 +16,7 @@ export default function NotificationPrompt() {
       setTimeout(() => setShow(true), 5000)
     }
     if (Notification.permission === 'granted') scheduleReminder()
-  }, [])
-
-  async function scheduleReminder() {
-    const reg = await navigator.serviceWorker.ready
-    reg.active?.postMessage({ type: 'SCHEDULE_REMINDER' })
-  }
+  }, [scheduleReminder])
 
   async function handleAllow() {
     const perm = await Notification.requestPermission()

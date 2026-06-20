@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { auth } from '@/lib/firebase'
 import { sendEmailVerification, reload } from 'firebase/auth'
 import Link from 'next/link'
 
 export default function VerifyEmailPage() {
-  const router   = useRouter()
   const [sent, setSent]       = useState(false)
   const [checking, setChecking] = useState(false)
   const [error, setError]     = useState('')

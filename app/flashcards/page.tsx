@@ -43,7 +43,7 @@ export default function FlashcardsPage() {
     try {
       const raw = localStorage.getItem('enarm_user_info')
       if (raw) {
-        const u = JSON.parse(raw)
+        JSON.parse(raw)
         // Acceso validado por proxy
       }
     } catch { /* ignore */ }

@@ -4,6 +4,10 @@ import { useEffect } from 'react'
 import { getAnalytics, isSupported } from 'firebase/analytics'
 import { getApps } from 'firebase/app'
 
+declare global {
+  interface Window { fbq?: (...args: unknown[]) => void }
+}
+
 export default function AnalyticsProvider() {
   useEffect(() => {
     isSupported().then(supported => {
@@ -11,16 +15,15 @@ export default function AnalyticsProvider() {
     })
 
     const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID
-    if (pixelId && !(window as any).fbq) {
+    if (pixelId && !window.fbq) {
       const s = document.createElement('script')
       s.async = true
       s.src = 'https://connect.facebook.net/en_US/fbevents.js'
       document.head.appendChild(s)
       s.onload = () => {
-        const fbq = (window as any).fbq as (...args: unknown[]) => void
-        if (fbq) {
-          fbq('init', pixelId)
-          fbq('track', 'PageView')
+        if (window.fbq) {
+          window.fbq('init', pixelId)
+          window.fbq('track', 'PageView')
         }
       }
     }
