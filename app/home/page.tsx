@@ -4,10 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface UserInfo {
-  uid:      string
-  email:    string
-  isPaid:   boolean
-  daysLeft: number
+  uid:    string
+  email:  string
+  isPaid: boolean
 }
 
 const EXAM_MODULES = [
@@ -81,9 +80,6 @@ export default function DashboardPage() {
     window.location.href = '/login'
   }
 
-  const daysLeft  = userInfo?.daysLeft ?? 0
-  const isDemo    = !userInfo?.isPaid
-  const isExpired = isDemo && daysLeft <= 0 && !!userInfo
 
   return (
     <main style={S.main}>
@@ -101,25 +97,10 @@ export default function DashboardPage() {
         {userInfo?.email ?? 'Cargando...'} · Banco maestro 2,000 preguntas
       </p>
 
-      {/* Banner trial */}
-      {isDemo && userInfo && (
-        <div style={{ backgroundColor: '#0f172a', border: '1px solid #1e3a5f', borderRadius: 12, padding: '14px 18px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <p style={{ color: '#60a5fa', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 3px 0' }}>◉ PERÍODO DE PRUEBA</p>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
-              {daysLeft <= 0 ? 'Tu prueba ha expirado' : `${daysLeft} día${daysLeft !== 1 ? 's' : ''} restante${daysLeft !== 1 ? 's' : ''}`}
-            </p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ color: '#3b82f6', fontSize: '1.6rem', fontWeight: 'bold', lineHeight: 1 }}>{daysLeft}</div>
-            <div style={{ color: '#475569', fontSize: '0.65rem' }}>días</div>
-          </div>
-        </div>
-      )}
 
       {/* Flashcards rápidas */}
-      <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: isExpired ? 'not-allowed' : 'pointer', opacity: isExpired ? 0.5 : 1 }}
-        onClick={() => isExpired ? router.push('/upgrade') : router.push('/flashcards')}>
+      <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: false ? 'not-allowed' : 'pointer', opacity: false ? 0.5 : 1 }}
+        onClick={() => false ? router.push('/upgrade') : router.push('/flashcards')}>
         <div>
           <p style={{ color: '#fbbf24', fontSize: '0.7rem', letterSpacing: '2px', margin: '0 0 4px 0' }}>MÓDULO EXTRA</p>
           <h3 style={{ color: '#e2e8f0', margin: 0, fontSize: '1.1rem' }}>Flashcards</h3>
@@ -135,9 +116,9 @@ export default function DashboardPage() {
         {EXAM_MODULES.map(m => (
           <button
             key={m.id}
-            onClick={() => isExpired ? router.push('/upgrade') : router.push(m.href)}
-            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: isExpired ? 'not-allowed' : 'pointer', transition: 'border-color 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', opacity: isExpired ? 0.5 : 1 }}
-            onMouseEnter={e => !isExpired && (e.currentTarget.style.borderColor = m.color)}
+            onClick={() => false ? router.push('/upgrade') : router.push(m.href)}
+            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: false ? 'not-allowed' : 'pointer', transition: 'border-color 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', opacity: false ? 0.5 : 1 }}
+            onMouseEnter={e => !false && (e.currentTarget.style.borderColor = m.color)}
             onMouseLeave={e => (e.currentTarget.style.borderColor = '#1e293b')}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>

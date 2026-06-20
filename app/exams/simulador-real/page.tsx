@@ -27,7 +27,7 @@ export default function SimuladorRealPage() {
       const raw = localStorage.getItem('enarm_user_info')
       if (raw) {
         const u = JSON.parse(raw)
-        if (!u.isPaid && u.daysLeft <= 0) window.location.href = '/upgrade'
+        // Acceso validado por proxy
       }
     } catch { /* ignore */ }
   }, [])

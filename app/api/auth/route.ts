@@ -29,29 +29,22 @@ async function handleLogin(idToken: string) {
       return NextResponse.json({ error: 'Debes verificar tu correo electrónico antes de continuar.' }, { status: 403 })
     }
 
-    let profile = await getUserProfile(decoded.uid)
-
+    const profile = await getUserProfile(decoded.uid)
     if (!profile) {
-      await createUserProfile(decoded.uid, decoded.email ?? '', fingerprint, ip)
-      profile = await getUserProfile(decoded.uid)
+      return NextResponse.json({ error: 'Perfil no encontrado. Regístrate primero.' }, { status: 404 })
     }
 
-    if (!profile) {
-      return NextResponse.json({ error: 'Error al crear perfil.' }, { status: 500 })
-    }
-
-    const sessionData = JSON.stringify({
+    const cookieValue = Buffer.from(JSON.stringify({
       uid:    decoded.uid,
       email:  decoded.email,
       isPaid: profile.isPaid,
-    })
+    })).toString('base64')
+
     const response = NextResponse.json({
       ok: true,
       uid: decoded.uid,
       email: decoded.email,
       isPaid: profile.isPaid,
-      daysLeft,
-      cookieSet: true,
     })
 
     response.cookies.set(SESSION_COOKIE, cookieValue, {
@@ -62,12 +55,7 @@ async function handleLogin(idToken: string) {
       path:     '/',
     })
 
-    return NextResponse.json({
-      ok: true,
-      uid: decoded.uid,
-      email: decoded.email,
-      isPaid: profile.isPaid,
-    })
+    return response
   } catch (err) {
     console.error('Login error:', err)
     return NextResponse.json({ error: 'Token inválido o expirado.' }, { status: 401 })

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { getSessionFromCookie } from '@/lib/session'
+import { getSession } from '@/lib/session'
 
 export async function GET() {
-  const session = await getSessionFromCookie()
+  const session = await getSession()
 
   if (!session) {
     return NextResponse.json({ status: 'NO_COOKIE' })

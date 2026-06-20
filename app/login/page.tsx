@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
-import { generateFingerprint, getClientIp } from '@/lib/fingerprint'
 
 export default function LoginPage() {
   useEffect(() => {
-    const user = localStorage.getItem("enarm_user_info")
-    if (user) { window.location.replace('/home'); return }
+    const user = localStorage.getItem('enarm_user_info')
+    if (user) window.location.replace('/home')
   }, [])
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -23,13 +23,11 @@ export default function LoginPage() {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password)
       const idToken = await cred.user.getIdToken()
-      const fingerprint = generateFingerprint()
-      const ip = await getClientIp()
       const res = await fetch('/api/auth', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'login', idToken, fingerprint, ip }),
+        body: JSON.stringify({ action: 'login', idToken }),
       })
       const data = await res.json() as { error?: string; ok?: boolean; uid?: string; email?: string; isPaid?: boolean }
 
@@ -38,15 +36,13 @@ export default function LoginPage() {
         return
       }
 
-      // Solo para display en UI — la autorización real viene de la cookie httpOnly
       localStorage.setItem('enarm_user_info', JSON.stringify({
         uid:    data.uid,
         email:  data.email,
         isPaid: data.isPaid,
       }))
 
-      router.push('/')
-      router.refresh()
+      window.location.replace('/home')
     } catch (err: unknown) {
       const code = (err as { code?: string }).code
       if (code === 'auth/invalid-credential' || code === 'auth/user-not-found' || code === 'auth/wrong-password') {
@@ -56,19 +52,12 @@ export default function LoginPage() {
       } else {
         setError('Error de conexión. Intenta de nuevo.')
       }
-      window.location.replace('/home')
-    } catch {
-      setError('Correo o contrasena incorrectos')
     } finally {
       setLoading(false)
     }
   }
 
-  return (
-    <main style={S.main}>
-      <div style={S.card}>
-        <h1 style={S.logo}>ENARM 360</h1>
-        <p style={S.sub}>Simulador de Casos Clínicos · 2,000 preguntas reales</p>
+  const inp: React.CSSProperties = { width: '100%', backgroundColor: '#1a1a2e', border: '1px solid #2a2a3e', borderRadius: 10, padding: '13px 16px', color: '#e2e8f0', fontSize: '1rem', fontFamily: 'DM Sans, Arial, sans-serif', outline: 'none', boxSizing: 'border-box' }
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#0a0a14', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'DM Sans, Arial, sans-serif' }}>
@@ -88,13 +77,13 @@ export default function LoginPage() {
         </div>
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: 20 }}>
-            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CORREO ELECTRONICO</label>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CORREO ELECTRÓNICO</label>
             <input style={inp} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@correo.com" required />
           </div>
           <div style={{ marginBottom: 24 }}>
-            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CONTRASENA</label>
+            <label style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 2, display: 'block', marginBottom: 8 }}>CONTRASEÑA</label>
             <div style={{ position: 'relative' }}>
-              <input style={inp} type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Minimo 6 caracteres" required />
+              <input style={inp} type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required />
               <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.1rem' }}>
                 {showPass ? '🙈' : '👁'}
               </button>
@@ -106,18 +95,15 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {error && <p style={S.error}>{error}</p>}
-
         <p style={{ textAlign: 'center', marginTop: 24, color: '#475569', fontSize: '0.85rem' }}>
           ¿No tienes cuenta?{' '}
-          <Link href="/register" style={{ color: '#D4AF37', textDecoration: 'none' }}>Crear cuenta →</Link>
+          <a href="/register" style={{ color: '#00d9ff', textDecoration: 'none' }}>Crear cuenta →</a>
         </p>
         <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #1a1a2e', display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' as const }}>
-          <a href="/terminos" style={{ color: '#334155', fontSize: '0.72rem' }}>Terminos</a>
+          <a href="/terminos" style={{ color: '#334155', fontSize: '0.72rem' }}>Términos</a>
           <a href="/privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Privacidad</a>
-          <a href="/aviso-privacidad" style={{ color: '#334155', fontSize: '0.72rem' }}>Aviso</a>
         </div>
-        <p style={{ textAlign: 'center', marginTop: 12, color: '#1e293b', fontSize: '0.65rem' }}>v1.3.3</p>
+        <p style={{ textAlign: 'center', marginTop: 12, color: '#1e293b', fontSize: '0.65rem' }}>v2.0.0</p>
       </div>
     </main>
   )
