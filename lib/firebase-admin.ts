@@ -31,6 +31,8 @@ export const adminAuth = {
     admin.auth(getApp()).verifyIdToken(...args),
   getUser: (...args: Parameters<admin.auth.Auth['getUser']>) =>
     admin.auth(getApp()).getUser(...args),
+  deleteUser: (uid: string) =>
+    admin.auth(getApp()).deleteUser(uid),
 }
 
 export const adminFirestore = new Proxy({} as admin.firestore.Firestore, {

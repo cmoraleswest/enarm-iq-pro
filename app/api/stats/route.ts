@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { getUserStats } from '@/lib/firestore'
+import { getSession } from '@/lib/session'
 
 export async function GET() {
-  const cookieStore = await cookies()
-  const raw = cookieStore.get('enarm_sess')?.value
+  const session = await getSession()
+  if (!session) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
 
   try {
-    const uid = raw ? (JSON.parse(Buffer.from(raw, 'base64').toString()) as { uid: string }).uid : 'anonymous'
-    const stats = await getUserStats(uid)
+    const stats = await getUserStats(session.uid)
     return NextResponse.json({ stats })
   } catch {
     return NextResponse.json({ error: 'Error al obtener estadísticas.' }, { status: 500 })

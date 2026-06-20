@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ENARM IQ — Simulador de Casos Clínicos",
+  title: "ENARM 360 — Simulador de Casos Clínicos",
   description: "Banco de 2,000 preguntas reales para el ENARM",
 };
 

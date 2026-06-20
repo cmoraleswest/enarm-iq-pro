@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { adminAuth } from '@/lib/firebase-admin'
-import { createUserProfile, getUserProfile, isTrialActive, trialDaysLeft, detectFraud } from '@/lib/firestore'
+import { createUserProfile, getUserProfile } from '@/lib/firestore'
 
 const SESSION_COOKIE = 'enarm_sess'
-const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 días (Firebase gestiona el trial, no la cookie)
+const SESSION_MAX_AGE = 30 * 24 * 60 * 60
 
-// POST: login (verificar idToken, crear cookie de sesión)
+// POST: login o pre-registro
 export async function POST(request: Request) {
   const body = await request.json() as {
     action: 'login' | 'register'
@@ -16,17 +16,16 @@ export async function POST(request: Request) {
   }
 
   if (body.action === 'register') {
-    return handleRegister(body.fingerprint ?? '', body.ip ?? 'unknown')
+    return NextResponse.json({ ok: true })
   }
 
-  return handleLogin(body.idToken ?? '', request)
+  return handleLogin(body.idToken ?? '')
 }
 
-async function handleLogin(idToken: string, request: Request) {
+async function handleLogin(idToken: string) {
   try {
     const decoded = await adminAuth.verifyIdToken(idToken)
 
-    // Usuario debe tener email verificado
     if (!decoded.email_verified) {
       return NextResponse.json({ error: 'Debes verificar tu correo electrónico antes de continuar.' }, { status: 403 })
     }
@@ -36,20 +35,10 @@ async function handleLogin(idToken: string, request: Request) {
       return NextResponse.json({ error: 'Perfil no encontrado. Regístrate primero.' }, { status: 404 })
     }
 
-    const active  = isTrialActive(profile)
-    const daysLeft = trialDaysLeft(profile)
-
-    if (!active) {
-      return NextResponse.json({ error: 'Tu período de prueba ha finalizado.', code: 'TRIAL_EXPIRED' }, { status: 402 })
-    }
-
-    // Crear cookie de sesión
     const sessionData = JSON.stringify({
-      uid:         decoded.uid,
-      email:       decoded.email,
-      isPaid:      profile.isPaid,
-      daysLeft,
-      trialActive: active,
+      uid:    decoded.uid,
+      email:  decoded.email,
+      isPaid: profile.isPaid,
     })
 
     const cookieStore = await cookies()
@@ -61,23 +50,16 @@ async function handleLogin(idToken: string, request: Request) {
       path:     '/',
     })
 
-    return NextResponse.json({ ok: true, uid: decoded.uid, email: decoded.email, isPaid: profile.isPaid, daysLeft })
+    return NextResponse.json({
+      ok: true,
+      uid: decoded.uid,
+      email: decoded.email,
+      isPaid: profile.isPaid,
+    })
   } catch (err) {
     console.error('Login error:', err)
     return NextResponse.json({ error: 'Token inválido o expirado.' }, { status: 401 })
   }
-}
-
-async function handleRegister(fingerprint: string, ip: string) {
-  // Verificación anti-fraude — solo bloquea si hay trial expirado en mismo dispositivo/IP
-  const isFraud = await detectFraud(fingerprint, ip)
-  if (isFraud) {
-    return NextResponse.json({
-      error: 'Ya utilizaste el período de prueba gratuito desde este dispositivo.',
-      code: 'FRAUD_DETECTED',
-    }, { status: 403 })
-  }
-  return NextResponse.json({ ok: true })
 }
 
 // PUT: crear perfil tras registro exitoso en Firebase Auth

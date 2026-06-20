@@ -36,23 +36,18 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ action: 'login', idToken }),
       })
-      const data = await res.json() as { error?: string; code?: string; ok?: boolean; uid?: string; email?: string; isPaid?: boolean; daysLeft?: number }
+      const data = await res.json() as { error?: string; ok?: boolean; uid?: string; email?: string; isPaid?: boolean }
 
       if (!res.ok) {
-        if (data.code === 'TRIAL_EXPIRED') {
-          router.push('/upgrade')
-          return
-        }
         setError(data.error ?? 'Error al iniciar sesión.')
         return
       }
 
-      // 3. Guardar info en localStorage para UI (no auth real — esa es la cookie)
+      // Solo para display en UI — la autorización real viene de la cookie httpOnly
       localStorage.setItem('enarm_user_info', JSON.stringify({
-        uid:     data.uid,
-        email:   data.email,
-        isPaid:  data.isPaid,
-        daysLeft: data.daysLeft,
+        uid:    data.uid,
+        email:  data.email,
+        isPaid: data.isPaid,
       }))
 
       router.push('/')
@@ -74,7 +69,7 @@ export default function LoginPage() {
   return (
     <main style={S.main}>
       <div style={S.card}>
-        <h1 style={S.logo}>ENARM IQ</h1>
+        <h1 style={S.logo}>ENARM 360</h1>
         <p style={S.sub}>Simulador de Casos Clínicos · 2,000 preguntas reales</p>
 
         <form onSubmit={handleLogin}>
@@ -105,7 +100,7 @@ export default function LoginPage() {
 
         <p style={{ textAlign: 'center', marginTop: 24, color: '#475569', fontSize: '0.85rem' }}>
           ¿No tienes cuenta?{' '}
-          <Link href="/register" style={{ color: '#D4AF37', textDecoration: 'none' }}>Regístrate gratis →</Link>
+          <Link href="/register" style={{ color: '#D4AF37', textDecoration: 'none' }}>Crear cuenta →</Link>
         </p>
       </div>
     </main>

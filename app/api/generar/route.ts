@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server'
+import { getSession } from '@/lib/session'
 import { loadBanco, shuffle } from '@/lib/exam-utils'
 
 export async function POST(request: Request) {
+  const session = await getSession()
+  if (!session) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
   try {
     const body = await request.json() as { categoria?: string }
     const banco = loadBanco()
@@ -17,13 +23,11 @@ export async function POST(request: Request) {
     const q = shuffle(pool)[0]
 
     return NextResponse.json({
-      id:                 q.id,
-      caso:               q.caso,
-      opciones:           q.opciones,
-      respuesta_correcta: q.respuesta_correcta,
-      justificacion:      q.justificacion,
-      categoria:          q.categoria,
-      dificultad:         q.dificultad,
+      id:         q.id,
+      caso:       q.caso,
+      opciones:   q.opciones,
+      categoria:  q.categoria,
+      dificultad: q.dificultad,
     })
   } catch (err) {
     console.error('Error en /api/generar:', err)

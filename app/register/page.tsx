@@ -70,8 +70,8 @@ export default function RegisterPage() {
   return (
     <main style={styles.main}>
       <div style={styles.card}>
-        <h1 style={styles.logo}>ENARM IQ</h1>
-        <p style={styles.sub}>Crea tu cuenta gratuita · 2 días de acceso completo</p>
+        <h1 style={styles.logo}>ENARM 360</h1>
+        <p style={styles.sub}>Crea tu cuenta para acceder al simulador</p>
 
         <form onSubmit={handleRegister}>
           <Field label="CORREO ELECTRÓNICO">
@@ -105,15 +105,15 @@ export default function RegisterPage() {
           </Field>
 
           <button type="submit" disabled={loading} style={{ ...styles.btn, backgroundColor: loading ? '#78600a' : '#D4AF37', cursor: loading ? 'not-allowed' : 'pointer' }}>
-            {loading ? 'Creando cuenta...' : 'CREAR CUENTA GRATIS'}
+            {loading ? 'Creando cuenta...' : 'CREAR CUENTA'}
           </button>
         </form>
 
         {error && <p style={styles.error}>{error}</p>}
 
-        <div style={styles.trialBadge}>
-          <p style={{ color: '#4ade80', fontSize: '0.78rem', letterSpacing: '1px', margin: '0 0 4px 0' }}>◉ PERÍODO DE PRUEBA</p>
-          <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: 0 }}>2 días de acceso completo · Sin tarjeta de crédito</p>
+        <div style={styles.infoBadge}>
+          <p style={{ color: '#D4AF37', fontSize: '0.78rem', letterSpacing: '1px', margin: '0 0 4px 0' }}>◉ ACCESO PREMIUM</p>
+          <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: 0 }}>2,000 preguntas · 5 tipos de examen · Desde $99 MXN/mes</p>
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 24, color: '#475569', fontSize: '0.85rem' }}>
@@ -155,5 +155,5 @@ const styles: Record<string, React.CSSProperties> = {
   btn:        { width: '100%', padding: 15, color: '#0f0f1a', border: 'none', borderRadius: 10, fontSize: '1rem', fontWeight: 'bold', letterSpacing: '1px', fontFamily: 'Georgia, serif', marginTop: 8, transition: 'background-color 0.2s' },
   error:      { color: '#f87171', fontSize: '0.85rem', textAlign: 'center', marginTop: 12, backgroundColor: '#450a0a', padding: 10, borderRadius: 8 },
   eyeBtn:     { position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 4, lineHeight: 0 },
-  trialBadge: { marginTop: 28, padding: 16, backgroundColor: '#0f172a', borderRadius: 10, border: '1px solid #14532d' },
+  infoBadge: { marginTop: 28, padding: 16, backgroundColor: '#0f172a', borderRadius: 10, border: '1px solid #D4AF37' },
 }

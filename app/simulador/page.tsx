@@ -7,10 +7,14 @@ interface Caso {
   id: number
   caso: string
   opciones: string[]
-  respuesta_correcta: string
-  justificacion: string
   categoria: string
   dificultad: string
+}
+
+interface VerifyResult {
+  isCorrect: boolean
+  correcta: string
+  justificacion: string
 }
 
 interface StatCategoria {
@@ -52,6 +56,7 @@ export default function SimuladorPage() {
   const [stats, setStats] = useState<Stats>({ correctas: 0, incorrectas: 0, porCategoria: {} })
   const [verResumen, setVerResumen] = useState(false)
   const [showJustif, setShowJustif] = useState(false)
+  const [verifyResult, setVerifyResult] = useState<VerifyResult | null>(null)
 
   // Cargar stats persistidos
   useEffect(() => {
@@ -65,6 +70,7 @@ export default function SimuladorPage() {
     setRespondido(false)
     setVerResumen(false)
     setShowJustif(false)
+    setVerifyResult(null)
     try {
       const res = await fetch('/api/generar', {
         method: 'POST',
@@ -81,36 +87,48 @@ export default function SimuladorPage() {
     }
   }
 
-  const responder = (opcion: string) => {
+  const responder = async (opcion: string) => {
     if (respondido || !caso) return
     setSeleccion(opcion)
     setRespondido(true)
 
-    const esCorrecta = opcion === caso.respuesta_correcta
-    setStats(prev => {
-      const cat = prev.porCategoria[caso.categoria] ?? { correctas: 0, total: 0 }
-      const updated: Stats = {
-        correctas: prev.correctas + (esCorrecta ? 1 : 0),
-        incorrectas: prev.incorrectas + (esCorrecta ? 0 : 1),
-        porCategoria: {
-          ...prev.porCategoria,
-          [caso.categoria]: {
-            correctas: cat.correctas + (esCorrecta ? 1 : 0),
-            total: cat.total + 1,
-          },
-        },
-      }
-      saveStats(updated)
-      return updated
-    })
+    try {
+      const res = await fetch('/api/generar/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionId: caso.id, selected: opcion }),
+      })
+      const data = await res.json() as VerifyResult
+      setVerifyResult(data)
 
-    // Animación fade-in de justificación
-    setTimeout(() => setShowJustif(true), 300)
+      const esCorrecta = data.isCorrect
+      setStats(prev => {
+        const cat = prev.porCategoria[caso.categoria] ?? { correctas: 0, total: 0 }
+        const updated: Stats = {
+          correctas: prev.correctas + (esCorrecta ? 1 : 0),
+          incorrectas: prev.incorrectas + (esCorrecta ? 0 : 1),
+          porCategoria: {
+            ...prev.porCategoria,
+            [caso.categoria]: {
+              correctas: cat.correctas + (esCorrecta ? 1 : 0),
+              total: cat.total + 1,
+            },
+          },
+        }
+        saveStats(updated)
+        return updated
+      })
+
+      setTimeout(() => setShowJustif(true), 300)
+    } catch {
+      setRespondido(false)
+      setSeleccion(null)
+    }
   }
 
   const estadoBoton = (opcion: string): EstadoBoton => {
-    if (!respondido) return 'idle'
-    if (opcion === caso?.respuesta_correcta) return 'correcto'
+    if (!respondido || !verifyResult) return 'idle'
+    if (opcion === verifyResult.correcta) return 'correcto'
     if (opcion === seleccion) return 'incorrecto'
     return 'revelado'
   }
@@ -287,7 +305,7 @@ export default function SimuladorPage() {
               </div>
 
               {/* Justificación con fade-in */}
-              {respondido && (
+              {respondido && verifyResult && (
                 <div style={{
                   backgroundColor: '#0d1117', border: '1px solid #1d4ed8',
                   borderRadius: '12px', padding: '24px',
@@ -298,7 +316,7 @@ export default function SimuladorPage() {
                     📋 ANÁLISIS TÉCNICO — GUÍA DE PRÁCTICA CLÍNICA
                   </h3>
                   <p style={{ margin: 0, lineHeight: '1.9', color: '#bfdbfe', fontSize: '0.95rem' }}>
-                    {caso.justificacion}
+                    {verifyResult.justificacion}
                   </p>
                 </div>
               )}

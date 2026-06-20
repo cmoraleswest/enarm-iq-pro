@@ -6,10 +6,14 @@ import { useRouter } from 'next/navigation'
 interface Pregunta {
   id: number
   caso: string
-  respuesta_correcta: string
-  justificacion: string
   categoria: string
   dificultad: string
+}
+
+interface RespuestaServer {
+  isCorrect: boolean
+  correcta: string
+  justificacion: string
 }
 
 interface FlashStats {
@@ -43,6 +47,7 @@ export default function FlashcardsPage() {
   const [categoria, setCategoria] = useState('Todas')
   const [stats, setStats] = useState<FlashStats>({ dominio: 0, repasar: 0, total: 0 })
   const [respuestaVisible, setRespuestaVisible] = useState(false)
+  const [respuestaServer, setRespuestaServer] = useState<RespuestaServer | null>(null)
 
   useEffect(() => {
     setStats(loadStats())
@@ -53,6 +58,7 @@ export default function FlashcardsPage() {
     setPregunta(null)
     setVolteada(false)
     setRespuestaVisible(false)
+    setRespuestaServer(null)
     try {
       const res = await fetch('/api/generar', {
         method: 'POST',
@@ -69,7 +75,21 @@ export default function FlashcardsPage() {
     }
   }
 
-  const voltear = () => {
+  const voltear = async () => {
+    if (!volteada && pregunta && !respuestaServer) {
+      // Pedir respuesta al server al voltear por primera vez
+      try {
+        const res = await fetch('/api/generar/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ questionId: pregunta.id, selected: '' }),
+        })
+        const data = await res.json() as RespuestaServer
+        setRespuestaServer(data)
+      } catch {
+        return
+      }
+    }
     setVolteada(v => !v)
     if (!volteada) {
       setTimeout(() => setRespuestaVisible(true), 200)
@@ -224,14 +244,20 @@ export default function FlashcardsPage() {
             ) : (
               // REVERSO: respuesta + justificación
               <div style={{ opacity: respuestaVisible ? 1 : 0, transition: 'opacity 0.3s ease' }}>
-                <p style={{ color: '#3b82f6', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 10px 0' }}>RESPUESTA CORRECTA</p>
-                <p style={{ color: '#4ade80', fontSize: '1.05rem', fontWeight: 'bold', margin: '0 0 16px 0', lineHeight: '1.5' }}>
-                  {pregunta.respuesta_correcta}
-                </p>
-                <p style={{ color: '#60a5fa', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 8px 0' }}>JUSTIFICACIÓN</p>
-                <p style={{ margin: 0, lineHeight: '1.8', color: '#bfdbfe', fontSize: '0.88rem' }}>
-                  {pregunta.justificacion}
-                </p>
+                {respuestaServer ? (
+                  <>
+                    <p style={{ color: '#3b82f6', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 10px 0' }}>RESPUESTA CORRECTA</p>
+                    <p style={{ color: '#4ade80', fontSize: '1.05rem', fontWeight: 'bold', margin: '0 0 16px 0', lineHeight: '1.5' }}>
+                      {respuestaServer.correcta}
+                    </p>
+                    <p style={{ color: '#60a5fa', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 8px 0' }}>JUSTIFICACIÓN</p>
+                    <p style={{ margin: 0, lineHeight: '1.8', color: '#bfdbfe', fontSize: '0.88rem' }}>
+                      {respuestaServer.justificacion}
+                    </p>
+                  </>
+                ) : (
+                  <p style={{ color: '#64748b' }}>Cargando...</p>
+                )}
               </div>
             )}
           </div>

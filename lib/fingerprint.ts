@@ -1,9 +1,6 @@
 'use client'
 
-/**
- * Genera un fingerprint del dispositivo basado en propiedades del browser.
- * No es infalible pero disuade el abuso del período de prueba.
- */
+/** Genera un identificador único del dispositivo basado en propiedades del browser. */
 export function generateFingerprint(): string {
   if (typeof window === 'undefined') return 'server'
 

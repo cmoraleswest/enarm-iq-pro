@@ -101,6 +101,10 @@ export interface UserProfile {
   isPaid: boolean
   deviceFingerprint: string
   registrationIp: string
+  paidAt?: number
+  promoCode?: string
+  influencerId?: string
+  stripeCustomerId?: string
 }
 
 // Respuesta del API /api/exam al iniciar

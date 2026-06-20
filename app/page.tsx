@@ -2,13 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { TRIAL_MS } from '@/lib/constants'
 
 interface UserInfo {
-  uid:      string
-  email:    string
-  isPaid:   boolean
-  daysLeft: number
+  uid:    string
+  email:  string
+  isPaid: boolean
 }
 
 const EXAM_MODULES = [
@@ -79,15 +77,11 @@ export default function DashboardPage() {
     router.refresh()
   }
 
-  const daysLeft  = userInfo?.daysLeft ?? 0
-  const isDemo    = !userInfo?.isPaid
-  const trialPct  = Math.max(0, Math.min(100, (daysLeft / (TRIAL_MS / 86400000)) * 100))
-
   return (
     <main style={S.main}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-        <h1 style={S.logo}>ENARM IQ</h1>
+        <h1 style={S.logo}>ENARM 360</h1>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={() => router.push('/perfil')} style={S.btnGhost}>Mi perfil</button>
           <button onClick={handleLogout} disabled={loggingOut} style={{ ...S.btnGhost, color: '#475569' }}>
@@ -98,22 +92,6 @@ export default function DashboardPage() {
       <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: 20 }}>
         {userInfo?.email ?? 'Cargando...'} · Banco maestro 2,000 preguntas
       </p>
-
-      {/* Banner trial */}
-      {isDemo && userInfo && (
-        <div style={{ backgroundColor: '#0f172a', border: '1px solid #1e3a5f', borderRadius: 12, padding: '14px 18px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <p style={{ color: '#60a5fa', fontSize: '0.72rem', letterSpacing: '1px', margin: '0 0 3px 0' }}>◉ PERÍODO DE PRUEBA</p>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
-              {daysLeft <= 0 ? 'Tu prueba ha expirado' : `${daysLeft} día${daysLeft !== 1 ? 's' : ''} restante${daysLeft !== 1 ? 's' : ''}`}
-            </p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ color: '#3b82f6', fontSize: '1.6rem', fontWeight: 'bold', lineHeight: 1 }}>{daysLeft}</div>
-            <div style={{ color: '#475569', fontSize: '0.65rem' }}>días</div>
-          </div>
-        </div>
-      )}
 
       {/* Flashcards rápidas */}
       <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
@@ -151,7 +129,7 @@ export default function DashboardPage() {
       </div>
 
       <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 40 }}>
-        ENARM IQ · Banco Maestro 2025
+        Simula ENARM · Banco Maestro 2025
       </p>
     </main>
   )

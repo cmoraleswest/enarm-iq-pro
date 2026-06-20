@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import {
   loadBanco, selectDiagnosticQuestions, selectMixedQuestions,
   selectSimulatorQuestions, toClientQuestion, gradeAnswers, EXAM_CONFIG,
@@ -10,23 +9,18 @@ import {
   fetchPendingSession,
   removePendingSession,
 } from '@/lib/firestore'
+import { getSession } from '@/lib/session'
 import type {
   ExamType, Specialty, ClientAnswer, StartExamResponse, SubmitExamResponse,
 } from '@/types/exam'
 
-async function getSessionUid(): Promise<string> {
-  const cookieStore = await cookies()
-  const raw = cookieStore.get('enarm_sess')?.value
-  if (!raw) return 'anonymous'
-  try {
-    const data = JSON.parse(Buffer.from(raw, 'base64').toString()) as { uid: string }
-    return data.uid || 'anonymous'
-  } catch { return 'anonymous' }
-}
-
 // POST /api/exam — iniciar o calificar examen
 export async function POST(request: Request) {
-  const uid = await getSessionUid()
+  const session = await getSession()
+  if (!session) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+  const uid = session.uid
 
   const body = await request.json() as {
     action: 'start' | 'submit'

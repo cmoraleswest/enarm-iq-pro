@@ -3,9 +3,6 @@ import type {
   UserProfile, ExamSession, SubmitExamResponse,
   AnswerResult, SpecialtyStats, Specialty, DiagnosticSnapshot, UserStats,
 } from '@/types/exam'
-import { TRIAL_DAYS, TRIAL_MS } from './constants'
-
-export { TRIAL_MS }
 
 // ──────────────────────────────────────────────
 // USUARIOS
@@ -21,7 +18,7 @@ export async function createUserProfile(
     email,
     displayName: email.split('@')[0],
     createdAt: Date.now(),
-    trialStartedAt: Date.now(), // el trial empieza al registrarse
+    trialStartedAt: null,
     isPaid: false,
     deviceFingerprint: fingerprint,
     registrationIp: ip,
@@ -35,57 +32,8 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   return { uid, ...snap.data() } as UserProfile
 }
 
-export function isTrialActive(profile: UserProfile): boolean {
-  if (profile.isPaid) return true
-  if (!profile.trialStartedAt) return false
-  return Date.now() < profile.trialStartedAt + TRIAL_MS
-}
-
-export function trialDaysLeft(profile: UserProfile): number {
-  if (profile.isPaid) return Infinity
-  if (!profile.trialStartedAt) return 0
-  const left = (profile.trialStartedAt + TRIAL_MS) - Date.now()
-  return Math.max(0, Math.ceil(left / (24 * 60 * 60 * 1000)))
-}
-
-// Detección de fraude: mismo fingerprint o IP ya usó trial
-export async function detectFraud(fingerprint: string, ip: string): Promise<boolean> {
-  const db = adminFirestore
-
-  // Buscar por fingerprint
-  const fpSnap = await db.collection('users')
-    .where('deviceFingerprint', '==', fingerprint)
-    .where('isPaid', '==', false)
-    .limit(1)
-    .get()
-
-  if (!fpSnap.empty) {
-    const user = fpSnap.docs[0].data()
-    const started = user.trialStartedAt as number | null
-    // Si el trial ya expiró en ese dispositivo → fraude
-    if (started && Date.now() > started + TRIAL_MS) return true
-  }
-
-  // Buscar por IP (menos restrictivo — solo bloquear si ya expiró)
-  if (ip && ip !== 'unknown') {
-    const ipSnap = await db.collection('users')
-      .where('registrationIp', '==', ip)
-      .where('isPaid', '==', false)
-      .limit(3)
-      .get()
-
-    let expiredCount = 0
-    for (const doc of ipSnap.docs) {
-      const u = doc.data()
-      if (u.trialStartedAt && Date.now() > u.trialStartedAt + TRIAL_MS) {
-        expiredCount++
-      }
-    }
-    // Bloquear si hay 2+ cuentas expiradas en la misma IP
-    if (expiredCount >= 2) return true
-  }
-
-  return false
+export function isAccountActive(profile: UserProfile): boolean {
+  return profile.isPaid === true
 }
 
 // ──────────────────────────────────────────────
