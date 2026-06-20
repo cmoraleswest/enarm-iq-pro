@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { createHmac } from 'crypto'
 
 const SESSION_COOKIE = 'enarm_sess'
 
-const PUBLIC_PATHS = ['/login', '/register', '/verify-email', '/upgrade']
+const PUBLIC_PATHS = ['/login', '/register', '/verify-email', '/upgrade', '/privacidad', '/terminos', '/aviso-privacidad', '/faq', '/pago/exitoso']
 const PUBLIC_API   = ['/api/auth', '/api/stripe']
 
 // Rutas que requieren isPaid para acceder
@@ -47,20 +46,25 @@ interface SessionData {
   isPaid: boolean
 }
 
-function parseSession(raw: string): SessionData | null {
+async function hmacHex(secret: string, message: string): Promise<string> {
+  const enc = new TextEncoder()
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message))
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+async function parseSession(raw: string): Promise<SessionData | null> {
   try {
     const dotIdx = raw.lastIndexOf('.')
-    if (dotIdx === -1) {
-      // Cookie legacy sin firma — rechazar
-      return null
-    }
+    if (dotIdx === -1) return null
+
     const payload = raw.slice(0, dotIdx)
     const sig = raw.slice(dotIdx + 1)
 
     const secret = process.env.SESSION_SECRET
     if (!secret) return null
 
-    const expected = createHmac('sha256', secret).update(payload).digest('hex')
+    const expected = await hmacHex(secret, payload)
     if (sig.length !== expected.length) return null
     let mismatch = 0
     for (let i = 0; i < sig.length; i++) {
@@ -68,7 +72,7 @@ function parseSession(raw: string): SessionData | null {
     }
     if (mismatch !== 0) return null
 
-    const data = JSON.parse(Buffer.from(payload, 'base64').toString()) as SessionData
+    const data = JSON.parse(atob(payload)) as SessionData
     if (!data.uid) return null
     return data
   } catch {
@@ -76,7 +80,7 @@ function parseSession(raw: string): SessionData | null {
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const origin = request.headers.get('origin')
   const isApi = pathname.startsWith('/api/')
@@ -107,7 +111,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  const session = parseSession(raw)
+  const session = await parseSession(raw)
   if (!session) {
     if (isApi) return NextResponse.json({ error: 'Sesión inválida' }, { status: 401 })
     return NextResponse.redirect(new URL('/login', request.url))
@@ -131,5 +135,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|icons/|og-image\\.png|robots\\.txt|sw\\.js|manifest\\.json|sitemap\\.xml).*)'],
 }
