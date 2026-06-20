@@ -18,7 +18,6 @@ export async function createUserProfile(
     email,
     displayName: email.split('@')[0],
     createdAt: Date.now(),
-    trialStartedAt: null,
     isPaid: false,
     deviceFingerprint: fingerprint,
     registrationIp: ip,

@@ -147,6 +147,6 @@ const styles: Record<string, React.CSSProperties> = {
   input:      { width: '100%', backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 10, padding: '13px 16px', color: '#e2e8f0', fontSize: '1rem', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' },
   btn:        { width: '100%', padding: 15, color: '#0f0f1a', border: 'none', borderRadius: 10, fontSize: '1rem', fontWeight: 'bold', letterSpacing: '1px', fontFamily: 'Georgia, serif', marginTop: 8, transition: 'background-color 0.2s' },
   error:      { color: '#f87171', fontSize: '0.85rem', textAlign: 'center', marginTop: 12, backgroundColor: '#450a0a', padding: 10, borderRadius: 8 },
-  eyeBtn:     { position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 4, lineHeight: 0 },
+  eyeBtn:     { position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 10, lineHeight: 0, minHeight: 44, minWidth: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' },
   infoBadge: { marginTop: 28, padding: 16, backgroundColor: '#0f172a', borderRadius: 10, border: '1px solid #D4AF37' },
 }

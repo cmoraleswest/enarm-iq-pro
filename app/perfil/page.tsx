@@ -97,7 +97,7 @@ export default function PerfilPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => window.location.href = '/home'} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}>←</button>
+          <button onClick={() => window.location.href = '/home'} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: '8px 12px', minHeight: 44, minWidth: 44 }}>←</button>
           <h1 style={{ color: '#00d9ff', fontSize: '1.8rem', margin: 0, letterSpacing: 2 }}>MI PERFIL</h1>
         </div>
         <button onClick={fetchStats} style={{ background: 'none', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>↺ Actualizar</button>

@@ -11,6 +11,7 @@ import {
   getExamSession,
 } from '@/lib/firestore'
 import { getSession } from '@/lib/session'
+import { rateLimit } from '@/lib/rate-limit'
 import type {
   ExamType, Specialty, ClientAnswer, StartExamResponse, SubmitExamResponse,
 } from '@/types/exam'
@@ -20,6 +21,10 @@ export async function POST(request: Request) {
   const session = await getSession()
   if (!session) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
+  if (!rateLimit(`exam:${session.uid}`, 10, 60_000)) {
+    return NextResponse.json({ error: 'Demasiadas solicitudes. Intenta en 1 minuto.' }, { status: 429 })
   }
   const uid = session.uid
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { adminAuth } from '@/lib/firebase-admin'
 import { createUserProfile, getUserProfile } from '@/lib/firestore'
+import { createSessionCookie } from '@/lib/session'
 
 const SESSION_COOKIE = 'enarm_sess'
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60
@@ -34,11 +35,11 @@ async function handleLogin(idToken: string) {
       return NextResponse.json({ error: 'Perfil no encontrado. Regístrate primero.' }, { status: 404 })
     }
 
-    const cookieValue = Buffer.from(JSON.stringify({
+    const cookieValue = createSessionCookie({
       uid:    decoded.uid,
-      email:  decoded.email,
+      email:  decoded.email ?? '',
       isPaid: profile.isPaid,
-    })).toString('base64')
+    })
 
     const response = NextResponse.json({
       ok: true,

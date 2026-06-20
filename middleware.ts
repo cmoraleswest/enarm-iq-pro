@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { createHmac } from 'crypto'
 
 const SESSION_COOKIE = 'enarm_sess'
 
@@ -48,7 +49,26 @@ interface SessionData {
 
 function parseSession(raw: string): SessionData | null {
   try {
-    const data = JSON.parse(Buffer.from(raw, 'base64').toString()) as SessionData
+    const dotIdx = raw.lastIndexOf('.')
+    if (dotIdx === -1) {
+      // Cookie legacy sin firma — rechazar
+      return null
+    }
+    const payload = raw.slice(0, dotIdx)
+    const sig = raw.slice(dotIdx + 1)
+
+    const secret = process.env.SESSION_SECRET
+    if (!secret) return null
+
+    const expected = createHmac('sha256', secret).update(payload).digest('hex')
+    if (sig.length !== expected.length) return null
+    let mismatch = 0
+    for (let i = 0; i < sig.length; i++) {
+      mismatch |= sig.charCodeAt(i) ^ expected.charCodeAt(i)
+    }
+    if (mismatch !== 0) return null
+
+    const data = JSON.parse(Buffer.from(payload, 'base64').toString()) as SessionData
     if (!data.uid) return null
     return data
   } catch {
@@ -56,7 +76,7 @@ function parseSession(raw: string): SessionData | null {
   }
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const origin = request.headers.get('origin')
   const isApi = pathname.startsWith('/api/')

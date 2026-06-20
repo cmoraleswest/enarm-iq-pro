@@ -179,7 +179,7 @@ export default function DiagnosticoPage() {
 const S: Record<string, React.CSSProperties> = {
   main:     { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 780, margin: '0 auto', backgroundColor: '#0f0f1a', minHeight: '100vh', color: '#e2e8f0' },
   h1:       { color: '#00d9ff', fontSize: '1.6rem', margin: 0, letterSpacing: 2 },
-  back:     { background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: 0 },
+  back:     { background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1.2rem', padding: '8px 12px', minHeight: 44, minWidth: 44 },
   badge:    { color: '#00d9ff', fontSize: '0.72rem', letterSpacing: '2px', margin: '0 0 8px 0' },
   infoCard: { backgroundColor: '#111827', borderRadius: 14, padding: 24, marginBottom: 20, border: '1px solid #1e293b' },
   stat:     { display: 'flex', alignItems: 'center', gap: 12, backgroundColor: '#111827', borderRadius: 10, padding: '12px 16px', border: '1px solid #1e293b' },

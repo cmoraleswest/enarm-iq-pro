@@ -82,6 +82,38 @@ export async function POST(request: Request) {
       .where('stripeCustomerId', '==', sub.customer).limit(1).get()
     if (!snap.empty) {
       await snap.docs[0].ref.update({ isPaid: false, plan: null })
+      console.log(`Suscripción cancelada: ${snap.docs[0].id}`)
+    }
+  }
+
+  // Reembolso — revocar acceso
+  if (event.type === 'charge.refunded') {
+    const charge = event.data.object as Stripe.Charge
+    const customerId = charge.customer as string
+    if (customerId) {
+      const snap = await adminFirestore.collection('users')
+        .where('stripeCustomerId', '==', customerId).limit(1).get()
+      if (!snap.empty) {
+        await snap.docs[0].ref.update({ isPaid: false, plan: null, refundedAt: Date.now() })
+        console.log(`Reembolso procesado: ${snap.docs[0].id}`)
+      }
+    }
+  }
+
+  // Pago fallido — marcar para notificar
+  if (event.type === 'invoice.payment_failed') {
+    const invoice = event.data.object as Stripe.Invoice
+    const customerId = invoice.customer as string
+    if (customerId) {
+      const snap = await adminFirestore.collection('users')
+        .where('stripeCustomerId', '==', customerId).limit(1).get()
+      if (!snap.empty) {
+        await snap.docs[0].ref.update({
+          paymentFailedAt: Date.now(),
+          paymentFailedCount: (snap.docs[0].data().paymentFailedCount || 0) + 1,
+        })
+        console.log(`Pago fallido: ${snap.docs[0].id}`)
+      }
     }
   }
 

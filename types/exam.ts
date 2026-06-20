@@ -110,7 +110,6 @@ export interface UserProfile {
   email: string
   displayName: string
   createdAt: number
-  trialStartedAt: number | null
   isPaid: boolean
   deviceFingerprint: string
   registrationIp: string

@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { loadBanco, shuffle } from '@/lib/exam-utils'
+import { rateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
   const session = await getSession()
   if (!session) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
+  if (!rateLimit(`generar:${session.uid}`, 60, 60_000)) {
+    return NextResponse.json({ error: 'Demasiadas solicitudes. Intenta en 1 minuto.' }, { status: 429 })
   }
 
   try {
