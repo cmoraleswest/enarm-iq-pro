@@ -10,7 +10,7 @@ import {
   removePendingSession,
 } from '@/lib/firestore'
 import { getSession } from '@/lib/session'
-import { rateLimit } from '@/lib/rate-limit'
+import { rateLimit, redis } from '@/lib/rate-limit'
 import type {
   ExamType, Specialty, ClientAnswer, StartExamResponse, SubmitExamResponse,
 } from '@/types/exam'
@@ -22,7 +22,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 
-  if (!rateLimit(`exam:${session.uid}`, 10, 60_000)) {
+  if (!session.isPaid) {
+    const { getUserProfile } = await import('@/lib/firestore')
+    const profile = await getUserProfile(session.uid)
+    if (!profile?.isPaid) {
+      return NextResponse.json({ error: 'Suscripción requerida.' }, { status: 402 })
+    }
+  }
+
+  if (!await rateLimit(`exam:${session.uid}`, 30, 60_000)) {
     return NextResponse.json({ error: 'Demasiadas solicitudes. Intenta en 1 minuto.' }, { status: 429 })
   }
   const uid = session.uid
@@ -42,16 +50,19 @@ export async function POST(request: Request) {
 
   try {
     if (body.action === 'start') {
-      return await handleStart(uid, body.examType!, body.specialties, body.numQuestions)
+      if (!body.examType) return NextResponse.json({ error: 'examType requerido' }, { status: 400 })
+      return await handleStart(uid, body.examType, body.specialties, body.numQuestions)
     }
 
     if (body.action === 'submit') {
-      return await handleSubmit(uid, body.sessionId!, body.answers!, body.startedAt!, body.partial ?? false)
+      if (!body.sessionId || !body.answers || !body.startedAt) {
+        return NextResponse.json({ error: 'Datos incompletos' }, { status: 400 })
+      }
+      return await handleSubmit(uid, body.sessionId, body.answers, body.startedAt, body.partial ?? false)
     }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error('[api/exam] error:', msg)
-    return NextResponse.json({ error: 'Error interno', detail: msg }, { status: 500 })
+    console.error('[api/exam] error:', err instanceof Error ? err.message : err)
+    return NextResponse.json({ error: 'Error interno del servidor.' }, { status: 500 })
   }
 
   return NextResponse.json({ error: 'Acción no válida' }, { status: 400 })
@@ -113,8 +124,13 @@ async function handleSubmit(
   clientAnswers: ClientAnswer[],
   startedAt: number,
   partial: boolean,
-): Promise<NextResponse<SubmitExamResponse | { answers: ReturnType<typeof gradeAnswers> } | { error: string }>> {
-  // Verificar que el UID coincide
+): Promise<NextResponse> {
+  const lockKey = `examlock:${sessionId}`
+  const locked = await redis.set(lockKey, '1', { nx: true, ex: 30 })
+  if (!locked) {
+    return NextResponse.json({ error: 'Examen ya enviado.' }, { status: 409 })
+  }
+
   if (!sessionId.startsWith(uid)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
@@ -132,16 +148,23 @@ async function handleSubmit(
 
   const answers = gradeAnswers(clientAnswers, questions)
 
-  // Calificación parcial: devuelve resultados sin guardar en Firestore ni borrar sesión
   if (partial) {
-    return NextResponse.json({ answers })
+    const safe = answers.map(a => ({
+      questionId: a.questionId,
+      selected: a.selected,
+      isCorrect: a.isCorrect,
+      correcta: a.correcta,
+      justificacion: a.justificacion,
+      categoria: a.categoria,
+    }))
+    return NextResponse.json({ answers: safe })
   }
 
   const result = await gradeAndSave(
     uid,
     pending.examType as ExamType,
     answers,
-    startedAt,
+    pending.startedAt,
     pending.specialties as Specialty[],
   )
 

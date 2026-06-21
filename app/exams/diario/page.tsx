@@ -49,7 +49,6 @@ export default function DiarioPage() {
       const raw = localStorage.getItem('enarm_user_info')
       if (raw) {
         JSON.parse(raw)
-        // Acceso validado por proxy
       }
     } catch { /* ignore */ }
     startExam()
@@ -134,7 +133,9 @@ export default function DiarioPage() {
       <Badges q={q} />
 
       {/* Caso */}
-      <div style={S.caso}><p style={{ margin: 0, lineHeight: '1.85', whiteSpace: 'pre-wrap', color: '#e2e8f0' }}>{q.caso}</p></div>
+      <div style={{ ...S.caso, maxHeight: '40vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <p style={{ margin: 0, lineHeight: '1.75', whiteSpace: 'pre-wrap', color: '#e2e8f0', fontSize: q.caso.length > 400 ? '0.85rem' : '0.95rem' }}>{q.caso}</p>
+      </div>
 
       {/* Opciones */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
@@ -147,7 +148,7 @@ export default function DiarioPage() {
           }
           return (
             <button key={i} onClick={() => responder(op)} disabled={!!currentResult}
-              style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: currentResult ? 'default' : 'pointer', transition: 'all 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: bg, border, color }}>
+              style={{ width: '100%', padding: '14px 16px', borderRadius: 12, fontSize: op.length > 80 ? '0.82rem' : '0.95rem', textAlign: 'left', cursor: currentResult ? 'default' : 'pointer', transition: 'all 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: bg, border, color, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', userSelect: 'none' }}>
               <span style={{ fontWeight: 'bold', marginRight: 10, color: currentResult ? 'inherit' : '#00d9ff' }}>{String.fromCharCode(65 + i)})</span>
               {op}
               {currentResult?.correcta === op   && <span style={{ float: 'right' }}>✓</span>}
@@ -159,9 +160,9 @@ export default function DiarioPage() {
 
       {/* Justificación inmediata (solo en diario) */}
       {currentResult && (
-        <div style={{ backgroundColor: '#0d1117', border: '1px solid #1d4ed8', borderRadius: 12, padding: 24, marginBottom: 20, opacity: justifVisible ? 1 : 0, transition: 'opacity 0.5s ease' }}>
+        <div style={{ backgroundColor: '#0d1117', border: '1px solid #1d4ed8', borderRadius: 12, padding: 20, marginBottom: 20, opacity: justifVisible ? 1 : 0, transition: 'opacity 0.5s ease', maxHeight: '50vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <p style={{ color: '#60a5fa', fontSize: '0.78rem', letterSpacing: '1.5px', margin: '0 0 12px 0' }}>📋 ANÁLISIS TÉCNICO — GPC</p>
-          <p style={{ margin: 0, lineHeight: '1.9', color: '#bfdbfe', fontSize: '0.92rem' }}>{currentResult.justificacion}</p>
+          <p style={{ margin: 0, lineHeight: '1.75', color: '#bfdbfe', fontSize: currentResult.justificacion && currentResult.justificacion.length > 300 ? '0.82rem' : '0.9rem' }}>{currentResult.justificacion || 'Justificación no disponible.'}</p>
         </div>
       )}
 

@@ -1,23 +1,31 @@
-const hits = new Map<string, { count: number; resetAt: number }>()
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
 
-export function rateLimit(key: string, maxRequests: number, windowMs: number): boolean {
-  const now = Date.now()
-  const entry = hits.get(key)
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+})
 
-  if (!entry || now > entry.resetAt) {
-    hits.set(key, { count: 1, resetAt: now + windowMs })
-    return true
+const limiters: Record<string, Ratelimit> = {}
+
+function getLimiter(prefix: string, maxRequests: number, windowSec: number): Ratelimit {
+  const key = `${prefix}:${maxRequests}:${windowSec}`
+  if (!limiters[key]) {
+    limiters[key] = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(maxRequests, `${windowSec} s`),
+      prefix: `rl:${prefix}`,
+    })
   }
-
-  if (entry.count >= maxRequests) return false
-  entry.count++
-  return true
+  return limiters[key]
 }
 
-// Limpia entradas expiradas cada 5 min
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, entry] of hits) {
-    if (now > entry.resetAt) hits.delete(key)
+export async function rateLimit(key: string, maxRequests: number, windowMs: number): Promise<boolean> {
+  try {
+    const limiter = getLimiter(key.split(':')[0], maxRequests, Math.round(windowMs / 1000))
+    const { success } = await limiter.limit(key)
+    return success
+  } catch {
+    return true
   }
-}, 5 * 60 * 1000)
+}

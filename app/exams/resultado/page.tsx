@@ -169,10 +169,10 @@ function SpecialtyRow({ sp }: { sp: SpecialtyStats }) {
 function AnswerCard({ ans, idx, expanded, onToggle }: { ans: AnswerResult; idx: number; expanded: boolean; onToggle: () => void }) {
   return (
     <div style={{ marginBottom: 10, borderRadius: 10, border: `1px solid ${ans.isCorrect ? '#14532d' : '#450a0a'}`, overflow: 'hidden' }}>
-      <button onClick={onToggle} style={{ width: '100%', padding: '12px 16px', backgroundColor: ans.isCorrect ? '#0d1f12' : '#1a0606', border: 'none', cursor: 'pointer', textAlign: 'left', fontFamily: 'DM Sans, Arial, sans-serif', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+      <button onClick={onToggle} style={{ width: '100%', padding: '12px 16px', backgroundColor: ans.isCorrect ? '#0d1f12' : '#1a0606', border: 'none', cursor: 'pointer', textAlign: 'left', fontFamily: 'DM Sans, Arial, sans-serif', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}>
         <span style={{ color: '#94a3b8', fontSize: '0.8rem', flexShrink: 0 }}>#{idx + 1}</span>
-        <span style={{ color: '#cbd5e1', fontSize: '0.85rem', flex: 1, lineHeight: '1.4' }}>
-          {ans.caso.length > 100 ? ans.caso.slice(0, 100) + '…' : ans.caso}
+        <span style={{ color: '#cbd5e1', fontSize: '0.82rem', flex: 1, lineHeight: '1.4' }}>
+          {ans.caso.length > 120 ? ans.caso.slice(0, 120) + '…' : ans.caso}
         </span>
         <span style={{ color: ans.isCorrect ? '#4ade80' : '#f87171', fontSize: '1rem', flexShrink: 0 }}>
           {ans.isCorrect ? '✓' : '✗'}
@@ -190,7 +190,7 @@ function AnswerCard({ ans, idx, expanded, onToggle }: { ans: AnswerResult; idx: 
             </>
           )}
           <p style={{ color: '#60a5fa', fontSize: '0.72rem', margin: '0 0 6px 0' }}>JUSTIFICACIÓN</p>
-          <p style={{ color: '#bfdbfe', margin: 0, lineHeight: '1.8', fontSize: '0.88rem' }}>{ans.justificacion}</p>
+          <p style={{ color: '#bfdbfe', margin: 0, lineHeight: '1.75', fontSize: ans.justificacion && ans.justificacion.length > 300 ? '0.8rem' : '0.88rem' }}>{ans.justificacion}</p>
         </div>
       )}
     </div>

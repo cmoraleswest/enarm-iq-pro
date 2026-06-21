@@ -22,7 +22,6 @@ export default function DiagnosticoPage() {
       const raw = localStorage.getItem('enarm_user_info')
       if (raw) {
         JSON.parse(raw)
-        // Acceso validado por proxy
       }
     } catch { /* ignore */ }
   }, [])
@@ -58,15 +57,21 @@ export default function DiagnosticoPage() {
     const isLast = currentIdx >= questions.length - 1
     if (isLast) {
       setPhase('submitting')
-      const res = await fetch('/api/exam', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
-      })
-      const data = await res.json()
-      sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
-      router.push(`/exams/resultado?session=${data.sessionId}`)
+      try {
+        const res = await fetch('/api/exam', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body:    JSON.stringify({ action: 'submit', sessionId, answers, startedAt }),
+        })
+        if (!res.ok) throw new Error()
+        const data = await res.json()
+        sessionStorage.setItem(`exam_result_${data.sessionId}`, JSON.stringify(data))
+        router.push(`/exams/resultado?session=${data.sessionId}`)
+      } catch {
+        setPhase('exam')
+        alert('Error al enviar. Intenta de nuevo.')
+      }
       return
     }
     setCurrentIdx(i => i + 1)
@@ -151,14 +156,16 @@ export default function DiagnosticoPage() {
         ))}
       </div>
 
-      <div style={S.caso}><p style={{ margin: 0, lineHeight: '1.85', whiteSpace: 'pre-wrap', color: '#e2e8f0' }}>{q.caso}</p></div>
+      <div style={{ ...S.caso, maxHeight: '40vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <p style={{ margin: 0, lineHeight: '1.75', whiteSpace: 'pre-wrap', color: '#e2e8f0', fontSize: q.caso.length > 400 ? '0.85rem' : '0.95rem' }}>{q.caso}</p>
+      </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
         {q.opciones.map((op, i) => {
           const isSelected = seleccion === op
           return (
             <button key={i} onClick={() => responder(op)} disabled={respondido}
-              style={{ width: '100%', padding: '16px 20px', borderRadius: 12, fontSize: '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: isSelected && respondido ? '#1e3a5f' : '#1e293b', border: isSelected && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0' }}>
+              style={{ width: '100%', padding: '14px 16px', borderRadius: 12, fontSize: op.length > 80 ? '0.82rem' : '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: isSelected && respondido ? '#1e3a5f' : '#1e293b', border: isSelected && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', userSelect: 'none' }}>
               <span style={{ fontWeight: 'bold', marginRight: 10, color: respondido ? 'inherit' : '#00d9ff' }}>{String.fromCharCode(65 + i)})</span>
               {op}
             </button>
