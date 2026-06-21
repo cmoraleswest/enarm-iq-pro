@@ -7,6 +7,7 @@ interface UserInfo {
   uid:    string
   email:  string
   isPaid: boolean
+  plan?:  string | null
 }
 
 const EXAM_MODULES = [
@@ -71,9 +72,9 @@ export default function DashboardPage() {
     }
     fetch('/api/check-session', { credentials: 'include' })
       .then(r => r.json())
-      .then((data: { status: string; uid?: string; email?: string; isPaid?: boolean }) => {
+      .then((data: { status: string; uid?: string; email?: string; isPaid?: boolean; plan?: string }) => {
         if (data.status === 'OK' && data.uid) {
-          const updated = { uid: data.uid, email: data.email ?? '', isPaid: data.isPaid ?? false }
+          const updated = { uid: data.uid, email: data.email ?? '', isPaid: data.isPaid ?? false, plan: data.plan ?? null }
           setUserInfo(updated)
           localStorage.setItem('enarm_user_info', JSON.stringify(updated))
         } else {
@@ -123,8 +124,8 @@ export default function DashboardPage() {
       </p>
 
 
-      {/* Banner referidos */}
-      {isPaid && (
+      {/* Banner referidos — solo plan anual */}
+      {isPaid && userInfo?.plan === 'annual' && (
         <div onClick={() => router.push('/perfil')}
           style={{ background: 'linear-gradient(135deg, #1a1a2e, #0f2027)', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #D4AF37', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', animation: 'pulse-gold 3s ease-in-out infinite' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

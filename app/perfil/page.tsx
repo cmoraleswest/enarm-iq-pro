@@ -26,6 +26,10 @@ export default function PerfilPage() {
   const [error, setError]   = useState('')
   const [tab, setTab]       = useState<'overview' | 'diagnostics' | 'history'>('overview')
   const [selectedEsp, setSelectedEsp] = useState(ESPECIALIDADES_CIFRHS[0].nombre)
+  const [refCode, setRefCode] = useState('')
+  const [refStats, setRefStats] = useState({ totalReferrals: 0, referralBalance: 0 })
+  const [copied, setCopied] = useState(false)
+  const [plan, setPlan] = useState<string | null>(null)
 
   const fetchStats = async () => {
     setLoading(true)
@@ -50,6 +54,14 @@ export default function PerfilPage() {
 
   useEffect(() => {
     fetchStats()
+    fetch('/api/check-session', { credentials: 'include' })
+      .then(r => r.json())
+      .then((d: { refCode?: string; totalReferrals?: number; referralBalance?: number; plan?: string }) => {
+        if (d.refCode) setRefCode(d.refCode)
+        if (d.plan) setPlan(d.plan)
+        setRefStats({ totalReferrals: d.totalReferrals ?? 0, referralBalance: d.referralBalance ?? 0 })
+      })
+      .catch(() => {})
   }, [])
 
   if (loading) {
@@ -160,6 +172,40 @@ export default function PerfilPage() {
           </div>
         )
       })()}
+
+      {/* Referidos — solo plan anual */}
+      {refCode && plan === 'annual' && (
+        <div style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #0f2027 50%, #1a1a2e 100%)', borderRadius: 20, padding: 28, marginBottom: 20, border: '2px solid #D4AF37', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, background: 'radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%)', borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, background: 'radial-gradient(circle, rgba(74,222,128,0.1) 0%, transparent 70%)', borderRadius: '50%' }} />
+          <div style={{ textAlign: 'center', marginBottom: 20, position: 'relative' }}>
+            <div style={{ fontSize: '2.2rem', marginBottom: 8 }}>💰</div>
+            <div style={{ color: '#D4AF37', fontSize: '0.72rem', letterSpacing: 3, marginBottom: 8 }}>PROGRAMA DE REFERIDOS</div>
+            <div style={{ color: '#4ade80', fontSize: '3rem', fontWeight: 'bold', lineHeight: 1, marginBottom: 4, textShadow: '0 0 30px rgba(74,222,128,0.3)' }}>$150 MXN</div>
+            <div style={{ color: '#e2e8f0', fontSize: '1.1rem', fontWeight: 600 }}>por cada amigo que se suscriba</div>
+            <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: '12px 0 0 0', lineHeight: 1.6 }}>
+              Comparte tu link. Cuando tu referido pague, <strong style={{ color: '#4ade80' }}>te enviamos $150 MXN directo por transferencia</strong>.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+            <input readOnly value={`simulaenarm.com/ref/${refCode}`} style={{ flex: 1, padding: '12px 14px', backgroundColor: '#0a0a14', border: '1px solid #334155', borderRadius: 12, color: '#00d9ff', fontSize: '0.9rem', fontFamily: 'monospace', letterSpacing: 0.5 }} />
+            <button onClick={() => { navigator.clipboard.writeText(`https://simulaenarm.com/ref/${refCode}`); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+              style={{ padding: '12px 20px', background: copied ? '#4ade80' : 'linear-gradient(135deg, #D4AF37, #B8860B)', border: 'none', borderRadius: 12, color: '#0f0f1a', fontSize: '0.9rem', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s' }}>
+              {copied ? 'Copiado' : 'Copiar link'}
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ flex: 1, background: 'linear-gradient(135deg, #0f172a, #1e293b)', borderRadius: 14, padding: 16, textAlign: 'center', border: '1px solid #1e3a5f' }}>
+              <div style={{ color: '#00d9ff', fontSize: '2rem', fontWeight: 'bold' }}>{refStats.totalReferrals}</div>
+              <div style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 1 }}>REFERIDOS</div>
+            </div>
+            <div style={{ flex: 1, background: 'linear-gradient(135deg, #0f172a, #1e293b)', borderRadius: 14, padding: 16, textAlign: 'center', border: '1px solid #1e3a5f' }}>
+              <div style={{ color: '#4ade80', fontSize: '2rem', fontWeight: 'bold' }}>${refStats.referralBalance}</div>
+              <div style={{ color: '#64748b', fontSize: '0.75rem', letterSpacing: 1 }}>GANADO</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
