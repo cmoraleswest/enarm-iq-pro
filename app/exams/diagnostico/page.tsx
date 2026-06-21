@@ -20,11 +20,16 @@ export default function DiagnosticoPage() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('enarm_user_info')
-      if (raw) {
-        JSON.parse(raw)
-      }
+      if (raw) { JSON.parse(raw) }
     } catch { /* ignore */ }
   }, [])
+
+  useEffect(() => {
+    if (phase !== 'exam' || !questions.length) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [phase, questions.length])
 
   const startExam = async () => {
     setPhase('loading')
@@ -35,6 +40,8 @@ export default function DiagnosticoPage() {
         credentials: 'include',
         body:    JSON.stringify({ action: 'start', examType: 'diagnostico' }),
       })
+      if (res.status === 401) { window.location.href = '/login'; return }
+      if (res.status === 402) { window.location.href = '/upgrade'; return }
       const data = await res.json() as { sessionId: string; questions: QuestionForClient[] }
       if (!res.ok) throw new Error()
       setQuestions(data.questions)

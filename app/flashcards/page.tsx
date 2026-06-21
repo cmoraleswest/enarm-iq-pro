@@ -88,6 +88,8 @@ export default function FlashcardsPage() {
         body: JSON.stringify({ categoria: categoria === 'Todas' ? undefined : categoria }),
       })
       const d = await res.json()
+      if (res.status === 401) { window.location.href = '/login'; return }
+      if (res.status === 402) { window.location.href = '/upgrade'; return }
       if (!res.ok) throw new Error(d.error)
       setPregunta(d)
     } catch (err: unknown) {

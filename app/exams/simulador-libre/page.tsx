@@ -22,9 +22,7 @@ export default function SimuladorLibrePage() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('enarm_user_info')
-      if (raw) {
-        JSON.parse(raw)
-      }
+      if (raw) { JSON.parse(raw) }
     } catch { /* ignore */ }
   }, [])
 
@@ -33,6 +31,13 @@ export default function SimuladorLibrePage() {
     timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [phase])
+
+  useEffect(() => {
+    if (phase !== 'exam' || !questions.length) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [phase, questions.length])
 
   const formatElapsed = (s: number) => {
     const h = Math.floor(s / 3600)
@@ -52,6 +57,8 @@ export default function SimuladorLibrePage() {
         credentials: 'include',
         body:    JSON.stringify({ action: 'start', examType: 'simulador_libre' }),
       })
+      if (res.status === 401) { window.location.href = '/login'; return }
+      if (res.status === 402) { window.location.href = '/upgrade'; return }
       const data = await res.json() as { sessionId: string; questions: QuestionForClient[] }
       if (!res.ok) throw new Error()
       setQuestions(data.questions)

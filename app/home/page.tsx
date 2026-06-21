@@ -61,16 +61,30 @@ export default function DashboardPage() {
   const router = useRouter()
   const [userInfo, setUserInfo]   = useState<UserInfo | null>(null)
   const [loggingOut, setLoggingOut] = useState(false)
-  const [debugInfo, setDebugInfo] = useState('')
+
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const raw = localStorage.getItem('enarm_user_info')
-    const path = window.location.pathname
-    const keys = Object.keys(localStorage)
-    setDebugInfo(`v1.3.3 | path=${path} | keys=[${keys.join(',')}] | hasData=${!!raw}`)
     if (raw) {
       try { setUserInfo(JSON.parse(raw) as UserInfo) } catch { /* corrupt data */ }
     }
+    fetch('/api/check-session', { credentials: 'include' })
+      .then(r => r.json())
+      .then((data: { status: string; uid?: string; email?: string; isPaid?: boolean }) => {
+        if (data.status === 'OK' && data.uid) {
+          const updated = { uid: data.uid, email: data.email ?? '', isPaid: data.isPaid ?? false }
+          setUserInfo(updated)
+          localStorage.setItem('enarm_user_info', JSON.stringify(updated))
+        } else {
+          localStorage.removeItem('enarm_user_info')
+          window.location.href = '/login'
+        }
+      })
+      .catch(() => {
+        if (!raw) window.location.href = '/login'
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   const handleLogout = async () => {
@@ -80,6 +94,17 @@ export default function DashboardPage() {
     window.location.href = '/login'
   }
 
+
+  if (loading && !userInfo) {
+    return (
+      <main style={S.main}>
+        <h1 style={S.logo}>Simula ENARM</h1>
+        <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: 8 }}>Cargando...</p>
+      </main>
+    )
+  }
+
+  const isPaid = userInfo ? userInfo.isPaid : false
 
   return (
     <main style={S.main}>
@@ -94,13 +119,29 @@ export default function DashboardPage() {
         </div>
       </div>
       <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: 20 }}>
-        {userInfo?.email ?? 'Cargando...'} · 280 reactivos · Formato CIFRHS 2025
+        {userInfo?.email ?? ''} · 280 reactivos · Formato CIFRHS 2025
       </p>
 
 
+      {/* Banner referidos */}
+      {isPaid && (
+        <div onClick={() => router.push('/perfil')}
+          style={{ background: 'linear-gradient(135deg, #1a1a2e, #0f2027)', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #D4AF37', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', animation: 'pulse-gold 3s ease-in-out infinite' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: '1.8rem' }}>💰</span>
+            <div>
+              <p style={{ color: '#D4AF37', fontSize: '0.7rem', letterSpacing: '2px', margin: '0 0 4px 0' }}>PROGRAMA DE REFERIDOS</p>
+              <h3 style={{ color: '#4ade80', margin: 0, fontSize: '1.1rem' }}>Gana <strong>$150 MXN</strong> por cada amigo</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.78rem', margin: '4px 0 0 0' }}>Te pagamos por transferencia cuando tu referido se suscriba</p>
+            </div>
+          </div>
+          <span style={{ color: '#D4AF37', fontSize: '1.5rem' }}>→</span>
+        </div>
+      )}
+
       {/* Flashcards rápidas */}
-      <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: false ? 'not-allowed' : 'pointer', opacity: false ? 0.5 : 1 }}
-        onClick={() => false ? router.push('/upgrade') : router.push('/flashcards')}>
+      <div style={{ backgroundColor: '#111827', borderRadius: 14, padding: '16px 20px', marginBottom: 16, border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: !isPaid ? 'not-allowed' : 'pointer', opacity: !isPaid ? 0.5 : 1 }}
+        onClick={() => !isPaid ? router.push('/upgrade') : router.push('/flashcards')}>
         <div>
           <p style={{ color: '#fbbf24', fontSize: '0.7rem', letterSpacing: '2px', margin: '0 0 4px 0' }}>MÓDULO EXTRA</p>
           <h3 style={{ color: '#e2e8f0', margin: 0, fontSize: '1.1rem' }}>Flashcards</h3>
@@ -116,9 +157,9 @@ export default function DashboardPage() {
         {EXAM_MODULES.map(m => (
           <button
             key={m.id}
-            onClick={() => false ? router.push('/upgrade') : router.push(m.href)}
-            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: false ? 'not-allowed' : 'pointer', transition: 'border-color 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', opacity: false ? 0.5 : 1 }}
-            onMouseEnter={e => !false && (e.currentTarget.style.borderColor = m.color)}
+            onClick={() => !isPaid ? router.push('/upgrade') : router.push(m.href)}
+            style={{ display: 'block', width: '100%', textAlign: 'left', backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 14, padding: 20, cursor: !isPaid ? 'not-allowed' : 'pointer', transition: 'border-color 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', opacity: !isPaid ? 0.5 : 1 }}
+            onMouseEnter={e => isPaid && (e.currentTarget.style.borderColor = m.color)}
             onMouseLeave={e => (e.currentTarget.style.borderColor = '#1e293b')}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
@@ -133,29 +174,8 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div style={{ marginTop: 40, padding: '16px 20px', backgroundColor: '#111827', borderRadius: 12, border: '1px solid #1e293b' }}>
-        <p style={{ color: '#475569', fontSize: '0.68rem', letterSpacing: '2px', margin: '0 0 8px 0' }}>VERSIÓN</p>
-        <p style={{ color: '#64748b', fontSize: '0.82rem', margin: '0 0 4px 0' }}>v1.3.3 — 19 junio 2026</p>
-        <ul style={{ color: '#475569', fontSize: '0.75rem', margin: '8px 0 0 0', paddingLeft: 16, lineHeight: '1.8' }}>
-          <li>Fix: eliminado proxy/middleware del servidor — causa raíz del redirect a login</li>
-          <li>Fix: navegación libre entre secciones sin kicks a login</li>
-          <li>Fix: sesión basada en localStorage (no depende de cookies del servidor)</li>
-          <li>Fix: perfil se genera automáticamente al iniciar sesión</li>
-          <li>Fix: resultados de examen con respuesta correcta y justificación</li>
-          <li>Fix: resultados se recuperan del servidor si se pierde sessionStorage</li>
-          <li>Rebrand: toda la app con colores SimulaENARM (cyan/pink)</li>
-          <li>Rebrand: fuente DM Sans en todas las pantallas</li>
-        </ul>
-      </div>
-
-      {debugInfo && (
-        <div style={{ marginTop: 16, padding: 12, backgroundColor: '#1a0a2e', border: '1px solid #6b21a8', borderRadius: 8, fontSize: '0.7rem', color: '#c084fc', wordBreak: 'break-all' }}>
-          🔍 DEBUG: {debugInfo}
-        </div>
-      )}
-
-      <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 16 }}>
-        Simula ENARM · Banco Maestro 2025
+      <p style={{ color: '#1e293b', fontSize: '0.72rem', textAlign: 'center', marginTop: 40 }}>
+        Simula ENARM · 2026
       </p>
     </main>
   )
@@ -164,5 +184,5 @@ export default function DashboardPage() {
 const S: Record<string, React.CSSProperties> = {
   main:     { padding: 24, fontFamily: 'DM Sans, Arial, sans-serif', maxWidth: 700, margin: '0 auto', backgroundColor: '#0a0a14', minHeight: '100vh', color: '#e2e8f0' },
   logo:     { color: '#00d9ff', fontSize: '2rem', margin: 0, letterSpacing: 3 },
-  btnGhost: { backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'DM Sans, Arial, sans-serif' },
+  btnGhost: { backgroundColor: 'transparent', border: '1px solid #334155', color: '#64748b', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontSize: '0.78rem', fontFamily: 'DM Sans, Arial, sans-serif', minHeight: 44, touchAction: 'manipulation' as const },
 }

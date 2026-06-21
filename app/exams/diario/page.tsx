@@ -28,6 +28,8 @@ export default function DiarioPage() {
         credentials: 'include',
         body:    JSON.stringify({ action: 'start', examType: 'diario' }),
       })
+      if (res.status === 401) { window.location.href = '/login'; return }
+      if (res.status === 402) { window.location.href = '/upgrade'; return }
       const data = await res.json() as { sessionId: string; questions: QuestionForClient[] }
       if (!res.ok) throw new Error('Error al cargar')
       setQuestions(data.questions)
@@ -47,12 +49,17 @@ export default function DiarioPage() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('enarm_user_info')
-      if (raw) {
-        JSON.parse(raw)
-      }
+      if (raw) { JSON.parse(raw) }
     } catch { /* ignore */ }
     startExam()
   }, [])
+
+  useEffect(() => {
+    if (phase !== 'exam' || !questions.length) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [phase, questions.length])
 
   const responder = async (selected: string) => {
     if (currentResult) return

@@ -72,6 +72,7 @@ export default function SimuladorPage() {
         body: JSON.stringify({ categoria: categoria === 'Todas' ? undefined : categoria }),
       })
       const data = await res.json()
+      if (res.status === 401 || res.status === 402) { window.location.href = res.status === 401 ? '/login' : '/upgrade'; return }
       if (!res.ok) throw new Error(data.error)
       setCaso(data)
     } catch (err: unknown) {
@@ -87,15 +88,22 @@ export default function SimuladorPage() {
     setRespondido(true)
 
     try {
-      const res = await fetch('/api/generar/verify', {
+      const res = await fetch('/api/generar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ questionId: caso.id, selected: opcion }),
+        credentials: 'include',
+        body: JSON.stringify({ action: 'reveal', questionId: caso.id }),
       })
-      const data = await res.json() as VerifyResult
-      setVerifyResult(data)
+      if (res.status === 401) { window.location.href = '/login'; return }
+      const data = await res.json() as { correcta: string; justificacion: string }
+      const result: VerifyResult = {
+        isCorrect: opcion === data.correcta,
+        correcta: data.correcta,
+        justificacion: data.justificacion,
+      }
+      setVerifyResult(result)
 
-      const esCorrecta = data.isCorrect
+      const esCorrecta = result.isCorrect
       setStats(prev => {
         const cat = prev.porCategoria[caso.categoria] ?? { correctas: 0, total: 0 }
         const updated: Stats = {
@@ -278,15 +286,15 @@ export default function SimuladorPage() {
                 ))}
               </div>
 
-              <div style={{ backgroundColor: '#1a1f2e', borderLeft: '4px solid #00d9ff', borderRadius: '10px', padding: '22px', marginBottom: '20px' }}>
-                <p style={{ margin: 0, lineHeight: '1.85', whiteSpace: 'pre-wrap', color: '#e2e8f0' }}>{caso.caso}</p>
+              <div style={{ backgroundColor: '#1a1f2e', borderLeft: '4px solid #00d9ff', borderRadius: '10px', padding: '22px', marginBottom: '20px', maxHeight: '40vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <p style={{ margin: 0, lineHeight: '1.75', whiteSpace: 'pre-wrap', color: '#e2e8f0', fontSize: caso.caso.length > 400 ? '0.85rem' : '0.95rem' }}>{caso.caso}</p>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
                 {caso.opciones.map((opcion, i) => {
                   const estado = estadoBoton(opcion)
                   return (
-                    <button key={i} onClick={() => responder(opcion)} style={estiloBoton(estado)}>
+                    <button key={i} onClick={() => responder(opcion)} style={{ ...estiloBoton(estado), touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', userSelect: 'none', fontSize: opcion.length > 80 ? '0.82rem' : '0.95rem', padding: '14px 16px' }}>
                       <span style={{ fontWeight: 'bold', marginRight: '10px', color: estado === 'idle' ? '#00d9ff' : 'inherit' }}>
                         {String.fromCharCode(65 + i)})
                       </span>
@@ -309,7 +317,7 @@ export default function SimuladorPage() {
                   <h3 style={{ color: '#60a5fa', margin: '0 0 14px 0', fontSize: '0.8rem', letterSpacing: '1.5px' }}>
                     📋 ANÁLISIS TÉCNICO — GUÍA DE PRÁCTICA CLÍNICA
                   </h3>
-                  <p style={{ margin: 0, lineHeight: '1.9', color: '#bfdbfe', fontSize: '0.95rem' }}>
+                  <p style={{ margin: 0, lineHeight: '1.75', color: '#bfdbfe', fontSize: verifyResult.justificacion.length > 300 ? '0.82rem' : '0.9rem' }}>
                     {verifyResult.justificacion}
                   </p>
                 </div>
