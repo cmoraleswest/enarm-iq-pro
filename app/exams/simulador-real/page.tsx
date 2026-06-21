@@ -106,11 +106,15 @@ export default function SimuladorRealPage() {
     }
   }
 
-  const responder = (op: string) => {
+  const seleccionar = (op: string) => {
     if (respondido) return
     setSeleccion(op)
+  }
+
+  const confirmarRespuesta = () => {
+    if (respondido || !seleccion) return
     setRespondido(true)
-    setAnswers(prev => [...prev, { questionId: questions[currentIdx].id, selected: op }])
+    setAnswers(prev => [...prev, { questionId: questions[currentIdx].id, selected: seleccion }])
   }
 
   const siguiente = () => {
@@ -175,7 +179,7 @@ export default function SimuladorRealPage() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        {[`#${q.id}`, q.categoria, q.dificultad].map(b => (
+        {[`#${q.id}`, q.categoria].map(b => (
           <span key={b} style={{ backgroundColor: '#1e293b', color: '#94a3b8', padding: '3px 10px', borderRadius: 10, fontSize: '0.72rem' }}>{b}</span>
         ))}
       </div>
@@ -186,13 +190,17 @@ export default function SimuladorRealPage() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
         {q.opciones.map((op, i) => (
-          <button key={i} onClick={() => responder(op)} disabled={respondido}
-            style={{ width: '100%', padding: '14px 16px', borderRadius: 12, fontSize: op.length > 80 ? '0.82rem' : '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: seleccion === op && respondido ? '#1e3a5f' : '#1e293b', border: seleccion === op && respondido ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', userSelect: 'none' }}>
+          <button key={i} onClick={() => seleccionar(op)} disabled={respondido}
+            style={{ width: '100%', padding: '14px 16px', borderRadius: 12, fontSize: op.length > 80 ? '0.82rem' : '0.95rem', textAlign: 'left', cursor: respondido ? 'default' : 'pointer', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: seleccion === op ? '#1e3a5f' : '#1e293b', border: seleccion === op ? '2px solid #3b82f6' : '1px solid #475569', color: '#e2e8f0', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', userSelect: 'none' }}>
             <span style={{ fontWeight: 'bold', marginRight: 10, color: respondido ? 'inherit' : '#f87171' }}>{String.fromCharCode(65 + i)})</span>
             {op}
           </button>
         ))}
       </div>
+
+      {seleccion && !respondido && (
+        <button onClick={confirmarRespuesta} style={{ ...S.btnRed, marginBottom: 12 }}>Confirmar respuesta</button>
+      )}
 
       {respondido && (
         <button onClick={siguiente} style={S.btnRed}>

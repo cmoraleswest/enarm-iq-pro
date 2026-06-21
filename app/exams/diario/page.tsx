@@ -18,6 +18,7 @@ export default function DiarioPage() {
   const [currentResult, setCurrentResult] = useState<AnswerResult | null>(null)
   const [resultSessionId, setResultSessionId] = useState('')
   const [error, setError]               = useState('')
+  const [seleccion, setSeleccion]       = useState<string | null>(null)
 
   const startExam = async () => {
     setPhase('loading')
@@ -61,8 +62,14 @@ export default function DiarioPage() {
     return () => window.removeEventListener('beforeunload', handler)
   }, [phase, questions.length])
 
-  const responder = async (selected: string) => {
+  const seleccionar = (op: string) => {
     if (currentResult) return
+    setSeleccion(op)
+  }
+
+  const confirmar = async () => {
+    if (currentResult || !seleccion) return
+    const selected = seleccion
     const q = questions[currentIdx]
     const newAnswers = [...answers, { questionId: q.id, selected }]
     setAnswers(newAnswers)
@@ -107,6 +114,7 @@ export default function DiarioPage() {
     setCurrentIdx(i => i + 1)
     setCurrentResult(null)
     setJustifVisible(false)
+    setSeleccion(null)
   }
 
   if (phase === 'loading') return <LoadingScreen />
@@ -145,16 +153,18 @@ export default function DiarioPage() {
       </div>
 
       {/* Opciones */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
         {q.opciones.map((op, i) => {
           let bg = '#1e293b', border = '1px solid #475569', color = '#e2e8f0'
           if (currentResult) {
             if (op === currentResult.correcta) { bg = '#14532d'; border = '2px solid #4ade80'; color = '#bbf7d0' }
             else if (op === currentResult.selected && !currentResult.isCorrect) { bg = '#450a0a'; border = '2px solid #f87171'; color = '#fecaca' }
             else { border = '1px solid #334155'; color = '#64748b' }
+          } else if (seleccion === op) {
+            bg = '#1e3a5f'; border = '2px solid #00d9ff'
           }
           return (
-            <button key={i} onClick={() => responder(op)} disabled={!!currentResult}
+            <button key={i} onClick={() => seleccionar(op)} disabled={!!currentResult}
               style={{ width: '100%', padding: '14px 16px', borderRadius: 12, fontSize: op.length > 80 ? '0.82rem' : '0.95rem', textAlign: 'left', cursor: currentResult ? 'default' : 'pointer', transition: 'all 0.2s', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: '1.5', minHeight: 54, backgroundColor: bg, border, color, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', userSelect: 'none' }}>
               <span style={{ fontWeight: 'bold', marginRight: 10, color: currentResult ? 'inherit' : '#00d9ff' }}>{String.fromCharCode(65 + i)})</span>
               {op}
@@ -164,6 +174,14 @@ export default function DiarioPage() {
           )
         })}
       </div>
+
+      {/* Confirmar respuesta */}
+      {seleccion && !currentResult && (
+        <button onClick={confirmar} disabled={phase === 'submitting'}
+          style={{ width: '100%', padding: 16, background: phase === 'submitting' ? '#334155' : 'linear-gradient(135deg, #00d9ff, #3b82f6)', color: '#fff', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 'bold', cursor: phase === 'submitting' ? 'not-allowed' : 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif', minHeight: 54, marginBottom: 24, touchAction: 'manipulation' }}>
+          {phase === 'submitting' ? 'Calificando...' : 'Confirmar respuesta'}
+        </button>
+      )}
 
       {/* Justificación inmediata (solo en diario) */}
       {currentResult && (
@@ -216,7 +234,7 @@ function ProgressBar({ pct, color = '#00d9ff' }: { pct: number; color?: string }
 function Badges({ q }: { q: QuestionForClient }) {
   return (
     <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-      {[`#${q.id}`, q.categoria, q.dificultad].map(b => (
+      {[`#${q.id}`, q.categoria].map(b => (
         <span key={b} style={{ backgroundColor: '#1e293b', color: '#94a3b8', padding: '3px 10px', borderRadius: 10, fontSize: '0.72rem' }}>{b}</span>
       ))}
     </div>

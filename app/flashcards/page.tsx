@@ -249,7 +249,7 @@ export default function FlashcardsPage() {
           {/* Badges */}
           <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
             {esRepaso && <span style={{ backgroundColor: '#78350f', color: '#fbbf24', padding: '3px 10px', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 'bold' }}>REPASO</span>}
-            {[`#${pregunta.id}`, pregunta.categoria, pregunta.dificultad].map(b => (
+            {[`#${pregunta.id}`, pregunta.categoria].map(b => (
               <span key={b} style={{ backgroundColor: '#1e293b', color: '#94a3b8', padding: '3px 10px', borderRadius: '10px', fontSize: '0.72rem' }}>{b}</span>
             ))}
           </div>

@@ -82,9 +82,14 @@ export default function SimuladorPage() {
     }
   }
 
-  const responder = async (opcion: string) => {
+  const seleccionarOp = (opcion: string) => {
     if (respondido || !caso) return
     setSeleccion(opcion)
+  }
+
+  const confirmarRespuesta = async () => {
+    if (respondido || !caso || !seleccion) return
+    const opcion = seleccion
     setRespondido(true)
 
     try {
@@ -281,7 +286,7 @@ export default function SimuladorPage() {
           {caso && (
             <div>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                {[`#${caso.id}`, caso.categoria, caso.dificultad].map(b => (
+                {[`#${caso.id}`, caso.categoria].map(b => (
                   <span key={b} style={{ backgroundColor: '#1e293b', color: '#94a3b8', padding: '3px 10px', borderRadius: '10px', fontSize: '0.72rem' }}>{b}</span>
                 ))}
               </div>
@@ -294,7 +299,7 @@ export default function SimuladorPage() {
                 {caso.opciones.map((opcion, i) => {
                   const estado = estadoBoton(opcion)
                   return (
-                    <button key={i} onClick={() => responder(opcion)} style={{ ...estiloBoton(estado), touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', userSelect: 'none', fontSize: opcion.length > 80 ? '0.82rem' : '0.95rem', padding: '14px 16px' }}>
+                    <button key={i} onClick={() => seleccionarOp(opcion)} style={{ ...estiloBoton(estado), touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', userSelect: 'none', fontSize: opcion.length > 80 ? '0.82rem' : '0.95rem', padding: '14px 16px', ...(seleccion === opcion && !respondido ? { backgroundColor: '#1e3a5f', border: '2px solid #00d9ff' } : {}) }}>
                       <span style={{ fontWeight: 'bold', marginRight: '10px', color: estado === 'idle' ? '#00d9ff' : 'inherit' }}>
                         {String.fromCharCode(65 + i)})
                       </span>
@@ -305,6 +310,14 @@ export default function SimuladorPage() {
                   )
                 })}
               </div>
+
+              {/* Confirmar respuesta */}
+              {seleccion && !respondido && (
+                <button onClick={confirmarRespuesta}
+                  style={{ width: '100%', padding: 16, background: 'linear-gradient(135deg, #00d9ff, #3b82f6)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', fontFamily: 'DM Sans, Arial, sans-serif', minHeight: '54px', marginBottom: '16px', touchAction: 'manipulation' }}>
+                  Confirmar respuesta
+                </button>
+              )}
 
               {/* Justificación con fade-in */}
               {respondido && verifyResult && (
