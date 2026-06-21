@@ -234,6 +234,11 @@ function ProgressBar({ pct, color = '#00d9ff' }: { pct: number; color?: string }
 function Badges({ q }: { q: QuestionForClient }) {
   return (
     <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+      {q.casoOrder && q.casoTotal && (
+        <span style={{ backgroundColor: '#312e81', color: '#a5b4fc', padding: '3px 10px', borderRadius: 10, fontSize: '0.72rem', fontWeight: 'bold' }}>
+          Seriada {q.casoOrder}/{q.casoTotal}
+        </span>
+      )}
       {[`#${q.id}`, q.categoria].map(b => (
         <span key={b} style={{ backgroundColor: '#1e293b', color: '#94a3b8', padding: '3px 10px', borderRadius: 10, fontSize: '0.72rem' }}>{b}</span>
       ))}

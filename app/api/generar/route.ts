@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
 import { getSession } from '@/lib/session'
 import { loadBanco, shuffle } from '@/lib/exam-utils'
 import { rateLimit, redis } from '@/lib/rate-limit'
@@ -25,7 +27,7 @@ export async function POST(request: Request) {
     }
   }
 
-  const body = await request.json() as { action?: string; categoria?: string; questionId?: number }
+  const body = await request.json() as { action?: string; categoria?: string; questionId?: number; mode?: string }
   const action = body.action ?? 'generate'
 
   if (action === 'reveal') {
@@ -55,6 +57,19 @@ export async function POST(request: Request) {
 
   if (!await rateLimit(`generar:${session.uid}`, 60, 60_000)) {
     return NextResponse.json({ error: 'Demasiadas solicitudes.' }, { status: 429 })
+  }
+
+  if (body.mode === 'short') {
+    try {
+      const flashRaw = fs.readFileSync(path.join(process.cwd(), 'data', 'flashcards_cortas.json'), 'utf-8')
+      const flashcards = JSON.parse(flashRaw) as { id: number; pregunta: string; respuesta: string; categoria: string }[]
+      const pool = body.categoria ? flashcards.filter(f => f.categoria === body.categoria) : flashcards
+      if (!pool.length) return NextResponse.json({ error: 'No hay flashcards.' }, { status: 404 })
+      const f = pool[Math.floor(Math.random() * pool.length)]
+      return NextResponse.json({ id: f.id, pregunta: f.pregunta, respuesta: f.respuesta, categoria: f.categoria, mode: 'short' })
+    } catch {
+      return NextResponse.json({ error: 'Error al cargar flashcards.' }, { status: 500 })
+    }
   }
 
   try {

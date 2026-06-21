@@ -63,6 +63,8 @@ export function loadBanco(): QuestionFull[] {
     dificultad: string
     idioma?: string
     casoId?: string
+    casoOrder?: number
+    casoTotal?: number
   }>
 
   _banco = data.map(q => {
@@ -77,6 +79,8 @@ export function loadBanco(): QuestionFull[] {
       dificultad: q.dificultad,
       ...(q.idioma && { idioma: q.idioma as 'es' | 'en' }),
       ...(q.casoId && { casoId: q.casoId }),
+      ...(q.casoOrder && { casoOrder: q.casoOrder }),
+      ...(q.casoTotal && { casoTotal: q.casoTotal }),
     }
   })
 
@@ -102,7 +106,7 @@ export function selectDiagnosticQuestions(): QuestionFull[] {
     selected.push(...shuffle(pool).slice(0, 36))
   }
 
-  return shuffle(selected)
+  return groupSerialCases(selected)
 }
 
 export function selectMixedQuestions(
@@ -113,7 +117,7 @@ export function selectMixedQuestions(
   const pool = specialties?.length
     ? banco.filter(q => specialties.includes(q.categoria))
     : banco
-  return shuffle(pool).slice(0, total)
+  return groupSerialCases(shuffle(pool).slice(0, total))
 }
 
 // CIFRHS 2025: 280 total, incluye ~30 en inglés
@@ -172,6 +176,8 @@ export function toClientQuestion(q: QuestionFull): QuestionForClient {
     dificultad: q.dificultad,
     ...(q.idioma && { idioma: q.idioma }),
     ...(q.casoId && { casoId: q.casoId }),
+    ...(q.casoOrder && { casoOrder: q.casoOrder }),
+    ...(q.casoTotal && { casoTotal: q.casoTotal }),
   }
 }
 

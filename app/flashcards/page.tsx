@@ -47,6 +47,8 @@ export default function FlashcardsPage() {
   const [respuestaVisible, setRespuestaVisible] = useState(false)
   const [respuestaServer, setRespuestaServer] = useState<RespuestaServer | null>(null)
   const [esRepaso, setEsRepaso] = useState(false)
+  const [modo, setModo] = useState<'caso' | 'rapido'>('rapido')
+  const [flashCorta, setFlashCorta] = useState<{ pregunta: string; respuesta: string; categoria: string } | null>(null)
 
   const totalUnicas = data.dominadas.length + data.porRepasar.length
   const pctDominio = totalUnicas > 0 ? Math.round((data.dominadas.length / totalUnicas) * 100) : 0
@@ -58,6 +60,27 @@ export default function FlashcardsPage() {
     setRespuestaVisible(false)
     setRespuestaServer(null)
     setEsRepaso(false)
+    setFlashCorta(null)
+
+    if (modo === 'rapido') {
+      try {
+        const res = await fetch('/api/generar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ mode: 'short', categoria: categoria === 'Todas' ? undefined : categoria }),
+        })
+        if (res.status === 401) { window.location.href = '/login'; return }
+        if (res.status === 402) { window.location.href = '/upgrade'; return }
+        const d = await res.json()
+        if (res.ok) {
+          setFlashCorta({ pregunta: d.pregunta, respuesta: d.respuesta, categoria: d.categoria })
+          setPregunta({ id: d.id, caso: d.pregunta, categoria: d.categoria, dificultad: '' })
+        }
+      } catch { /* fall through */ }
+      setCargando(false)
+      return
+    }
 
     // Si hay tarjetas por repasar, mostrar una de esas primero (cada 3 tarjetas o si no es nueva)
     const currentData = loadData()
@@ -101,17 +124,21 @@ export default function FlashcardsPage() {
 
   const voltear = async () => {
     if (!volteada && pregunta && !respuestaServer) {
-      try {
-        const res = await fetch('/api/generar', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'reveal', questionId: pregunta.id }),
-        })
-        const d = await res.json() as RespuestaServer
-        setRespuestaServer(d)
-      } catch {
-        return
+      if (flashCorta) {
+        setRespuestaServer({ isCorrect: true, correcta: flashCorta.respuesta, justificacion: '' })
+      } else {
+        try {
+          const res = await fetch('/api/generar', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'reveal', questionId: pregunta.id }),
+          })
+          const d = await res.json() as RespuestaServer
+          setRespuestaServer(d)
+        } catch {
+          return
+        }
       }
     }
     setVolteada(v => !v)
@@ -208,6 +235,16 @@ export default function FlashcardsPage() {
           </button>
         </div>
       )}
+
+      {/* Toggle modo */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        {[{ key: 'rapido' as const, label: '⚡ Dato rápido' }, { key: 'caso' as const, label: '📋 Caso clínico' }].map(m => (
+          <button key={m.key} onClick={() => { setModo(m.key); setPregunta(null); setFlashCorta(null) }}
+            style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${modo === m.key ? '#00d9ff' : '#1e293b'}`, backgroundColor: modo === m.key ? '#0d2847' : '#111827', color: modo === m.key ? '#00d9ff' : '#64748b', cursor: 'pointer', fontSize: '0.82rem', fontWeight: modo === m.key ? 'bold' : 'normal', fontFamily: 'DM Sans, Arial, sans-serif', touchAction: 'manipulation' }}>
+            {m.label}
+          </button>
+        ))}
+      </div>
 
       {/* Filtros */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>

@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/generar": ["./data/**/*"],
     "/api/exam":    ["./data/**/*"],
+    "/api/generar/[...slug]": ["./data/**/*"],
   },
   serverExternalPackages: ['firebase-admin', '@google-cloud/storage', 'google-auth-library'],
   async headers() {
