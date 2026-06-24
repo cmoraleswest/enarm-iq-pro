@@ -105,7 +105,7 @@ export default function DashboardPage() {
     )
   }
 
-  const isPaid = userInfo ? userInfo.isPaid : false
+  const isPaid = loading ? true : (userInfo ? userInfo.isPaid : false)
 
   return (
     <main style={S.main}>
